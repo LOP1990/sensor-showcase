@@ -341,14 +341,21 @@ input[type=range]::-moz-range-thumb { width: 30px; height: 30px; border-radius: 
 /* ---------- boas-vindas (config remota) ---------- */
 .ribbon { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 46vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(13px, 1.05vw, 17px); color: var(--glow); border: 1px solid rgba(255, 210, 122, .45); background: rgba(5, 7, 11, .55); padding: 6px 16px; border-radius: 999px; font-family: 'Noto Sans JP', var(--font); }
 .ribbon[hidden] { display: none; }
-.welcome { position: absolute; left: var(--pad); bottom: clamp(60px, 10vh, 120px); max-width: 48vw; font-family: 'Noto Sans JP', var(--font); }
+.welcome { position: absolute; left: var(--pad); bottom: clamp(50px, 8vh, 100px); max-width: 50vw; font-family: 'Noto Sans JP', var(--font); }
 .welcome[hidden] { display: none; }
 body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display: none; }
 .w-from { color: var(--glow); font-size: clamp(15px, 1.25vw, 21px); letter-spacing: .02em; margin-bottom: 10px; }
-.w-head { font-size: clamp(56px, 7.2vw, 120px); font-weight: 700; line-height: 1; letter-spacing: .02em; color: var(--plat-2); }
-.w-name { font-size: clamp(30px, 3.4vw, 56px); font-weight: 700; line-height: 1.15; margin-top: 10px; color: var(--text); }
-.w-msg { font-weight: 450; color: var(--text-2); font-size: clamp(16px, 1.45vw, 24px); line-height: 1.7; margin-top: 14px; max-width: 30em; }
-.w-en { font-family: var(--font); color: var(--text-2); font-size: clamp(15px, 1.25vw, 20px); margin-top: 10px; }
+.w-from[hidden] { display: none; }
+.w-head { font-size: clamp(48px, 5.6vw, 96px); font-weight: 700; line-height: 1.05; letter-spacing: .02em; color: var(--plat-2); }
+.w-name { margin-top: 6px; color: var(--text); }
+.w-head2 { font-family: var(--font); font-size: clamp(22px, 2.3vw, 38px); font-weight: 600; font-stretch: 106%; color: var(--plat); margin-bottom: clamp(10px, 1.6vh, 20px); letter-spacing: -.01em; }
+.w-guest { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; row-gap: 2px; padding: clamp(5px, .8vh, 10px) 0; border-top: 1px solid var(--line); }
+.w-guest:last-child { border-bottom: 1px solid var(--line); }
+.w-guest .g-name { font-size: clamp(22px, 2.3vw, 38px); font-weight: 700; line-height: 1.2; }
+.w-guest .g-alt { font-family: var(--font); font-size: clamp(14px, 1.15vw, 19px); color: var(--text-3); font-weight: 500; }
+.w-guest .g-meta { flex-basis: 100%; font-family: var(--font); font-size: clamp(13px, 1.05vw, 17px); color: var(--text-2); }
+.w-msg { font-weight: 450; color: var(--text-2); font-size: clamp(16px, 1.35vw, 22px); line-height: 1.7; margin-top: 14px; max-width: 32em; }
+.w-en { font-family: var(--font); color: var(--text-2); font-size: clamp(14px, 1.15vw, 19px); line-height: 1.5; margin-top: 8px; max-width: 46em; }
 .w-pt { font-family: var(--font); color: var(--text-3); font-size: clamp(13px, 1vw, 16px); margin-top: 6px; }
 .w-voice { display: inline-flex; align-items: center; gap: 10px; margin-top: 20px; padding: 12px 22px; border-radius: 999px; border: 1px solid rgba(255, 210, 122, .55); color: var(--glow); font-size: clamp(14px, 1.15vw, 19px); font-weight: 600; min-height: 50px; font-family: 'Noto Sans JP', var(--font); pointer-events: auto; }
 .w-voice:active, .w-voice.playing { background: rgba(255, 210, 122, .16); }
@@ -558,7 +565,7 @@ body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display:
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.07-1102</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.07-1111</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -5258,7 +5265,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.07-1102';
+const BUILD = '2026.11.07-1111';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -5334,6 +5341,19 @@ const Welcome = {
     if (w.until && d > w.until) return false;
     return true;
   },
+  guests() {
+    const w = this.cfg;
+    if (Array.isArray(w.guests) && w.guests.length) return w.guests.filter((g) => g && (g.name || g.native));
+    if (w.guest || w.guestNative) return [{ name: w.guest, native: w.guestNative, title: w.title, honorific: w.honorific, company: w.company, country: w.country, countryNative: w.countryNative }];
+    return [];
+  },
+  langs() { const w = this.cfg; return Array.isArray(w.languages) && w.languages.length ? w.languages : [w.lang || 'ja']; },
+  countryName(a2) { const c = a2 ? countryByA2.get(a2) : null; return c ? (LANG === 'pt' ? c.pt : c.en) : ''; },
+  spotList() {
+    const seen = new Map();
+    this.guests().forEach((g) => { if (g.country && !seen.has(g.country)) seen.set(g.country, { a2: g.country, label: [g.countryNative, this.countryName(g.country)].filter(Boolean).join(' · ') }); });
+    return [...seen.values()];
+  },
   apply(w) {
     const was = this.active;
     this.cfg = w || {}; this.active = this.isActive(w);
@@ -5341,41 +5361,43 @@ const Welcome = {
     $('#welcome').hidden = !this.active;
     $('#ribbon').hidden = !this.active;
     $('#tap-label').textContent = this.active ? T('tapWelcome') : T('tap');
-    Globe.spotlight(this.active ? (w.country || null) : null, this.active ? this.countryLabel() : '');
+    Globe.spotlight(this.active ? this.spotList() : []);
     this.render();
     if (this.active && !was) { this.lastSpoke = 0; if (current === 'attract') this.onAttract(); }
     if (!this.active && this.audio) { try { this.audio.pause(); } catch (e) {} }
   },
-  countryLabel() {
-    const w = this.cfg; const c = w.country ? countryByA2.get(w.country) : null;
-    if (!c) return '';
-    return (w.countryNative ? w.countryNative + ' · ' : '') + (LANG === 'pt' ? c.pt : c.en);
-  },
-  nameLine() {
-    const w = this.cfg;
-    const native = w.guestNative && w.guestNative.trim();
-    const hon = w.honorific || '';
-    return native ? `${native} ${hon}`.trim() : `${w.guest || ''} ${hon}`.trim();
+  guestName(g) {
+    const native = g.native && g.native.trim();
+    const hon = (g.honorific || '').trim();
+    if (native) return `${native} ${hon}`.trim();
+    if (hon) return `${g.name || ''} ${hon}`.trim();          // "Keiju Wakatsuki 様" — o sufixo substitui o Mr.
+    return `${g.title ? g.title + ' ' : ''}${g.name || ''}`.trim();
   },
   render() {
     if (!this.active) return;
-    const w = this.cfg;
-    const pick = (o, fallback) => (o == null ? fallback || '' : typeof o === 'string' ? o : (o[w.lang] || o.ja || o.en || o.pt || fallback || ''));
-    const company = w.company || '';
-    $('#w-from').textContent = [company, w.countryNative, (w.country && countryByA2.get(w.country) ? (LANG === 'pt' ? countryByA2.get(w.country).pt : countryByA2.get(w.country).en) : '')].filter(Boolean).join(' · ');
-    $('#w-head').textContent = pick(w.headline, 'ようこそ');
-    $('#w-name').textContent = this.nameLine();
-    $('#w-msg').textContent = pick(w.message, '');
-    const en = w.lineEn || (w.guest ? `Welcome to Sensor Technology, ${w.title ? w.title + ' ' : ''}${w.guest}${company ? ' · ' + company : ''}.` : '');
-    $('#w-en').textContent = en;
+    const w = this.cfg, langs = this.langs(), guests = this.guests();
+    const tx = (o, lang) => (o == null ? '' : typeof o === 'string' ? o : (o[lang] || ''));
+    const HEAD = { ja: 'ようこそ', de: 'Herzlich willkommen', en: 'Welcome', pt: 'Bem-vindos', es: 'Bienvenidos', fr: 'Bienvenue', it: 'Benvenuti', zh: '欢迎', ko: '환영합니다' };
+    const heads = langs.map((l) => tx(w.headline, l) || HEAD[l] || HEAD.en);
+    const companies = [...new Set(guests.map((g) => g.company).filter(Boolean))];
+    $('#w-from').textContent = w.eyebrow || ''; $('#w-from').hidden = !w.eyebrow;
+    const head = $('#w-head'); head.textContent = heads[0]; head.lang = langs[0];
+    const rest = heads.slice(1).join(' · ');
+    $('#w-name').innerHTML = (rest ? `<div class="w-head2">${rest}</div>` : '') + guests.map((g) => {
+      const meta = [g.role, g.company, g.countryNative, this.countryName(g.country)].filter(Boolean).join(' · ');
+      const alt = g.native && g.name ? ` <span class="g-alt">${g.name}</span>` : '';
+      return `<div class="w-guest"><span class="g-name" lang="${g.lang || (g.native ? langs[0] : 'en')}">${this.guestName(g)}</span>${alt}<span class="g-meta">${meta}</span></div>`;
+    }).join('');
+    const msgs = langs.map((l) => ({ l, t: tx(w.message, l) })).filter((m) => m.t);
+    const first = msgs[0]; $('#w-msg').textContent = first ? first.t : ''; $('#w-msg').lang = first ? first.l : langs[0];
+    $('#w-en').innerHTML = msgs.slice(1).map((m) => `<span lang="${m.l}">${m.t}</span>`).join('<br>');
     $('#w-pt').textContent = w.linePt || '';
     const voice = w.voice || {};
     const hasVoice = voice.mode !== 'off' && (voice.audio || voice.text);
     $('#w-voice').hidden = !hasVoice;
-    $('#w-voice-label').textContent = voice.buttonLabel || (w.lang === 'ja' ? '音声メッセージを再生' : T('voiceBtn'));
-    const rib = w.ribbon || `${pick(w.headline, 'ようこそ')} ${this.nameLine()}${company ? ' · ' + company : ''}`;
-    $('#ribbon').textContent = rib;
-    $('#ribbon').lang = w.lang || 'ja';
+    $('#w-voice-label').textContent = voice.buttonLabel || T('voiceBtn');
+    $('#ribbon').textContent = w.ribbon || heads.join(' · ');
+    $('#ribbon').lang = langs[0];
   },
   onAttract() {
     if (!this.active) return;
@@ -5760,39 +5782,42 @@ const Globe = (function () {
     globe.add(line);
     arcs.push({ line, curve, N, phase: (i * 0.618) % 1, speed: 0.11 + 0.05 * Math.random(), delay: 0.25 + (i / exportCountries.length) * 2.2, a2: c.a2, spot: false });
   });
-  // Destaque de um país (boas-vindas): pontos e arco em dourado, rótulo fixo
-  let spot = null;
+  // Destaque de países (boas-vindas): pontos e arcos em dourado; o globo vira de um para o outro
+  let spots = [], spotCur = 0, spotT = 0, rotTarget = null;
+  const SPOT_SECONDS = 9;
   function recolorArc(a, gold) {
     const col = a.line.geometry.attributes.color.array, N = a.N;
     const from = gold ? cGold : cA, to = gold ? new THREE.Color(0xfff1c2) : cB;
     for (let k = 0; k <= N; k++) { const cc = from.clone().lerp(to, k / N); col[k * 3] = cc.r; col[k * 3 + 1] = cc.g; col[k * 3 + 2] = cc.b; }
     a.line.geometry.attributes.color.needsUpdate = true; a.spot = gold;
   }
-  function spotlight(a2, label) {
-    const c = a2 ? countryByA2.get(a2) : null;
-    const next = c ? { a2, i: c.i, label: label || '', c } : null;
-    if ((spot && spot.a2) === (next && next.a2)) { if (spot && next) spot.label = next.label; if (labelEl && spot) labelEl.textContent = spot.label; return; }
-    spot = next;
+  function spotlight(list) {
+    const next = (Array.isArray(list) ? list : (list ? [{ a2: list }] : [])).map((x) => Object.assign({}, x, { c: countryByA2.get(x.a2) })).filter((x) => x.c);
+    const same = next.length === spots.length && next.every((x, i) => x.a2 === spots[i].a2);
+    if (same) { spots.forEach((x, i) => { x.label = next[i].label; }); if (labelEl && tourCountry && spots[spotCur]) labelEl.textContent = spots[spotCur].label || labelEl.textContent; return; }
+    spots = next;
+    const set = new Set(spots.map((x) => x.c.i)), setA2 = new Set(spots.map((x) => x.a2));
     if (dotsGeo) {
       const arr = dotsGeo.attributes.color.array, sz = dotsGeo.attributes.aSize.array;
       for (let k = 0; k < dotN; k++) {
         const ci = dotIdx[k];
         let col = ci === brIdx ? cBr : exportIdx.has(ci) ? cHi : cDim;
-        let s = ci === brIdx ? 1.35 : exportIdx.has(ci) ? 1.15 : 0.9;
-        if (spot && ci === spot.i) { col = cGold; s = 1.4; }
-        arr[k * 3] = col.r; arr[k * 3 + 1] = col.g; arr[k * 3 + 2] = col.b; sz[k] = s;
+        let sc = ci === brIdx ? 1.35 : exportIdx.has(ci) ? 1.15 : 0.9;
+        if (set.has(ci)) { col = cGold; sc = 1.4; }
+        arr[k * 3] = col.r; arr[k * 3 + 1] = col.g; arr[k * 3 + 2] = col.b; sz[k] = sc;
       }
       dotsGeo.attributes.color.needsUpdate = true; dotsGeo.attributes.aSize.needsUpdate = true;
     }
-    arcs.forEach((a) => { const g = !!spot && a.a2 === spot.a2; if (g !== a.spot) recolorArc(a, g); });
-    active.material.color.setHex(spot ? 0xffd27a : 0xffffff);
-    tourT = 0; tourCountry = null;
-    faceSpot();
+    arcs.forEach((a) => { const g = setA2.has(a.a2); if (g !== a.spot) recolorArc(a, g); });
+    active.material.color.setHex(spots.length ? 0xffd27a : 0xffffff);
+    spotCur = 0; spotT = 0; tourT = 0; tourCountry = null; rotTarget = null;
+    faceSpot(true);
   }
-  function faceSpot() {
-    if (!spot) return;
-    const v = latLon(spot.c.lat, spot.c.lon, 1);
-    globe.rotation.y = Math.atan2(-v.x, v.z) - 0.3; // país virado para o visitante, um pouco à esquerda do centro
+  function faceSpot(instant) {
+    if (!spots.length) { rotTarget = null; return; }
+    const sp = spots[spotCur]; const v = latLon(sp.c.lat, sp.c.lon, 1);
+    rotTarget = Math.atan2(-v.x, v.z) - 0.3; // país virado para o visitante, um pouco à esquerda do centro
+    if (instant) globe.rotation.y = rotTarget;
     vel = 0;
   }
 
@@ -5820,7 +5845,7 @@ const Globe = (function () {
     else if (m === 'world') { offXT = wide ? -0.2 : -0.05; offYT = 0.05; distT = 4.7; brightT = 1; pitchT = 0.16; }
     else { offXT = wide ? -0.47 : -0.3; offYT = 0.04; distT = 3.4; brightT = 0.3; pitchT = 0.25; }
     if (m === 'attract' && revealT0 < 0) revealT0 = performance.now();
-    if (m === 'attract') { revealT0 = performance.now(); arcs.forEach((a) => a.line.geometry.setDrawRange(0, 0)); faceSpot(); }
+    if (m === 'attract') { revealT0 = performance.now(); arcs.forEach((a) => a.line.geometry.setDrawRange(0, 0)); if (spots.length) { spotCur = 0; tourCountry = null; faceSpot(true); } }
     if (labelEl) { labelEl.classList.remove('on'); }
   }
   function resize() {
@@ -5842,13 +5867,17 @@ const Globe = (function () {
   const tmp = new THREE.Vector3();
   function tour(now) {
     if (!exportCountries.length) return;
-    if (spot && tourCountry !== spot.c) {
-      tourCountry = spot.c; tourT = now;
-      const v = latLon(spot.c.lat, spot.c.lon, R * 1.004);
-      active.geometry.attributes.position.set([v.x, v.y, v.z]); active.geometry.attributes.position.needsUpdate = true;
-      ensureLabel().textContent = spot.label || L({ pt: spot.c.pt, en: spot.c.en });
-      if (mode === 'world') World.highlight(spot.a2);
-    } else if (!spot && now - tourT > D.kiosk.tourSeconds * 1000 && !dragging) {
+    if (spots.length) {
+      if (!tourCountry || (now - spotT > SPOT_SECONDS * 1000 && !dragging)) {
+        if (tourCountry) spotCur = (spotCur + 1) % spots.length;
+        const sp = spots[spotCur]; tourCountry = sp.c; spotT = now; tourT = now;
+        const v = latLon(sp.c.lat, sp.c.lon, R * 1.004);
+        active.geometry.attributes.position.set([v.x, v.y, v.z]); active.geometry.attributes.position.needsUpdate = true;
+        ensureLabel().textContent = sp.label || L({ pt: sp.c.pt, en: sp.c.en });
+        if (mode === 'world') World.highlight(sp.a2);
+        faceSpot(false);
+      }
+    } else if (now - tourT > D.kiosk.tourSeconds * 1000 && !dragging) {
       tourT = now; tourI = (tourI + 1) % exportCountries.length; tourCountry = exportCountries[tourI];
       const v = latLon(tourCountry.lat, tourCountry.lon, R * 1.004);
       active.geometry.attributes.position.set([v.x, v.y, v.z]); active.geometry.attributes.position.needsUpdate = true;
@@ -5878,7 +5907,14 @@ const Globe = (function () {
     if (dotMat) dotMat.uniforms.bright.value = 0.35 + 0.65 * bright;
     camera.position.z = dist; camera.lookAt(0, 0, 0);
     root.rotation.x = pitch;
-    if (!dragging) { globe.rotation.y += ((spot ? 0.018 : 0.045) + vel * 18) * dt; vel *= Math.pow(0.02, dt); }
+    if (!dragging) {
+      if (spots.length && rotTarget != null) {
+        rotTarget += 0.012 * dt; // deriva lenta enquanto encara o país
+        let dr = rotTarget - globe.rotation.y; dr = Math.atan2(Math.sin(dr), Math.cos(dr));
+        globe.rotation.y += dr * (1 - Math.pow(0.25, dt));
+      } else { globe.rotation.y += (0.045 + vel * 18) * dt; }
+      vel *= Math.pow(0.02, dt);
+    }
     atm.material.uniforms.col.value.setHex(0xbfd3e6).multiplyScalar(bright);
     // arcos: revelação progressiva + pulsos
     const tr = revealT0 < 0 ? 99 : (now - revealT0) / 1000;
@@ -5886,7 +5922,7 @@ const Globe = (function () {
     arcs.forEach((a, i) => {
       const k = clamp((tr - a.delay) / 1.4, 0, 1);
       a.line.geometry.setDrawRange(0, Math.floor(ease(k) * (a.N + 1)));
-      a.line.material.opacity = (a.spot ? 1 : (spot ? 0.3 : 0.5)) * bright;
+      a.line.material.opacity = (a.spot ? 1 : (spots.length ? 0.3 : 0.5)) * bright;
       const t = k >= 1 ? ((now * 0.001 * a.speed + a.phase) % 1) : 0;
       const p = a.curve.getPoint(t);
       pp[i * 3] = p.x; pp[i * 3 + 1] = p.y; pp[i * 3 + 2] = p.z;
@@ -5898,7 +5934,7 @@ const Globe = (function () {
     renderer.render(scene, camera);
   }
   window.addEventListener('resize', resize); resize();
-  return { setMode, render, resize, spotlight };
+  return { setMode, render, resize, spotlight, debug: () => ({ spots: spots.map((x) => x.a2), spotCur, tour: tourCountry && tourCountry.a2, rotY: globe.rotation.y, rotTarget }) };
 })();
 
 /* ------------------------------------------------------------

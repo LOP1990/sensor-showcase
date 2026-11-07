@@ -1,33 +1,31 @@
 {
-  "defaultLang": "pt",
+  "defaultLang": "en",
   "welcome": {
-    "enabled": false,
-    "from": "",
-    "until": "",
-    "lang": "ja",
-    "title": "Mr.",
-    "guest": "Keiju Wakatsuki",
-    "guestNative": "",
-    "honorific": "様",
-    "company": "OGG",
-    "country": "JP",
-    "countryNative": "日本",
-    "headline": { "ja": "ようこそ", "en": "Welcome", "pt": "Bem-vindo" },
+    "enabled": true,
+    "from": "2026-11-09",
+    "until": "2026-11-13",
+    "languages": ["ja", "de", "en"],
+    "eyebrow": "",
+    "guests": [
+      { "name": "Jörn Lützen", "title": "Dr.", "native": "", "honorific": "", "role": "CEO", "company": "Innovative Sensor Technology IST AG", "country": "CH", "countryNative": "Schweiz", "lang": "de" },
+      { "name": "Keiju Wakatsuki", "title": "Mr.", "native": "", "honorific": "様", "role": "", "company": "OGG Co., Ltd.", "country": "JP", "countryNative": "日本", "lang": "ja" },
+      { "name": "Shun Takeshita", "title": "Mr.", "native": "", "honorific": "様", "role": "", "company": "OGG Co., Ltd.", "country": "JP", "countryNative": "日本", "lang": "ja" }
+    ],
+    "headline": { "ja": "ようこそ", "de": "Herzlich willkommen", "en": "Welcome" },
     "message": {
       "ja": "センサー・テクノロジーへお越しいただき、誠にありがとうございます。皆様を心より歓迎いたします。",
-      "en": "Thank you for visiting Sensor Technology. It is an honour to welcome you.",
-      "pt": "Obrigado pela visita à Sensor Technology. É uma honra recebê-los."
+      "de": "Wir freuen uns sehr über Ihren Besuch bei Sensor Technology und heißen Sie herzlich willkommen.",
+      "en": "Thank you for visiting Sensor Technology. It is an honour to welcome you to Diadema."
     },
-    "lineEn": "",
-    "linePt": "Boas-vindas ao nosso principal distribuidor no Japão",
+    "linePt": "Boas-vindas aos nossos parceiros do Japão e da Suíça",
     "ribbon": "",
     "voice": {
       "mode": "auto",
       "audio": "audio/welcome-ja.mp3",
-      "text": "若月様、ようこそお越しくださいました。センサー・テクノロジー一同、オージージーの皆様を心より歓迎いたします。遠いブラジルまでお越しいただき、誠にありがとうございます。どうぞごゆっくりお過ごしください。",
+      "text": "若月様、竹下様、ようこそお越しくださいました。センサー・テクノロジー一同、オージージーの皆様を心より歓迎いたします。遠いブラジルまでお越しいただき、誠にありがとうございます。どうぞごゆっくりお過ごしください。",
       "lang": "ja-JP",
       "everyMinutes": 15,
-      "buttonLabel": "音声メッセージを再生"
+      "buttonLabel": "音声メッセージを再生 · Play greeting"
     }
   },
   "videos": {

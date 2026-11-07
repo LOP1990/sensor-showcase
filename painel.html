@@ -42,6 +42,12 @@ details { margin-top: 10px; } summary { cursor: pointer; color: var(--plat); }
 .hint { font-size: 13px; color: var(--text-3); margin-top: 6px; }
 ol { padding-left: 20px; color: var(--text-2); } li { margin-bottom: 6px; }
 .ja { font-family: 'Noto Sans JP', system-ui, sans-serif; }
+.guest { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-top: 10px; background: var(--surface-2); }
+.guest .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.guest label { margin-top: 8px; font-size: 13px; }
+.guest .rm { float: right; font: inherit; font-size: 13px; color: var(--bad); background: none; border: 0; cursor: pointer; }
+.lang-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.lang-chips label { display: inline-flex; align-items: center; gap: 6px; margin: 0; padding: 8px 12px; border: 1px solid var(--line-2); border-radius: 999px; color: var(--text); font-size: 14px; }
 </style>
 </head>
 <body>
@@ -55,31 +61,25 @@ ol { padding-left: 20px; color: var(--text-2); } li { margin-bottom: 6px; }
     <div><label for="w-from">Liga a partir de (opcional)</label><input type="date" id="w-from"></div>
     <div><label for="w-until">Desliga depois de (opcional)</label><input type="date" id="w-until"></div>
   </div>
-  <div class="row">
-    <div><label for="w-guest">Convidado (letras latinas)</label><input type="text" id="w-guest" placeholder="Keiju Wakatsuki"></div>
-    <div><label for="w-native">Nome no idioma dele (kanji)</label><input type="text" id="w-native" class="ja" placeholder="若月 啓樹"></div>
+  <label>Idiomas da saudação (o primeiro vira o título grande)</label>
+  <div class="lang-chips" id="w-langs">
+    <label><input type="checkbox" value="ja"> Japonês</label>
+    <label><input type="checkbox" value="de"> Alemão</label>
+    <label><input type="checkbox" value="en"> Inglês</label>
+    <label><input type="checkbox" value="es"> Espanhol</label>
+    <label><input type="checkbox" value="pt"> Português</label>
   </div>
-  <div class="row">
-    <div><label for="w-title">Tratamento (EN)</label><input type="text" id="w-title" placeholder="Mr."></div>
-    <div><label for="w-hon">Tratamento no idioma dele</label><input type="text" id="w-hon" class="ja" placeholder="様"></div>
-  </div>
-  <div class="row">
-    <div><label for="w-company">Empresa</label><input type="text" id="w-company" placeholder="OGG"></div>
-    <div><label for="w-country">País (código)</label><input type="text" id="w-country" placeholder="JP" maxlength="2" style="text-transform:uppercase"></div>
-  </div>
-  <div class="row">
-    <div><label for="w-cnative">País no idioma dele</label><input type="text" id="w-cnative" class="ja" placeholder="日本"></div>
-    <div><label for="w-lang">Idioma da saudação</label><select id="w-lang"><option value="ja">Japonês</option><option value="en">Inglês</option><option value="pt">Português</option></select></div>
-  </div>
-  <label for="w-head">Título grande (no idioma da saudação)</label><input type="text" id="w-head" class="ja" placeholder="ようこそ">
-  <label for="w-msg">Mensagem (no idioma da saudação)</label><textarea id="w-msg" class="ja"></textarea>
-  <label for="w-en">Linha em inglês (vazio = automática)</label><input type="text" id="w-en" placeholder="Welcome to Sensor Technology, Mr. Keiju Wakatsuki · OGG.">
+  <label>Convidados</label>
+  <div id="guests"></div>
+  <button type="button" class="btn secondary" id="btn-add-guest" style="margin-top:10px">+ convidado</button>
+  <div id="msgs"></div>
   <label for="w-pt">Linha em português (para a equipe)</label><input type="text" id="w-pt">
   <div class="row">
     <div><label for="v-mode">Voz</label><select id="v-mode"><option value="auto">Automática + botão</option><option value="button">Só pelo botão</option><option value="off">Desligada</option></select></div>
     <div><label for="v-every">Repetir automática a cada (min)</label><input type="number" id="v-every" min="1" max="240" value="15"></div>
   </div>
   <label for="v-audio">Arquivo de áudio (no repositório)</label><input type="text" id="v-audio" placeholder="audio/welcome-ja.mp3">
+  <label for="v-text">Texto falado (usado se o áudio não existir; gera a voz pelo Android)</label><textarea id="v-text" class="ja"></textarea>
   <div style="margin-top:10px"><button type="button" class="btn secondary" id="btn-voice">▶ Ouvir a voz</button> <a class="btn secondary" style="display:inline-block;text-decoration:none" id="btn-preview" href="index.html?preview=welcome" target="_blank">Pré-visualizar a tela</a></div>
 </div>
 
@@ -141,14 +141,45 @@ ol { padding-left: 20px; color: var(--text-2); } li { margin-bottom: 6px; }
     } catch (e) { st('Não consegui carregar: ' + e.message, 'bad'); if (!cfg) cfg = { welcome: {}, videos: {} }; }
     fill();
   }
+  const LANGN = { ja: 'Japonês', de: 'Alemão', en: 'Inglês', es: 'Espanhol', pt: 'Português' };
+  const HEADS = { ja: 'ようこそ', de: 'Herzlich willkommen', en: 'Welcome', es: 'Bienvenidos', pt: 'Bem-vindos' };
+  function guestRow(g, i) {
+    const d = document.createElement('div'); d.className = 'guest'; d.dataset.i = i;
+    d.innerHTML = `<button type="button" class="rm">remover</button><b>Convidado ${i + 1}</b>
+      <div class="row3"><div><label>Tratamento</label><input type="text" data-k="title" placeholder="Mr. / Dr."></div><div><label>Nome (letras latinas)</label><input type="text" data-k="name"></div><div><label>Nome nativo (kanji…)</label><input type="text" data-k="native" class="ja"></div></div>
+      <div class="row3"><div><label>Sufixo nativo</label><input type="text" data-k="honorific" class="ja" placeholder="様"></div><div><label>Cargo</label><input type="text" data-k="role" placeholder="CEO"></div><div><label>Empresa</label><input type="text" data-k="company"></div></div>
+      <div class="row3"><div><label>País (código)</label><input type="text" data-k="country" maxlength="2" style="text-transform:uppercase"></div><div><label>País no idioma dele</label><input type="text" data-k="countryNative" class="ja" placeholder="日本 / Schweiz"></div><div><label>Idioma do nome</label><select data-k="lang"><option value="ja">Japonês</option><option value="de">Alemão</option><option value="en">Inglês</option><option value="es">Espanhol</option><option value="pt">Português</option></select></div></div>`;
+    d.querySelectorAll('[data-k]').forEach((el) => { el.value = g[el.dataset.k] || (el.tagName === 'SELECT' ? 'en' : ''); });
+    d.querySelector('.rm').addEventListener('click', () => { d.remove(); renumber(); });
+    return d;
+  }
+  function renumber() { document.querySelectorAll('#guests .guest').forEach((d, i) => { d.querySelector('b').textContent = 'Convidado ' + (i + 1); }); }
+  function renderMsgs(langs, w) {
+    const box = $('#msgs'); box.innerHTML = '';
+    langs.forEach((l) => {
+      const head = (w.headline && typeof w.headline === 'object' ? w.headline[l] : '') || HEADS[l] || '';
+      const msg = (w.message && typeof w.message === 'object' ? w.message[l] : '') || '';
+      const d = document.createElement('div');
+      d.innerHTML = `<label>Título em ${LANGN[l] || l}</label><input type="text" data-head="${l}" class="ja" value=""><label>Mensagem em ${LANGN[l] || l}</label><textarea data-msg="${l}" class="ja"></textarea>`;
+      d.querySelector('[data-head]').value = head; d.querySelector('[data-msg]').value = msg;
+      box.appendChild(d);
+    });
+  }
+  function selectedLangs() { return [...document.querySelectorAll('#w-langs input:checked')].map((i) => i.value); }
+  document.querySelectorAll('#w-langs input').forEach((i) => i.addEventListener('change', () => renderMsgs(selectedLangs(), collectPartial())));
+  function collectPartial() { const w = Object.assign({}, cfg.welcome || {}); const h = {}, m = {}; document.querySelectorAll('[data-head]').forEach((el) => { h[el.dataset.head] = el.value; }); document.querySelectorAll('[data-msg]').forEach((el) => { m[el.dataset.msg] = el.value; }); w.headline = Object.assign({}, w.headline || {}, h); w.message = Object.assign({}, w.message || {}, m); return w; }
+  $('#btn-add-guest').addEventListener('click', () => { $('#guests').appendChild(guestRow({ lang: 'en' }, document.querySelectorAll('#guests .guest').length)); });
   function fill() {
     const w = cfg.welcome || {}, v = w.voice || {}, vd = cfg.videos || {};
-    const pick = (o) => (o == null ? '' : typeof o === 'string' ? o : (o[w.lang || 'ja'] || o.ja || o.en || o.pt || ''));
     $('#w-enabled').checked = !!w.enabled; $('#w-from').value = w.from || ''; $('#w-until').value = w.until || '';
-    $('#w-guest').value = w.guest || ''; $('#w-native').value = w.guestNative || ''; $('#w-title').value = w.title || ''; $('#w-hon').value = w.honorific || '';
-    $('#w-company').value = w.company || ''; $('#w-country').value = w.country || ''; $('#w-cnative').value = w.countryNative || ''; $('#w-lang').value = w.lang || 'ja';
-    $('#w-head').value = pick(w.headline); $('#w-msg').value = pick(w.message); $('#w-en').value = w.lineEn || ''; $('#w-pt').value = w.linePt || '';
+    const langs = Array.isArray(w.languages) && w.languages.length ? w.languages : [w.lang || 'ja'];
+    document.querySelectorAll('#w-langs input').forEach((i) => { i.checked = langs.includes(i.value); });
+    const guests = Array.isArray(w.guests) && w.guests.length ? w.guests : (w.guest ? [{ name: w.guest, native: w.guestNative, title: w.title, honorific: w.honorific, company: w.company, country: w.country, countryNative: w.countryNative, lang: w.lang }] : []);
+    const gb = $('#guests'); gb.innerHTML = ''; guests.forEach((g, i) => gb.appendChild(guestRow(g, i)));
+    renderMsgs(langs, w);
+    $('#w-pt').value = w.linePt || '';
     $('#v-mode').value = v.mode || 'auto'; $('#v-every').value = v.everyMinutes || 15; $('#v-audio').value = v.audio || '';
+    $('#v-text').value = v.text || '';
     $('#vd-enabled').checked = !!vd.enabled; $('#vd-every').value = vd.everySeconds || 75; $('#vd-lang').value = cfg.defaultLang || 'pt';
     const items = (vd.items || []);
     $('#vd-list').textContent = items.length ? 'Vídeos publicados: ' + items.map((i) => (i.title && (i.title.pt || i.title.en)) || i.src).join(' · ') : 'Nenhum vídeo publicado ainda — envie os arquivos que eu os incluo no repositório.';
@@ -162,14 +193,13 @@ ol { padding-left: 20px; color: var(--text-2); } li { margin-bottom: 6px; }
     $('#pill-cfg').textContent = 'config: ' + (sha ? 'repositório' : 'publicada');
   }
   function collect() {
-    const w = Object.assign({}, cfg.welcome || {}); const lang = $('#w-lang').value;
+    const w = collectPartial();
     w.enabled = $('#w-enabled').checked; w.from = $('#w-from').value; w.until = $('#w-until').value;
-    w.guest = $('#w-guest').value.trim(); w.guestNative = $('#w-native').value.trim(); w.title = $('#w-title').value.trim(); w.honorific = $('#w-hon').value.trim();
-    w.company = $('#w-company').value.trim(); w.country = $('#w-country').value.trim().toUpperCase(); w.countryNative = $('#w-cnative').value.trim(); w.lang = lang;
-    w.headline = Object.assign({}, typeof w.headline === 'object' ? w.headline : {}, { [lang]: $('#w-head').value.trim() });
-    w.message = Object.assign({}, typeof w.message === 'object' ? w.message : {}, { [lang]: $('#w-msg').value.trim() });
-    w.lineEn = $('#w-en').value.trim(); w.linePt = $('#w-pt').value.trim();
-    w.voice = Object.assign({}, w.voice || {}, { mode: $('#v-mode').value, everyMinutes: +$('#v-every').value || 15, audio: $('#v-audio').value.trim() });
+    w.languages = selectedLangs().length ? selectedLangs() : ['en']; w.lang = w.languages[0];
+    w.guests = [...document.querySelectorAll('#guests .guest')].map((d) => { const g = {}; d.querySelectorAll('[data-k]').forEach((el) => { g[el.dataset.k] = el.value.trim(); }); g.country = (g.country || '').toUpperCase(); return g; }).filter((g) => g.name || g.native);
+    delete w.guest; delete w.guestNative; delete w.title; delete w.honorific; delete w.company; delete w.country; delete w.countryNative; delete w.lineEn;
+    w.linePt = $('#w-pt').value.trim();
+    w.voice = Object.assign({}, w.voice || {}, { mode: $('#v-mode').value, everyMinutes: +$('#v-every').value || 15, audio: $('#v-audio').value.trim(), text: $('#v-text').value.trim() });
     const vd = Object.assign({}, cfg.videos || {}, { enabled: $('#vd-enabled').checked, everySeconds: +$('#vd-every').value || 75 });
     return Object.assign({}, cfg, { defaultLang: $('#vd-lang').value, welcome: w, videos: vd });
   }
