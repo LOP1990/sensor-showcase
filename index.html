@@ -102,6 +102,9 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
   z-index: 20;
 }
 .brand { display: flex; align-items: center; gap: 12px; }
+.brand-logo { display: block; height: clamp(44px, 5.8vh, 66px); width: auto; }
+.brand-fallback { display: flex; align-items: center; gap: 12px; }
+.brand-fallback[hidden] { display: none; }
 .brand-mark { width: 14px; height: 14px; border-radius: 50%; background: var(--plat-2);
   box-shadow: 0 0 0 4px rgba(191, 211, 230, .18), 0 0 24px rgba(191, 211, 230, .35); }
 .brand-name { font-size: clamp(15px, 1.15vw, 19px); font-weight: 600; font-stretch: 110%; letter-spacing: .02em; }
@@ -369,7 +372,7 @@ body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display:
 .video-layer[hidden] { display: none; }
 .video-layer video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .video-layer .vcap { position: absolute; left: var(--pad); bottom: clamp(40px, 7vh, 80px); display: flex; flex-direction: column; gap: 6px; text-shadow: 0 2px 12px rgba(0, 0, 0, .7); }
-.video-layer .vcap-brand { font-size: clamp(13px, 1vw, 16px); color: var(--plat); letter-spacing: .02em; }
+.video-layer .vcap-logo { height: clamp(28px, 3.4vh, 44px); width: auto; display: block; margin-bottom: 4px; }
 .video-layer #vcap-title { font-size: clamp(22px, 2.4vw, 40px); font-weight: 600; font-stretch: 106%; color: var(--text); }
 
 </style>
@@ -383,7 +386,8 @@ body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display:
 <div id="app">
   <header id="top">
     <button id="brand" class="brand" type="button" aria-label="Sensor Technology">
-      <span class="brand-mark"></span><span class="brand-name">Sensor Technology</span>
+      <img class="brand-logo" src="logo.png" alt="Sensor Technology" draggable="false" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+      <span class="brand-fallback" hidden><span class="brand-mark"></span><span class="brand-name">Sensor Technology</span></span>
     </button>
     <div id="ribbon" class="ribbon" hidden></div>
     <div class="top-right">
@@ -568,7 +572,7 @@ body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display:
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.07-1142</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.07-1145</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -576,7 +580,7 @@ body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display:
   <div id="toast" class="toast"></div>
   <div id="video-layer" class="video-layer" hidden>
     <video id="video-el" muted playsinline preload="auto"></video>
-    <div class="vcap"><span class="vcap-brand">Sensor Technology</span><span id="vcap-title"></span></div>
+    <div class="vcap"><img class="vcap-logo" src="logo.png" alt="Sensor Technology" draggable="false"><span id="vcap-title"></span></div>
   </div>
   <audio id="welcome-audio" preload="auto"></audio>
 </div>
@@ -5268,7 +5272,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.07-1142';
+const BUILD = '2026.11.07-1145';
 const Updater = {
   pending: null, failures: 0,
   start() {
