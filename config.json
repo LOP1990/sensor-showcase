@@ -2,7 +2,7 @@
   "defaultLang": "en",
   "welcome": {
     "enabled": true,
-    "from": "2026-11-09",
+    "from": "2026-11-07",
     "until": "2026-11-13",
     "languages": [
       "ja",
@@ -21,7 +21,7 @@
         "country": "CH",
         "countryNative": "Schweiz",
         "lang": "de",
-        "photo": ""
+        "photo": "photos/joern-luetzen.jpg"
       },
       {
         "name": "Keiju Wakatsuki",
@@ -33,7 +33,7 @@
         "country": "JP",
         "countryNative": "日本",
         "lang": "ja",
-        "photo": ""
+        "photo": "photos/keiju-wakatsuki.jpg"
       },
       {
         "name": "Shun Takeshita",
