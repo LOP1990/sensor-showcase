@@ -1,0 +1,18 @@
+APP DE DEMONSTRAÇÃO — SENSOR TECHNOLOGY
+Pasta pronta para hospedar (GitHub Pages, droplet/Caddy ou qualquer servidor estático).
+
+Arquivos
+  index.html            o app inteiro (fonte, Three.js, mapa e código embutidos)
+  version.json          versão publicada — o tablet confere a cada 2 min e recarrega sozinho quando muda
+  manifest.webmanifest  torna o app instalável em tela cheia (PWA)
+  sw.js                 cache offline: o tablet abre o app mesmo sem internet
+  icons/                ícones do app
+  .nojekyll             necessário no GitHub Pages (evita que ele ignore arquivos)
+
+Para atualizar
+  Substitua TODOS os arquivos pela versão nova (index.html + version.json + sw.js mudam a cada build).
+  O tablet troca sozinho em até ~2 minutos, quando ninguém estiver usando.
+
+Para editar o conteúdo
+  Tudo fica no bloco SENSOR_DATA no começo do index.html (textos PT/EN, países, história, clientes, produtos).
+  Depois de editar, mude também o valor de "version" no version.json (qualquer texto diferente) para o tablet recarregar.
