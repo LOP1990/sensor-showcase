@@ -341,7 +341,7 @@ input[type=range]::-moz-range-thumb { width: 30px; height: 30px; border-radius: 
 /* ---------- boas-vindas (config remota) ---------- */
 .ribbon { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 46vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(13px, 1.05vw, 17px); color: var(--glow); border: 1px solid rgba(255, 210, 122, .45); background: rgba(5, 7, 11, .55); padding: 6px 16px; border-radius: 999px; font-family: 'Noto Sans JP', var(--font); }
 .ribbon[hidden] { display: none; }
-.welcome { position: absolute; left: var(--pad); bottom: clamp(44px, 7vh, 90px); max-width: 50vw; max-height: calc(100vh - var(--top-h) - 9vh); overflow: hidden; font-family: 'Noto Sans JP', var(--font); }
+.welcome { position: absolute; left: calc(var(--pad) - 8px); padding-left: 8px; bottom: clamp(44px, 7vh, 90px); max-width: calc(50vw + 8px); max-height: calc(100vh - var(--top-h) - 9vh); overflow: hidden; font-family: 'Noto Sans JP', var(--font); }
 .welcome[hidden] { display: none; }
 body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display: none; }
 .w-from { color: var(--glow); font-size: clamp(15px, 1.25vw, 21px); letter-spacing: .02em; margin-bottom: 10px; }
@@ -568,7 +568,7 @@ body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display:
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.07-1117</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.07-1142</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -5268,7 +5268,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.07-1117';
+const BUILD = '2026.11.07-1142';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -5359,6 +5359,7 @@ const Welcome = {
   },
   apply(w) {
     const was = this.active;
+    const hadVoice = !!(this.cfg.voice && (this.cfg.voice.audio || this.cfg.voice.text));
     this.cfg = w || {}; this.active = this.isActive(w);
     document.body.classList.toggle('welcome-on', this.active);
     $('#welcome').hidden = !this.active;
@@ -5366,7 +5367,7 @@ const Welcome = {
     $('#tap-label').textContent = this.active ? T('tapWelcome') : T('tap');
     Globe.spotlight(this.active ? this.spotList() : []);
     this.render();
-    if (this.active && !was) { this.lastSpoke = 0; if (current === 'attract') this.onAttract(); }
+    if (this.active && (!was || !hadVoice)) { this.lastSpoke = 0; if (current === 'attract') this.onAttract(); }
     if (!this.active && this.audio) { try { this.audio.pause(); } catch (e) {} }
   },
   guestName(g) {
@@ -5409,8 +5410,22 @@ const Welcome = {
     const voice = this.cfg.voice || {};
     if (voice.mode !== 'auto') return;
     const every = (voice.everyMinutes || 10) * 60000;
-    if (performance.now() - this.lastSpoke < every) return;
+    if (this.lastSpoke && performance.now() - this.lastSpoke < every) return;
     setTimeout(() => { if (current === 'attract' && Welcome.active) Welcome.speak(true); }, 1800);
+  },
+  onMotion() {
+    // Disparado pelo Fully quando a câmera detecta alguém se aproximando (Motion Detection + JavaScript Interface)
+    if (!this.active || current !== 'attract') return;
+    const voice = this.cfg.voice || {};
+    if (voice.mode !== 'auto') return;
+    const cool = (voice.motionMinutes == null ? 3 : +voice.motionMinutes) * 60000;
+    if (this.lastSpoke && performance.now() - this.lastSpoke < cool) return;
+    this.speak(true);
+  },
+  pendingAuto: false,
+  unlock() {
+    // Primeiro toque do dia: destrava o áudio no WebView e toca o que ficou pendente
+    if (this.pendingAuto) { this.pendingAuto = false; this.speak(true); }
   },
   speak(auto) {
     const voice = this.cfg.voice || {};
@@ -5418,11 +5433,19 @@ const Welcome = {
     const done = () => btn.classList.remove('playing');
     this.lastSpoke = performance.now();
     if (voice.audio) {
+      const abs = new URL(voice.audio, location.href).href;
+      try {
+        if (window.fully && typeof fully.playSound === 'function') { fully.playSound(abs, false); btn.classList.add('playing'); setTimeout(done, 30000); return; }
+      } catch (e) {}
       const a = this.audio || (this.audio = $('#welcome-audio'));
       if (a.getAttribute('src') !== voice.audio) a.src = voice.audio;
       a.currentTime = 0; btn.classList.add('playing');
       a.onended = done; a.onerror = () => { done(); if (!auto) Welcome.speakTts(voice); };
-      a.play().catch(() => { done(); if (!auto) Welcome.speakTts(voice); });
+      a.play().then(() => { Welcome.pendingAuto = false; }).catch((err) => {
+        done();
+        if (auto && err && err.name === 'NotAllowedError') { Welcome.pendingAuto = true; Welcome.lastSpoke = 0; return; } // sem gesto ainda: toca no primeiro toque
+        if (!auto) Welcome.speakTts(voice);
+      });
       return;
     }
     this.speakTts(voice);
@@ -5707,6 +5730,54 @@ const Globe = (function () {
   }));
   globe.add(occ);
 
+  // Terra realista — Blue Marble (dia), Black Marble (luzes noturnas), máscara de água e nuvens.
+  // Carrega as texturas em segundo plano; se faltarem (arquivo solto, offline no 1º uso), fica a malha de pontos.
+  let earthMat = null, cloudsMesh = null, texturesOk = false, dotsObj = null;
+  const SUN = new THREE.Vector3(-0.72, 0.38, 0.42).normalize(); // sol fixo em relação à câmera: dia à esquerda, noite à direita
+  (function buildEarth() {
+    if (location.protocol === 'file:') return;
+    const loader = new THREE.TextureLoader();
+    const load = (src, srgb) => new Promise((res, rej) => loader.load(src, (t) => { if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); res(t); }, undefined, rej));
+    Promise.all([load('textures/earth-day.webp', true), load('textures/earth-night.webp', true), load('textures/earth-water.webp', false)]).then(([day, night, water]) => {
+      earthMat = new THREE.ShaderMaterial({
+        uniforms: { dayMap: { value: day }, nightMap: { value: night }, waterMap: { value: water }, sunDir: { value: SUN }, bright: { value: 1 } },
+        vertexShader: 'varying vec2 vUv; varying vec3 vN; varying vec3 vP; void main(){ vUv = uv; vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vP = mv.xyz; gl_Position = projectionMatrix * mv; }',
+        fragmentShader: [
+          'uniform sampler2D dayMap; uniform sampler2D nightMap; uniform sampler2D waterMap; uniform vec3 sunDir; uniform float bright;',
+          'varying vec2 vUv; varying vec3 vN; varying vec3 vP;',
+          'void main(){',
+          '  vec3 n = normalize(vN); vec3 v = normalize(-vP);',
+          '  float ndl = dot(n, sunDir);',
+          '  float light = smoothstep(-0.12, 0.32, ndl);',
+          '  vec3 day = texture2D(dayMap, vUv).rgb;',
+          '  vec3 night = texture2D(nightMap, vUv).rgb;',
+          '  float water = texture2D(waterMap, vUv).r;',
+          '  vec3 h = normalize(sunDir + v);',
+          '  float spec = pow(max(dot(n, h), 0.0), 48.0) * water * 0.45 * light;',
+          '  float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0);',
+          '  vec3 col = day * (0.06 + 1.05 * light) + night * (1.0 - light) * vec3(1.15, 1.05, 0.85) + vec3(spec);',
+          '  col += vec3(0.28, 0.5, 0.85) * rim * (0.35 + 0.4 * light);',
+          '  gl_FragColor = vec4(col * bright, 1.0);',
+          '  #include <colorspace_fragment>',
+          '}',
+        ].join('\n'),
+      });
+      const earth = new THREE.Mesh(new THREE.SphereGeometry(R * 0.999, 96, 96), earthMat);
+      earth.renderOrder = -1;
+      globe.add(earth); occ.visible = false; texturesOk = true;
+      if (dotsObj) dotsObj.visible = false;
+      load('textures/earth-clouds.webp', true).then((ct) => {
+        cloudsMesh = new THREE.Mesh(new THREE.SphereGeometry(R * 1.012, 72, 72), new THREE.ShaderMaterial({
+          uniforms: { map: { value: ct }, sunDir: { value: SUN }, bright: { value: 1 } },
+          vertexShader: 'varying vec2 vUv; varying vec3 vN; void main(){ vUv = uv; vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+          fragmentShader: 'uniform sampler2D map; uniform vec3 sunDir; uniform float bright; varying vec2 vUv; varying vec3 vN; void main(){ float a = texture2D(map, vUv).a; float l = 0.08 + 0.95 * smoothstep(-0.15, 0.4, dot(normalize(vN), sunDir)); gl_FragColor = vec4(vec3(l) * bright, a * 0.9); }',
+          transparent: true, depthWrite: false,
+        }));
+        globe.add(cloudsMesh);
+      }).catch(() => {});
+    }).catch(() => { /* sem texturas: mantém a malha de pontos */ });
+  })();
+
   // Atmosfera
   const atm = new THREE.Mesh(new THREE.SphereGeometry(R * 1.08, 64, 64), new THREE.ShaderMaterial({
     uniforms: { col: { value: new THREE.Color(0xbfd3e6) } },
@@ -5746,8 +5817,10 @@ const Globe = (function () {
       fragmentShader: 'uniform sampler2D map; uniform float bright; varying vec3 vC; void main(){ vec4 t = texture2D(map, gl_PointCoord); if (t.a < 0.08) discard; gl_FragColor = vec4(vC * bright, t.a); }',
       transparent: true, depthWrite: false, vertexColors: true,
     });
-    globe.add(new THREE.Points(geo, mat));
+    dotsObj = new THREE.Points(geo, mat);
+    globe.add(dotsObj);
     dotMat = mat; dotsGeo = geo;
+    if (texturesOk) dotsObj.visible = false;
   })();
 
   // Marcadores dos países de exportação e da origem
@@ -5920,14 +5993,17 @@ const Globe = (function () {
       } else { globe.rotation.y += (0.045 + vel * 18) * dt; }
       vel *= Math.pow(0.02, dt);
     }
-    atm.material.uniforms.col.value.setHex(0xbfd3e6).multiplyScalar(bright);
+    atm.material.uniforms.col.value.setHex(texturesOk ? 0x7fb4ee : 0xbfd3e6).multiplyScalar(bright);
+    const eb = Math.pow(bright, 1.6);
+    if (earthMat) earthMat.uniforms.bright.value = 0.1 + 0.9 * eb;
+    if (cloudsMesh) { cloudsMesh.rotation.y += 0.004 * dt; cloudsMesh.material.uniforms.bright.value = 0.1 + 0.9 * eb; }
     // arcos: revelação progressiva + pulsos
     const tr = revealT0 < 0 ? 99 : (now - revealT0) / 1000;
     const pp = pulses.geometry.attributes.position.array;
     arcs.forEach((a, i) => {
       const k = clamp((tr - a.delay) / 1.4, 0, 1);
       a.line.geometry.setDrawRange(0, Math.floor(ease(k) * (a.N + 1)));
-      a.line.material.opacity = (a.spot ? 1 : (spots.length ? 0.3 : 0.5)) * bright;
+      a.line.material.opacity = (a.spot ? 1 : (spots.length ? 0.35 : (texturesOk ? 0.7 : 0.5))) * bright;
       const t = k >= 1 ? ((now * 0.001 * a.speed + a.phase) % 1) : 0;
       const p = a.curve.getPoint(t);
       pp[i * 3] = p.x; pp[i * 3 + 1] = p.y; pp[i * 3 + 2] = p.z;
@@ -6277,6 +6353,8 @@ go('attract');
 requestAnimationFrame(loop);
 $('#video-layer').addEventListener('pointerup', () => { Videos.stop(false); go('home'); });
 $('#w-voice').addEventListener('click', () => Welcome.speak(false));
+document.addEventListener('pointerdown', () => Welcome.unlock(), { passive: true });
+try { if (window.fully && typeof fully.bind === 'function') fully.bind('onMotion', 'window.SensorApp && window.SensorApp.Welcome.onMotion();'); } catch (e) {}
 RemoteConfig.start();
 Updater.start();
 window.SensorApp = { go, setLang, Viewer, Globe, Welcome, Videos, RemoteConfig, data: D, build: BUILD, checkUpdate: () => Updater.check() };
