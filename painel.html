@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Painel · Sensor Technology</title>
+<style>
+:root { color-scheme: dark; --bg: #05070B; --surface: #10161F; --surface-2: #151D28; --line: rgba(191,211,230,.16); --line-2: rgba(191,211,230,.3); --text: #EFECE6; --text-2: #B3BDCA; --text-3: #76829A; --plat: #BFD3E6; --plat-2: #E8F1FB; --glow: #FFD27A; --ok: #7FD4A6; --bad: #FF8A80; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 16px; line-height: 1.45; }
+body { padding: max(16px, env(safe-area-inset-left)) ; padding-block: 20px 60px; max-width: 720px; margin: 0 auto; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 17px; margin: 28px 0 10px; color: var(--plat-2); }
+p { margin: 0 0 10px; color: var(--text-2); }
+.sub { color: var(--text-3); font-size: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-top: 12px; }
+label { display: block; font-size: 14px; color: var(--text-2); margin: 12px 0 6px; }
+input[type=text], input[type=date], input[type=number], select, textarea { width: 100%; font: inherit; color: var(--text); background: var(--surface-2); border: 1px solid var(--line-2); border-radius: 10px; padding: 12px 14px; min-height: 46px; }
+textarea { min-height: 90px; resize: vertical; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.switch { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+.switch:first-child { border-top: 0; padding-top: 0; }
+.switch b { font-weight: 600; }
+.switch small { display: block; color: var(--text-3); font-weight: 400; }
+.toggle { position: relative; width: 54px; height: 32px; flex: none; }
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle span { position: absolute; inset: 0; background: #2A3442; border-radius: 999px; transition: background .2s; }
+.toggle span::after { content: ''; position: absolute; left: 3px; top: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; transition: transform .2s; }
+.toggle input:checked + span { background: var(--ok); }
+.toggle input:checked + span::after { transform: translateX(22px); }
+.btn { font: inherit; font-weight: 600; color: var(--bg); background: var(--plat); border: 0; border-radius: 999px; padding: 14px 22px; min-height: 48px; cursor: pointer; }
+.btn.secondary { background: transparent; color: var(--text); border: 1px solid var(--line-2); }
+.btn:disabled { opacity: .5; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; position: sticky; bottom: 0; background: linear-gradient(180deg, transparent, var(--bg) 30%); padding: 14px 0 6px; }
+.status { font-size: 14px; color: var(--text-3); margin-top: 10px; min-height: 20px; }
+.status.ok { color: var(--ok); } .status.bad { color: var(--bad); }
+.pill { display: inline-block; font-size: 13px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--text-2); }
+.pill.on { color: var(--ok); border-color: rgba(127,212,166,.5); }
+code { background: var(--surface-2); padding: 1px 6px; border-radius: 6px; font-size: 14px; }
+details { margin-top: 10px; } summary { cursor: pointer; color: var(--plat); }
+.hint { font-size: 13px; color: var(--text-3); margin-top: 6px; }
+ol { padding-left: 20px; color: var(--text-2); } li { margin-bottom: 6px; }
+.ja { font-family: 'Noto Sans JP', system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Painel do app de demonstração</h1>
+<p class="sub">Muda o que o tablet da recepção mostra, de qualquer lugar. O tablet relê a configuração a cada minuto; a publicação leva até 2 minutos.</p>
+<div id="state" class="card"><span class="pill" id="pill-w">boas-vindas: …</span> <span class="pill" id="pill-v">vídeos: …</span> <span class="pill" id="pill-cfg">config: carregando</span></div>
+
+<div class="card">
+  <div class="switch"><div><b>Tela de boas-vindas</b><small>Substitui a tela de atração pela saudação ao convidado</small></div><label class="toggle"><input type="checkbox" id="w-enabled"><span></span></label></div>
+  <div class="row">
+    <div><label for="w-from">Liga a partir de (opcional)</label><input type="date" id="w-from"></div>
+    <div><label for="w-until">Desliga depois de (opcional)</label><input type="date" id="w-until"></div>
+  </div>
+  <div class="row">
+    <div><label for="w-guest">Convidado (letras latinas)</label><input type="text" id="w-guest" placeholder="Keiju Wakatsuki"></div>
+    <div><label for="w-native">Nome no idioma dele (kanji)</label><input type="text" id="w-native" class="ja" placeholder="若月 啓樹"></div>
+  </div>
+  <div class="row">
+    <div><label for="w-title">Tratamento (EN)</label><input type="text" id="w-title" placeholder="Mr."></div>
+    <div><label for="w-hon">Tratamento no idioma dele</label><input type="text" id="w-hon" class="ja" placeholder="様"></div>
+  </div>
+  <div class="row">
+    <div><label for="w-company">Empresa</label><input type="text" id="w-company" placeholder="OGG"></div>
+    <div><label for="w-country">País (código)</label><input type="text" id="w-country" placeholder="JP" maxlength="2" style="text-transform:uppercase"></div>
+  </div>
+  <div class="row">
+    <div><label for="w-cnative">País no idioma dele</label><input type="text" id="w-cnative" class="ja" placeholder="日本"></div>
+    <div><label for="w-lang">Idioma da saudação</label><select id="w-lang"><option value="ja">Japonês</option><option value="en">Inglês</option><option value="pt">Português</option></select></div>
+  </div>
+  <label for="w-head">Título grande (no idioma da saudação)</label><input type="text" id="w-head" class="ja" placeholder="ようこそ">
+  <label for="w-msg">Mensagem (no idioma da saudação)</label><textarea id="w-msg" class="ja"></textarea>
+  <label for="w-en">Linha em inglês (vazio = automática)</label><input type="text" id="w-en" placeholder="Welcome to Sensor Technology, Mr. Keiju Wakatsuki · OGG.">
+  <label for="w-pt">Linha em português (para a equipe)</label><input type="text" id="w-pt">
+  <div class="row">
+    <div><label for="v-mode">Voz</label><select id="v-mode"><option value="auto">Automática + botão</option><option value="button">Só pelo botão</option><option value="off">Desligada</option></select></div>
+    <div><label for="v-every">Repetir automática a cada (min)</label><input type="number" id="v-every" min="1" max="240" value="15"></div>
+  </div>
+  <label for="v-audio">Arquivo de áudio (no repositório)</label><input type="text" id="v-audio" placeholder="audio/welcome-ja.mp3">
+  <div style="margin-top:10px"><button type="button" class="btn secondary" id="btn-voice">▶ Ouvir a voz</button> <a class="btn secondary" style="display:inline-block;text-decoration:none" id="btn-preview" href="index.html?preview=welcome" target="_blank">Pré-visualizar a tela</a></div>
+</div>
+
+<div class="card">
+  <div class="switch"><div><b>Vídeos na tela de atração</b><small>Intercala os vídeos institucionais com o globo, sem som</small></div><label class="toggle"><input type="checkbox" id="vd-enabled"><span></span></label></div>
+  <div class="row">
+    <div><label for="vd-every">Intervalo entre vídeos (segundos de globo)</label><input type="number" id="vd-every" min="20" max="900" value="75"></div>
+    <div><label for="vd-lang">Idioma padrão do app</label><select id="vd-lang"><option value="pt">Português</option><option value="en">Inglês</option></select></div>
+  </div>
+  <div id="vd-list" class="hint"></div>
+</div>
+
+<div class="card">
+  <h2 style="margin-top:0">Acesso para salvar</h2>
+  <p class="sub">O painel grava a configuração no repositório do GitHub com um token seu. O token fica guardado só neste navegador.</p>
+  <label for="token">Token do GitHub (fine-grained, só o repositório sensor-showcase, permissão Contents: Read and write)</label>
+  <input type="text" id="token" placeholder="github_pat_…" autocomplete="off">
+  <details><summary>Como criar o token (2 minutos)</summary>
+    <ol>
+      <li>GitHub → foto do perfil → <b>Settings</b> → <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.</li>
+      <li>Nome: <code>painel-showcase</code>; expiração: 1 ano; Repository access: <b>Only select repositories</b> → <code>sensor-showcase</code>.</li>
+      <li>Permissions → Repository permissions → <b>Contents: Read and write</b>. Generate e cole aqui.</li>
+    </ol>
+  </details>
+</div>
+
+<div class="actions">
+  <button type="button" class="btn" id="btn-save">Salvar e publicar</button>
+  <button type="button" class="btn secondary" id="btn-reload">Recarregar do servidor</button>
+</div>
+<div class="status" id="status"></div>
+
+<script>
+(function () {
+  const OWNER = 'LOP1990', REPO = 'sensor-showcase', PATH = 'config.json', BRANCH = 'main';
+  const $ = (s) => document.querySelector(s);
+  let cfg = null, sha = null;
+  const st = (msg, cls) => { const el = $('#status'); el.textContent = msg; el.className = 'status ' + (cls || ''); };
+  const tokenKey = 'showcase-token';
+  try { $('#token').value = localStorage.getItem(tokenKey) || ''; } catch (e) {}
+  $('#token').addEventListener('change', () => { try { localStorage.setItem(tokenKey, $('#token').value.trim()); } catch (e) {} });
+
+  async function load() {
+    st('Carregando…');
+    try {
+      // Lê pela API (tem o sha necessário para salvar); se não houver token, lê o arquivo publicado
+      const tok = $('#token').value.trim();
+      if (tok) {
+        const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}?ref=${BRANCH}`, { headers: { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json' } });
+        if (!r.ok) throw new Error('GitHub respondeu ' + r.status + (r.status === 401 ? ' (token inválido)' : ''));
+        const j = await r.json(); sha = j.sha;
+        cfg = JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g, '')))));
+        st('Configuração carregada do repositório.', 'ok');
+      } else {
+        const r = await fetch('config.json?t=' + Date.now(), { cache: 'no-store' });
+        cfg = await r.json(); sha = null;
+        st('Configuração publicada carregada. Para salvar, informe o token.', '');
+      }
+    } catch (e) { st('Não consegui carregar: ' + e.message, 'bad'); if (!cfg) cfg = { welcome: {}, videos: {} }; }
+    fill();
+  }
+  function fill() {
+    const w = cfg.welcome || {}, v = w.voice || {}, vd = cfg.videos || {};
+    const pick = (o) => (o == null ? '' : typeof o === 'string' ? o : (o[w.lang || 'ja'] || o.ja || o.en || o.pt || ''));
+    $('#w-enabled').checked = !!w.enabled; $('#w-from').value = w.from || ''; $('#w-until').value = w.until || '';
+    $('#w-guest').value = w.guest || ''; $('#w-native').value = w.guestNative || ''; $('#w-title').value = w.title || ''; $('#w-hon').value = w.honorific || '';
+    $('#w-company').value = w.company || ''; $('#w-country').value = w.country || ''; $('#w-cnative').value = w.countryNative || ''; $('#w-lang').value = w.lang || 'ja';
+    $('#w-head').value = pick(w.headline); $('#w-msg').value = pick(w.message); $('#w-en').value = w.lineEn || ''; $('#w-pt').value = w.linePt || '';
+    $('#v-mode').value = v.mode || 'auto'; $('#v-every').value = v.everyMinutes || 15; $('#v-audio').value = v.audio || '';
+    $('#vd-enabled').checked = !!vd.enabled; $('#vd-every').value = vd.everySeconds || 75; $('#vd-lang').value = cfg.defaultLang || 'pt';
+    const items = (vd.items || []);
+    $('#vd-list').textContent = items.length ? 'Vídeos publicados: ' + items.map((i) => (i.title && (i.title.pt || i.title.en)) || i.src).join(' · ') : 'Nenhum vídeo publicado ainda — envie os arquivos que eu os incluo no repositório.';
+    pills();
+  }
+  function pills() {
+    const w = cfg.welcome || {}; const today = new Date().toISOString().slice(0, 10);
+    const active = w.enabled && (!w.from || today >= w.from) && (!w.until || today <= w.until);
+    const pw = $('#pill-w'); pw.textContent = 'boas-vindas: ' + (active ? 'ATIVA agora' : w.enabled ? 'ligada, fora do período' : 'desligada'); pw.className = 'pill' + (active ? ' on' : '');
+    const pv = $('#pill-v'); pv.textContent = 'vídeos: ' + ((cfg.videos || {}).enabled ? 'ligados' : 'desligados'); pv.className = 'pill' + ((cfg.videos || {}).enabled ? ' on' : '');
+    $('#pill-cfg').textContent = 'config: ' + (sha ? 'repositório' : 'publicada');
+  }
+  function collect() {
+    const w = Object.assign({}, cfg.welcome || {}); const lang = $('#w-lang').value;
+    w.enabled = $('#w-enabled').checked; w.from = $('#w-from').value; w.until = $('#w-until').value;
+    w.guest = $('#w-guest').value.trim(); w.guestNative = $('#w-native').value.trim(); w.title = $('#w-title').value.trim(); w.honorific = $('#w-hon').value.trim();
+    w.company = $('#w-company').value.trim(); w.country = $('#w-country').value.trim().toUpperCase(); w.countryNative = $('#w-cnative').value.trim(); w.lang = lang;
+    w.headline = Object.assign({}, typeof w.headline === 'object' ? w.headline : {}, { [lang]: $('#w-head').value.trim() });
+    w.message = Object.assign({}, typeof w.message === 'object' ? w.message : {}, { [lang]: $('#w-msg').value.trim() });
+    w.lineEn = $('#w-en').value.trim(); w.linePt = $('#w-pt').value.trim();
+    w.voice = Object.assign({}, w.voice || {}, { mode: $('#v-mode').value, everyMinutes: +$('#v-every').value || 15, audio: $('#v-audio').value.trim() });
+    const vd = Object.assign({}, cfg.videos || {}, { enabled: $('#vd-enabled').checked, everySeconds: +$('#vd-every').value || 75 });
+    return Object.assign({}, cfg, { defaultLang: $('#vd-lang').value, welcome: w, videos: vd });
+  }
+  async function save() {
+    const tok = $('#token').value.trim();
+    if (!tok) { st('Informe o token do GitHub para salvar.', 'bad'); return; }
+    const next = collect();
+    $('#btn-save').disabled = true; st('Publicando…');
+    try {
+      if (!sha) { const r0 = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}?ref=${BRANCH}`, { headers: { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json' } }); if (r0.ok) sha = (await r0.json()).sha; }
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(next, null, 2) + '\n')));
+      const body = { message: 'painel: ' + (next.welcome.enabled ? 'boas-vindas ligada' : 'boas-vindas desligada') + (next.videos.enabled ? ', vídeos ligados' : ''), content, branch: BRANCH };
+      if (sha) body.sha = sha;
+      const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`, { method: 'PUT', headers: { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (!r.ok) { const t = await r.text(); throw new Error('GitHub respondeu ' + r.status + ': ' + t.slice(0, 140)); }
+      const j = await r.json(); sha = j.content.sha; cfg = next; pills();
+      st('Publicado. O tablet aplica em até 2 minutos.', 'ok');
+    } catch (e) { st('Falhou: ' + e.message, 'bad'); }
+    $('#btn-save').disabled = false;
+  }
+  $('#btn-save').addEventListener('click', save);
+  $('#btn-reload').addEventListener('click', load);
+  $('#btn-voice').addEventListener('click', () => { const src = $('#v-audio').value.trim(); if (!src) return; const a = new Audio(src + '?t=' + Date.now()); a.play().catch(() => st('O navegador bloqueou o áudio; toque de novo.', 'bad')); });
+  load();
+})();
+</script>
+</body>
+</html>

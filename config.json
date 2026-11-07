@@ -1,0 +1,39 @@
+{
+  "defaultLang": "pt",
+  "welcome": {
+    "enabled": false,
+    "from": "",
+    "until": "",
+    "lang": "ja",
+    "title": "Mr.",
+    "guest": "Keiju Wakatsuki",
+    "guestNative": "",
+    "honorific": "様",
+    "company": "OGG",
+    "country": "JP",
+    "countryNative": "日本",
+    "headline": { "ja": "ようこそ", "en": "Welcome", "pt": "Bem-vindo" },
+    "message": {
+      "ja": "センサー・テクノロジーへお越しいただき、誠にありがとうございます。皆様を心より歓迎いたします。",
+      "en": "Thank you for visiting Sensor Technology. It is an honour to welcome you.",
+      "pt": "Obrigado pela visita à Sensor Technology. É uma honra recebê-los."
+    },
+    "lineEn": "",
+    "linePt": "Boas-vindas ao nosso principal distribuidor no Japão",
+    "ribbon": "",
+    "voice": {
+      "mode": "auto",
+      "audio": "audio/welcome-ja.mp3",
+      "text": "若月様、ようこそお越しくださいました。センサー・テクノロジー一同、オージージーの皆様を心より歓迎いたします。遠いブラジルまでお越しいただき、誠にありがとうございます。どうぞごゆっくりお過ごしください。",
+      "lang": "ja-JP",
+      "everyMinutes": 15,
+      "buttonLabel": "音声メッセージを再生"
+    }
+  },
+  "videos": {
+    "enabled": false,
+    "everySeconds": 75,
+    "muted": true,
+    "items": []
+  }
+}
