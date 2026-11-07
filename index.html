@@ -341,23 +341,26 @@ input[type=range]::-moz-range-thumb { width: 30px; height: 30px; border-radius: 
 /* ---------- boas-vindas (config remota) ---------- */
 .ribbon { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 46vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(13px, 1.05vw, 17px); color: var(--glow); border: 1px solid rgba(255, 210, 122, .45); background: rgba(5, 7, 11, .55); padding: 6px 16px; border-radius: 999px; font-family: 'Noto Sans JP', var(--font); }
 .ribbon[hidden] { display: none; }
-.welcome { position: absolute; left: var(--pad); bottom: clamp(50px, 8vh, 100px); max-width: 50vw; font-family: 'Noto Sans JP', var(--font); }
+.welcome { position: absolute; left: var(--pad); bottom: clamp(44px, 7vh, 90px); max-width: 50vw; max-height: calc(100vh - var(--top-h) - 9vh); overflow: hidden; font-family: 'Noto Sans JP', var(--font); }
 .welcome[hidden] { display: none; }
 body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display: none; }
 .w-from { color: var(--glow); font-size: clamp(15px, 1.25vw, 21px); letter-spacing: .02em; margin-bottom: 10px; }
 .w-from[hidden] { display: none; }
-.w-head { font-size: clamp(48px, 5.6vw, 96px); font-weight: 700; line-height: 1.05; letter-spacing: .02em; color: var(--plat-2); }
+.w-head { font-size: clamp(40px, min(5vw, 8vh), 92px); font-weight: 700; line-height: 1.05; letter-spacing: .02em; color: var(--plat-2); }
 .w-name { margin-top: 6px; color: var(--text); }
-.w-head2 { font-family: var(--font); font-size: clamp(22px, 2.3vw, 38px); font-weight: 600; font-stretch: 106%; color: var(--plat); margin-bottom: clamp(10px, 1.6vh, 20px); letter-spacing: -.01em; }
-.w-guest { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; row-gap: 2px; padding: clamp(5px, .8vh, 10px) 0; border-top: 1px solid var(--line); }
+.w-head2 { font-family: var(--font); font-size: clamp(20px, min(2vw, 3.4vh), 36px); font-weight: 600; font-stretch: 106%; color: var(--plat); margin-bottom: clamp(8px, 1.4vh, 18px); letter-spacing: -.01em; }
+.w-guest { display: flex; align-items: center; gap: clamp(12px, 1.2vw, 20px); padding: clamp(4px, .7vh, 10px) 0; border-top: 1px solid var(--line); }
 .w-guest:last-child { border-bottom: 1px solid var(--line); }
-.w-guest .g-name { font-size: clamp(22px, 2.3vw, 38px); font-weight: 700; line-height: 1.2; }
-.w-guest .g-alt { font-family: var(--font); font-size: clamp(14px, 1.15vw, 19px); color: var(--text-3); font-weight: 500; }
-.w-guest .g-meta { flex-basis: 100%; font-family: var(--font); font-size: clamp(13px, 1.05vw, 17px); color: var(--text-2); }
-.w-msg { font-weight: 450; color: var(--text-2); font-size: clamp(16px, 1.35vw, 22px); line-height: 1.7; margin-top: 14px; max-width: 32em; }
-.w-en { font-family: var(--font); color: var(--text-2); font-size: clamp(14px, 1.15vw, 19px); line-height: 1.5; margin-top: 8px; max-width: 46em; }
-.w-pt { font-family: var(--font); color: var(--text-3); font-size: clamp(13px, 1vw, 16px); margin-top: 6px; }
-.w-voice { display: inline-flex; align-items: center; gap: 10px; margin-top: 20px; padding: 12px 22px; border-radius: 999px; border: 1px solid rgba(255, 210, 122, .55); color: var(--glow); font-size: clamp(14px, 1.15vw, 19px); font-weight: 600; min-height: 50px; font-family: 'Noto Sans JP', var(--font); pointer-events: auto; }
+.w-guest .g-photo { flex: none; width: clamp(48px, min(5vw, 8vh), 92px); height: clamp(48px, min(5vw, 8vh), 92px); border-radius: 50%; object-fit: cover; object-position: center top; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(191, 211, 230, .45); background: var(--surface-2); }
+.w-guest .g-initials { display: inline-flex; align-items: center; justify-content: center; font-family: var(--font); font-weight: 600; font-size: clamp(16px, min(1.8vw, 2.8vh), 30px); color: var(--plat); letter-spacing: .02em; }
+.w-guest .g-text { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; row-gap: 2px; min-width: 0; }
+.w-guest .g-name { font-size: clamp(20px, min(2.1vw, 3.4vh), 36px); font-weight: 700; line-height: 1.2; }
+.w-guest .g-alt { font-family: var(--font); font-size: clamp(13px, min(1.1vw, 1.8vh), 18px); color: var(--text-3); font-weight: 500; }
+.w-guest .g-meta { flex-basis: 100%; font-family: var(--font); font-size: clamp(12px, min(1vw, 1.7vh), 16px); color: var(--text-2); }
+.w-msg { font-weight: 450; color: var(--text-2); font-size: clamp(14px, min(1.25vw, 2.1vh), 21px); line-height: 1.6; margin-top: clamp(8px, 1.4vh, 16px); max-width: 32em; }
+.w-en { font-family: var(--font); color: var(--text-2); font-size: clamp(13px, min(1.05vw, 1.8vh), 18px); line-height: 1.45; margin-top: clamp(4px, .8vh, 8px); max-width: 46em; }
+.w-pt { font-family: var(--font); color: var(--text-3); font-size: clamp(12px, min(.95vw, 1.6vh), 15px); margin-top: 4px; }
+.w-voice { display: inline-flex; align-items: center; gap: 10px; margin-top: clamp(10px, 1.6vh, 20px); padding: 10px 20px; border-radius: 999px; border: 1px solid rgba(255, 210, 122, .55); color: var(--glow); font-size: clamp(13px, min(1.1vw, 1.9vh), 18px); font-weight: 600; min-height: 46px; font-family: 'Noto Sans JP', var(--font); pointer-events: auto; }
 .w-voice:active, .w-voice.playing { background: rgba(255, 210, 122, .16); }
 .w-voice[hidden] { display: none; }
 
@@ -565,7 +568,7 @@ body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display:
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.07-1111</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.07-1117</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -5265,7 +5268,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.07-1111';
+const BUILD = '2026.11.07-1117';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -5383,10 +5386,12 @@ const Welcome = {
     $('#w-from').textContent = w.eyebrow || ''; $('#w-from').hidden = !w.eyebrow;
     const head = $('#w-head'); head.textContent = heads[0]; head.lang = langs[0];
     const rest = heads.slice(1).join(' · ');
+    const initials = (g) => (g.name || g.native || '').split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
     $('#w-name').innerHTML = (rest ? `<div class="w-head2">${rest}</div>` : '') + guests.map((g) => {
       const meta = [g.role, g.company, g.countryNative, this.countryName(g.country)].filter(Boolean).join(' · ');
       const alt = g.native && g.name ? ` <span class="g-alt">${g.name}</span>` : '';
-      return `<div class="w-guest"><span class="g-name" lang="${g.lang || (g.native ? langs[0] : 'en')}">${this.guestName(g)}</span>${alt}<span class="g-meta">${meta}</span></div>`;
+      const pic = g.photo ? `<img class="g-photo" src="${g.photo}" alt="" draggable="false">` : `<span class="g-photo g-initials">${initials(g)}</span>`;
+      return `<div class="w-guest">${pic}<div class="g-text"><span class="g-name" lang="${g.lang || (g.native ? langs[0] : 'en')}">${this.guestName(g)}</span>${alt}<span class="g-meta">${meta}</span></div></div>`;
     }).join('');
     const msgs = langs.map((l) => ({ l, t: tx(w.message, l) })).filter((m) => m.t);
     const first = msgs[0]; $('#w-msg').textContent = first ? first.t : ''; $('#w-msg').lang = first ? first.l : langs[0];

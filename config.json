@@ -4,14 +4,55 @@
     "enabled": true,
     "from": "2026-11-09",
     "until": "2026-11-13",
-    "languages": ["ja", "de", "en"],
+    "languages": [
+      "ja",
+      "de",
+      "en"
+    ],
     "eyebrow": "",
     "guests": [
-      { "name": "Jörn Lützen", "title": "Dr.", "native": "", "honorific": "", "role": "CEO", "company": "Innovative Sensor Technology IST AG", "country": "CH", "countryNative": "Schweiz", "lang": "de" },
-      { "name": "Keiju Wakatsuki", "title": "Mr.", "native": "", "honorific": "様", "role": "", "company": "OGG Co., Ltd.", "country": "JP", "countryNative": "日本", "lang": "ja" },
-      { "name": "Shun Takeshita", "title": "Mr.", "native": "", "honorific": "様", "role": "", "company": "OGG Co., Ltd.", "country": "JP", "countryNative": "日本", "lang": "ja" }
+      {
+        "name": "Jörn Lützen",
+        "title": "Dr.",
+        "native": "",
+        "honorific": "",
+        "role": "CEO",
+        "company": "Innovative Sensor Technology IST AG",
+        "country": "CH",
+        "countryNative": "Schweiz",
+        "lang": "de",
+        "photo": ""
+      },
+      {
+        "name": "Keiju Wakatsuki",
+        "title": "Mr.",
+        "native": "",
+        "honorific": "様",
+        "role": "",
+        "company": "OGG Co., Ltd.",
+        "country": "JP",
+        "countryNative": "日本",
+        "lang": "ja",
+        "photo": ""
+      },
+      {
+        "name": "Shun Takeshita",
+        "title": "Mr.",
+        "native": "",
+        "honorific": "様",
+        "role": "",
+        "company": "OGG Co., Ltd.",
+        "country": "JP",
+        "countryNative": "日本",
+        "lang": "ja",
+        "photo": ""
+      }
     ],
-    "headline": { "ja": "ようこそ", "de": "Herzlich willkommen", "en": "Welcome" },
+    "headline": {
+      "ja": "ようこそ",
+      "de": "Herzlich willkommen",
+      "en": "Welcome"
+    },
     "message": {
       "ja": "センサー・テクノロジーへお越しいただき、誠にありがとうございます。皆様を心より歓迎いたします。",
       "de": "Wir freuen uns sehr über Ihren Besuch bei Sensor Technology und heißen Sie herzlich willkommen.",
