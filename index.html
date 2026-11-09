@@ -89,7 +89,18 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
   backdrop-filter: blur(6px);
 }
 .lbl3d.on { opacity: 1; }
-.lbl3d.hero { font-size: clamp(16px, 1.3vw, 22px); padding: 8px 14px; }
+/* rótulos do visualizador com linha de chamada até o ponto da peça */
+.lbl3d.l, .lbl3d.r { --gap: clamp(30px, 2.6vw, 48px); }
+.lbl3d.r { transform: translate(0, -50%); margin-left: var(--gap); }
+.lbl3d.l { transform: translate(-100%, -50%); margin-left: calc(-1 * var(--gap)); }
+.lbl3d.l::before, .lbl3d.r::before { content: ''; position: absolute; top: 50%; width: calc(var(--gap) - 3px); height: 1px; background: var(--plat-2); opacity: .75; }
+.lbl3d.r::before { right: 100%; }
+.lbl3d.l::before { left: 100%; }
+.lbl3d.l::after, .lbl3d.r::after { content: ''; position: absolute; top: 50%; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%; background: var(--plat-2); box-shadow: 0 0 0 3px rgba(11, 16, 23, .55); }
+.lbl3d.r::after { right: calc(100% + var(--gap) - 3.5px); }
+.lbl3d.l::after { left: calc(100% + var(--gap) - 3.5px); }
+.lbl3d.hero { font-size: clamp(16px, 1.3vw, 22px); padding: 8px 14px; display: flex; align-items: center; gap: 10px; }
+.lbl3d.hero .flag { width: 1.35em; aspect-ratio: 4 / 3; height: auto; border-radius: 2px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .15); flex: none; }
 .lbl3d .leader { position: absolute; left: 50%; top: 100%; width: 1px; height: 26px; background: var(--line-2); }
 
 #app { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
@@ -230,8 +241,10 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .region .bar { flex: 1; height: 2px; background: var(--line); position: relative; }
 .region .bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--plat); width: 0; transition: width .8s var(--ease); }
 #s-world .list { columns: 5; column-gap: clamp(14px, 1.6vw, 28px); font-size: clamp(12px, .95vw, 15px); color: var(--text-2); line-height: 1.6; margin-top: 14px; padding: 14px 18px; border-radius: var(--radius); background: rgba(5, 7, 11, .62); border: 1px solid var(--line); backdrop-filter: blur(8px); }
-#s-world .list span { display: block; break-inside: avoid; transition: color .3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#s-world .list span { display: flex; align-items: center; gap: 9px; break-inside: avoid; transition: color .3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 1px 0; }
+#s-world .list span .flag { width: clamp(18px, 1.35vw, 24px); height: auto; aspect-ratio: 4 / 3; border-radius: 2px; flex: none; box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); object-fit: cover; opacity: .92; }
 #s-world .list span.on { color: var(--plat-2); }
+#s-world .list span.on .flag { opacity: 1; box-shadow: 0 0 0 1px rgba(255, 210, 122, .8), 0 0 10px rgba(255, 210, 122, .35); }
 
 /* ---------- mercados / produtos (seletor + detalhe) ---------- */
 .split { display: grid; grid-template-columns: minmax(260px, 1fr) 1.6fr; gap: clamp(24px, 3vw, 64px); flex: 1; min-height: 0; margin-top: clamp(16px, 2.5vh, 32px); }
@@ -250,6 +263,16 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .picker button:active { background: var(--surface-2); }
 .detail { position: relative; border-left: 1px solid var(--line); padding-left: clamp(24px, 3vw, 56px); overflow: hidden; min-height: 0; display: flex; flex-direction: column; }
 .detail .i-big { width: clamp(56px, 5.5vw, 88px); height: clamp(56px, 5.5vw, 88px); color: var(--plat); margin-bottom: 16px; }
+.detail .photo { position: relative; flex: none; width: 100%; height: clamp(170px, 34vh, 400px); border-radius: var(--radius); overflow: hidden; margin-bottom: clamp(14px, 2.2vh, 24px); background: var(--surface); box-shadow: 0 18px 50px rgba(0, 0, 0, .45); isolation: isolate; }
+.detail .photo .ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.08); transition: opacity 1.3s var(--ease); }
+.detail .photo .ph.on { opacity: 1; animation: kenburns 7s linear forwards; }
+@keyframes kenburns { from { transform: scale(1.08) translate(1.2%, .6%); } to { transform: scale(1) translate(0, 0); } }
+.detail .photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 7, 11, 0) 55%, rgba(5, 7, 11, .55) 100%), linear-gradient(90deg, rgba(5, 7, 11, .25), rgba(5, 7, 11, 0) 40%); pointer-events: none; }
+.detail .photo .badge { position: absolute; left: 16px; bottom: 14px; width: clamp(40px, 3.6vw, 56px); height: clamp(40px, 3.6vw, 56px); border-radius: 14px; background: rgba(11, 16, 23, .7); border: 1px solid var(--line-2); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; color: var(--plat-2); z-index: 1; }
+.detail .photo .badge svg { width: 60%; height: 60%; }
+.detail .photo .dots { position: absolute; right: 16px; bottom: 18px; display: flex; gap: 6px; z-index: 1; }
+.detail .photo .dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .35); transition: background .4s, transform .4s; }
+.detail .photo .dots i.on { background: var(--plat-2); transform: scale(1.3); }
 .detail h3 { font-size: clamp(26px, 2.6vw, 42px); line-height: 1.1; letter-spacing: -.01em; }
 .detail .kind { color: var(--text-3); margin-top: 8px; font-size: clamp(13px, 1vw, 16px); }
 .detail .sum { color: var(--text-2); margin-top: 16px; max-width: 56ch; font-size: clamp(16px, 1.3vw, 21px); }
@@ -262,12 +285,14 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .detail.swap > * { animation: swapIn .45s var(--ease) both; }
 @keyframes swapIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
-/* ---------- clientes ---------- */
-.logo-wall { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 1fr; gap: clamp(12px, 1.5vw, 24px); margin-top: clamp(18px, 3vh, 36px); align-content: stretch; }
-.logo-wall .tile { display: flex; align-items: center; justify-content: center; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); padding: clamp(14px, 1.8vw, 30px); min-height: 0; }
-.logo-wall .tile img { max-width: 100%; max-height: 100%; object-fit: contain; filter: grayscale(1) brightness(1.4) contrast(1.05); opacity: .9; }
-.logo-wall .tile.empty { border-style: dashed; border-color: var(--line-2); background: transparent; color: var(--text-3); font-size: clamp(12px, 1vw, 15px); text-align: center; }
-.logo-wall .tile .nm { font-size: clamp(16px, 1.6vw, 26px); font-weight: 600; font-stretch: 108%; color: var(--text-2); letter-spacing: .01em; text-align: center; }
+/* ---------- clientes: cartões claros, marcas nas cores originais ---------- */
+.logo-wall { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: clamp(120px, 21.5vh, 236px); gap: clamp(12px, 1.4vw, 22px); margin-top: clamp(18px, 3vh, 36px); align-content: start; }
+.logo-wall .tile { display: flex; align-items: center; justify-content: center; border-radius: var(--radius); background: linear-gradient(180deg, #ffffff, #f1f4f8); border: 1px solid rgba(255, 255, 255, .55); box-shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 #fff; padding: clamp(10px, 1.2vw, 20px); min-height: 0; animation: tileIn .6s var(--ease) both; }
+.logo-wall .tile:nth-child(n) { animation-delay: calc(var(--k, 0) * 40ms); }
+.logo-wall .tile img { width: var(--w, 68%); max-width: 100%; max-height: 66%; object-fit: contain; display: block; }
+.logo-wall .tile.empty { border-style: dashed; border-color: var(--line-2); background: transparent; box-shadow: none; color: var(--text-3); font-size: clamp(12px, 1vw, 15px); text-align: center; }
+.logo-wall .tile .nm { font-size: clamp(16px, 1.6vw, 26px); font-weight: 600; font-stretch: 108%; color: #1d2430; letter-spacing: .01em; text-align: center; }
+@keyframes tileIn { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
 
 /* ---------- certificações ---------- */
 .certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 1.6vw, 28px); margin-top: clamp(18px, 3vh, 36px); }
@@ -277,7 +302,12 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .cert .std small { display: block; font-size: .42em; font-weight: 500; font-stretch: 100%; color: var(--text-3); margin-top: 8px; letter-spacing: 0; }
 .cert .what { margin-top: 16px; font-size: clamp(16px, 1.35vw, 22px); color: var(--text); }
 .cert .desc { margin-top: 8px; color: var(--text-2); font-size: clamp(14px, 1.1vw, 17px); max-width: 34ch; }
-.cert .meta { margin-top: auto; padding-top: 18px; display: flex; justify-content: space-between; gap: 12px; font-size: clamp(13px, 1vw, 16px); color: var(--text-2); font-variant-numeric: tabular-nums; }
+.cert .seals { margin-top: auto; padding-top: clamp(14px, 2vh, 22px); display: flex; align-items: center; gap: 12px; }
+.cert .seal { height: clamp(58px, 8.4vh, 92px); padding: 8px 12px; border-radius: 12px; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(0, 0, 0, .3); }
+.cert .seal img { height: 100%; width: auto; max-width: 160px; object-fit: contain; display: block; }
+.cert .body { margin-left: auto; text-align: right; font-size: clamp(12px, .95vw, 15px); color: var(--text-3); line-height: 1.35; max-width: 14ch; }
+.cert .body b { display: block; color: var(--text-2); font-weight: 600; }
+.cert .meta { padding-top: 14px; margin-top: 12px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; font-size: clamp(13px, 1vw, 16px); color: var(--text-2); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
 .cert .meta b { color: var(--text); font-weight: 600; }
 .cert .since { color: var(--plat-2); }
 .compliance { margin-top: clamp(18px, 3vh, 36px); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
@@ -295,7 +325,8 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .modes { position: absolute; left: 50%; bottom: clamp(18px, 3vh, 36px); transform: translateX(-50%); display: flex; gap: 6px; padding: 6px; border-radius: 999px; background: rgba(11, 16, 23, .78); border: 1px solid var(--line); backdrop-filter: blur(10px); }
 .modes button { padding: 12px 20px; border-radius: 999px; font-weight: 500; color: var(--text-2); min-height: 48px; font-size: clamp(14px, 1.1vw, 18px); white-space: nowrap; transition: background .25s, color .25s; }
 .modes button.on { background: var(--plat); color: var(--bg); font-weight: 600; }
-.vpanel { position: absolute; right: 0; top: clamp(70px, 9vh, 110px); width: clamp(280px, 26vw, 400px); border-radius: var(--radius); background: rgba(11, 16, 23, .8); border: 1px solid var(--line); backdrop-filter: blur(10px); padding: clamp(16px, 1.6vw, 26px); opacity: 0; transform: translateX(16px); pointer-events: none; transition: opacity .4s var(--ease), transform .4s var(--ease); }
+.vpanel { position: absolute; right: 0; top: clamp(70px, 9vh, 110px); width: clamp(280px, 26vw, 400px); border-radius: var(--radius); background: rgba(11, 16, 23, .8); border: 1px solid var(--line); backdrop-filter: blur(10px);
+  /* (no visualizador 3D o desfoque é desligado — ver body.viewer-on) */ padding: clamp(16px, 1.6vw, 26px); opacity: 0; transform: translateX(16px); pointer-events: none; transition: opacity .4s var(--ease), transform .4s var(--ease); }
 .vpanel.on { opacity: 1; transform: none; pointer-events: auto; }
 .vpanel h4 { margin: 0; font-size: clamp(15px, 1.15vw, 19px); font-weight: 600; }
 .vpanel .hint { color: var(--text-3); font-size: clamp(12px, .95vw, 15px); margin-top: 6px; }
@@ -381,6 +412,12 @@ body.video-on #top, body.video-on #rail { opacity: 0 !important; pointer-events:
 .video-layer .vcap[hidden] { display: none; }
 .video-layer .vcap-logo { height: clamp(36px, 4.6vh, 60px); width: auto; display: block; margin-bottom: 6px; }
 .video-layer #vcap-title { font-size: clamp(22px, 2.4vw, 40px); font-weight: 600; font-stretch: 106%; color: var(--text); }
+
+/* Visualizador 3D ativo: sem desfoque de fundo sobre o canvas que redesenha a cada quadro (GPU do tablet) */
+body.viewer-on .vpanel, body.viewer-on .modes, body.viewer-on .lbl3d { backdrop-filter: none; }
+body.viewer-on .vpanel { background: rgba(11, 16, 23, .9); }
+body.viewer-on .modes { background: rgba(11, 16, 23, .88); }
+body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
 
 </style>
 </head>
@@ -579,7 +616,7 @@ body.video-on #top, body.video-on #rail { opacity: 0 !important; pointer-events:
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-1025</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-1532</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -4887,86 +4924,111 @@ const SENSOR_DATA = {
               en: 'About 100 people in Diadema, ISO 14001 environmental management and exports to {n} countries across Europe, the Americas, Asia, Africa and Oceania.' } },
   ],
 
-  // Clientes: só o logo. logo = URL ou data:image/png;base64,... (sem logo, o nome aparece em texto)
-  // Exemplo: { name: 'Empresa', logo: 'data:image/svg+xml;base64,...' }
-  clients: [],
+  // Clientes: só o logo (arquivos em clients/). w = largura máxima dentro do cartão (%), para equilibrar
+  // marcas largas e quadradas; sem logo, o nome aparece em texto.
+  clients: [
+    { name: 'WEG', logo: 'clients/weg.svg', w: 56 },
+    { name: 'GE', logo: 'clients/ge.svg', w: 44 },
+    { name: 'ABB', logo: 'clients/abb.svg', w: 62 },
+    { name: 'Andritz', logo: 'clients/andritz.svg', w: 82 },
+    { name: 'Voith', logo: 'clients/voith.svg', w: 80 },
+    { name: 'WIKA', logo: 'clients/wika.svg', w: 66 },
+    { name: 'Endress+Hauser', logo: 'clients/endress-hauser.svg', w: 96 },
+    { name: 'TE Connectivity', logo: 'clients/te-connectivity.svg', w: 86 },
+    { name: 'DwyerOmega', logo: 'clients/dwyeromega.png', w: 98 },
+    { name: 'Pyromation', logo: 'clients/pyromation.png', w: 92 },
+    { name: 'Fox Thermal', logo: 'clients/fox-thermal.png', w: 72 },
+    { name: 'Sierra', logo: 'clients/sierra.png', w: 90 },
+    { name: 'Burns Engineering', logo: 'clients/burns.png', w: 82 },
+    { name: 'CS Instruments', logo: 'clients/cs-instruments.svg', w: 90 },
+    { name: 'Beamex', logo: 'clients/beamex.svg', w: 90 },
+    { name: 'Allmetra', logo: 'clients/allmetra.png', w: 90 },
+    { name: 'Auxitrol Weston', logo: 'clients/auxitrol-weston.png', w: 70 },
+    { name: 'OGG', logo: 'clients/ogg.png', w: 60 },
+  ],
   clientsPlaceholders: 12,
 
   markets: [
-    { id: 'hvac', icon: 'hvac',
+    { id: 'hvac', photos: ['markets/hvac-probes.webp'], icon: 'hvac',
       name: { pt: 'HVAC e refrigeração', en: 'HVAC and refrigeration' },
       summary: { pt: 'Controle fino de temperatura em sistemas de climatização e frio industrial, onde estabilidade ao longo de anos vale mais que velocidade.',
                  en: 'Fine temperature control in air-conditioning and industrial cooling, where stability over years matters more than speed.' },
       apps: { pt: ['Chillers e bombas de calor', 'Câmaras frias e cadeia do frio', 'Ar-condicionado de precisão', 'Trocadores de calor'],
               en: ['Chillers and heat pumps', 'Cold rooms and cold chain', 'Precision air conditioning', 'Heat exchangers'] },
       products: ['cww', 'assemblies'] },
-    { id: 'auto', icon: 'auto',
+    { id: 'auto', photos: ['markets/auto-assembly.webp', 'markets/auto-electric.webp', 'markets/auto-train.webp'], icon: 'auto',
       name: { pt: 'Automotivo e mobilidade', en: 'Automotive and mobility' },
       summary: { pt: 'Sensores que suportam vibração, ciclos térmicos severos e altas temperaturas em veículos e bancos de prova.',
                  en: 'Sensors that withstand vibration, severe thermal cycling and high temperatures in vehicles and test rigs.' },
       apps: { pt: ['Temperatura de gases de escape', 'Gestão térmica de baterias', 'Bancos de teste de motores', 'Climatização veicular'],
               en: ['Exhaust gas temperature', 'Battery thermal management', 'Engine test benches', 'Vehicle climate control'] },
       products: ['cww', 'thinfilm'] },
-    { id: 'industry', icon: 'industry',
+    { id: 'industry', photos: ['markets/industry-chemical.webp', 'markets/energy-generator.webp'], icon: 'industry',
       name: { pt: 'Processos industriais', en: 'Industrial processes' },
       summary: { pt: 'Medição confiável em plantas contínuas: o sensor certo evita paradas, refugo e desvios de qualidade.',
                  en: 'Reliable measurement in continuous plants: the right sensor prevents downtime, scrap and quality drift.' },
       apps: { pt: ['Petroquímica e química', 'Siderurgia e tratamento térmico', 'Papel e celulose', 'Plásticos e borracha'],
               en: ['Petrochemical and chemical', 'Steel and heat treatment', 'Pulp and paper', 'Plastics and rubber'] },
-      products: ['cww', 'assemblies', 'thermocouple'] },
-    { id: 'appliance', icon: 'appliance',
+      products: ['cww', 'assemblies'] },
+    { id: 'appliance', photos: ['markets/appliance-white.webp'], icon: 'appliance',
       name: { pt: 'Linha branca e aquecimento', en: 'Home appliances and heating' },
       summary: { pt: 'Grandes volumes com repetibilidade: o mesmo desempenho no primeiro e no milionésimo aparelho.',
                  en: 'High volumes with repeatability: the same performance in the first and in the millionth appliance.' },
       apps: { pt: ['Fornos e cooktops', 'Lava-louças e lavadoras', 'Caldeiras e aquecedores de água', 'Cafeteiras e equipamentos de cozinha'],
               en: ['Ovens and cooktops', 'Dishwashers and washing machines', 'Boilers and water heaters', 'Coffee machines and kitchen equipment'] },
       products: ['cww', 'thinfilm'] },
-    { id: 'energy', icon: 'energy',
+    { id: 'energy', photos: ['markets/energy-hydro.webp', 'markets/energy-solar.webp', 'markets/energy-generator.webp'], icon: 'energy',
       name: { pt: 'Energia', en: 'Energy' },
       summary: { pt: 'Monitoramento térmico de ativos caros e de longa vida, de transformadores a baterias estacionárias.',
                  en: 'Thermal monitoring of expensive, long-lived assets, from transformers to stationary batteries.' },
       apps: { pt: ['Transformadores e subestações', 'Usinas solares e eólicas', 'Geração térmica', 'Armazenamento em baterias'],
               en: ['Transformers and substations', 'Solar and wind plants', 'Thermal generation', 'Battery storage'] },
       products: ['cww', 'assemblies'] },
-    { id: 'food', icon: 'food',
+    { id: 'food', photos: ['markets/food-elements.webp'], icon: 'food',
       name: { pt: 'Alimentos e bebidas', en: 'Food and beverage' },
       summary: { pt: 'Temperatura é segurança alimentar: processos térmicos documentados do cozimento ao frio.',
                  en: 'Temperature is food safety: documented thermal processes from cooking to chilling.' },
       apps: { pt: ['Pasteurização e UHT', 'Fornos industriais', 'Câmaras de maturação e fermentação', 'Logística refrigerada'],
               en: ['Pasteurisation and UHT', 'Industrial ovens', 'Maturation and fermentation rooms', 'Refrigerated logistics'] },
       products: ['cww', 'assemblies', 'calibration'] },
-    { id: 'lab', icon: 'lab',
+    { id: 'lab', photos: ['markets/lab-surgery.webp'], icon: 'lab',
       name: { pt: 'Saúde, laboratório e farma', en: 'Health, laboratory and pharma' },
       summary: { pt: 'Equipamentos que precisam de exatidão comprovada e documentação para auditoria.',
                  en: 'Equipment that needs proven accuracy and documentation for audits.' },
       apps: { pt: ['Estufas e incubadoras', 'Autoclaves e esterilização', 'Banhos térmicos', 'Equipamentos analíticos'],
               en: ['Ovens and incubators', 'Autoclaves and sterilisation', 'Thermal baths', 'Analytical equipment'] },
-      products: ['cww', 'calibration', 'quartz'] },
-    { id: 'metrology', icon: 'metrology',
+      products: ['cww', 'calibration'] },
+    { id: 'metrology', photos: ['markets/metrology-bridge.webp'], icon: 'metrology',
       name: { pt: 'Metrologia e calibração', en: 'Metrology and calibration' },
       summary: { pt: 'Quando o sensor é a referência: elementos selecionados e calibração acreditada ISO/IEC 17025.',
                  en: 'When the sensor is the reference: selected elements and ISO/IEC 17025 accredited calibration.' },
       apps: { pt: ['Padrões de temperatura', 'Laboratórios acreditados', 'Instrumentação de referência', 'Validação de processos'],
               en: ['Temperature standards', 'Accredited laboratories', 'Reference instrumentation', 'Process validation'] },
-      products: ['cww', 'calibration', 'thermocouple'] },
+      products: ['cww', 'calibration'] },
   ],
 
   certifications: [
     { std: 'ISO 9001', ver: '2015',
       what: { pt: 'Sistema de gestão da qualidade', en: 'Quality management system' },
-      desc: { pt: 'Do projeto à expedição: processos controlados, rastreáveis e auditados.',
-              en: 'From design to shipping: controlled, traceable and audited processes.' },
-      cert: 'BR044900', since: 1993 },
+      desc: { pt: 'Projeto, desenvolvimento, fabricação e comercialização de sensores de temperatura de resistência de platina. Processos controlados, rastreáveis e auditados.',
+              en: 'Design, development, manufacturing and commercialization of platinum resistance temperature detectors. Controlled, traceable and audited processes.' },
+      cert: 'BR044900', since: 1993, valid: '2028',
+      body: { pt: 'Bureau Veritas Certification', en: 'Bureau Veritas Certification' },
+      seals: [{ img: 'seals/bureau-veritas.png', alt: 'Bureau Veritas Certification' }, { img: 'seals/ukas.png', alt: 'UKAS Management Systems 0008' }] },
     { std: 'ISO 14001', ver: '2015',
       what: { pt: 'Sistema de gestão ambiental', en: 'Environmental management system' },
-      desc: { pt: 'Gestão de resíduos, água e energia na fábrica de Diadema.',
-              en: 'Waste, water and energy management at the Diadema plant.' },
-      cert: 'BR044902', since: null, confirm: true },
+      desc: { pt: 'Gestão de resíduos, água e energia na fábrica de Diadema, auditada pelo mesmo organismo certificador.',
+              en: 'Waste, water and energy management at the Diadema plant, audited by the same certification body.' },
+      cert: 'BR044902', since: 2022, valid: '2028',
+      body: { pt: 'Bureau Veritas Certification', en: 'Bureau Veritas Certification' },
+      seals: [{ img: 'seals/bureau-veritas.png', alt: 'Bureau Veritas Certification' }, { img: 'seals/ukas.png', alt: 'UKAS Management Systems 0008' }] },
     { std: 'ISO/IEC 17025', ver: '2017',
       what: { pt: 'Laboratório de calibração acreditado', en: 'Accredited calibration laboratory' },
-      desc: { pt: 'Calibração de sensores e termômetros com rastreabilidade internacional.',
-              en: 'Calibration of sensors and thermometers with international traceability.' },
-      cert: 'CAL 0405', since: 2008 },
+      desc: { pt: 'Acreditação Cgcre/Inmetro (RBC) para calibração de sensores e termômetros, com rastreabilidade internacional (ILAC e IAAC).',
+              en: 'Cgcre/Inmetro (RBC) accreditation for the calibration of sensors and thermometers, with international traceability (ILAC and IAAC).' },
+      cert: 'CAL 0405', since: 2008,
+      body: { pt: 'Cgcre · Inmetro', en: 'Cgcre · Inmetro' },
+      seals: [{ img: 'seals/inmetro.png', alt: 'Inmetro' }] },
   ],
   compliance: ['RoHS', 'REACH', 'CETESB'],
 
@@ -5008,20 +5070,6 @@ const SENSOR_DATA = {
                  en: 'Platinum thin-film elements for fast-response, high-volume applications, complementing the CWW line.' },
       bullets: { pt: ['Pt100 a Pt1000 em formatos compactos', 'Resposta rápida', 'Pronta entrega para volumes de série'],
                  en: ['Pt100 to Pt1000 in compact formats', 'Fast response', 'Stock availability for series volumes'] } },
-    { id: 'thermocouple', icon: 'wire',
-      name: { pt: 'Fios de termopar de metais nobres', en: 'Noble-metal thermocouple wire' },
-      kind: { pt: 'Distribuição', en: 'Distribution' },
-      summary: { pt: 'Fios de platina e platina-ródio para termopares de alta temperatura, tipos R, S e B.',
-                 en: 'Platinum and platinum-rhodium wire for high-temperature thermocouples, types R, S and B.' },
-      bullets: { pt: ['Tipos R, S e B', 'Diâmetros sob consulta', 'Certificado de composição'],
-                 en: ['Types R, S and B', 'Diameters on request', 'Composition certificate'] } },
-    { id: 'quartz', icon: 'quartz',
-      name: { pt: 'Produtos de quartzo', en: 'Quartz products' },
-      kind: { pt: 'Distribuição', en: 'Distribution' },
-      summary: { pt: 'Tubos, placas, perfis, lingotes e barras de quartzo para laboratório, fornos e processos de alta pureza.',
-                 en: 'Quartz tubes, plates, profiles, ingots and bars for laboratories, furnaces and high-purity processes.' },
-      bullets: { pt: ['Tubos e perfis', 'Placas e barras', 'Lingotes'],
-                 en: ['Tubes and profiles', 'Plates and bars', 'Ingots'] } },
   ],
 
   // Parâmetros do visualizador 3D do CWW
@@ -5065,21 +5113,21 @@ const I18N = {
     worldCap: 'países recebem sensores feitos em Diadema',
     regions: { Americas: 'Américas', Europe: 'Europa', Asia: 'Ásia', Africa: 'África', Oceania: 'Oceania' },
     marketsTitle: 'Mercados e aplicações', applications: 'Aplicações', productsUsed: 'Produtos usados',
-    clientsTitle: 'Principais clientes', clientSlot: 'logo do cliente',
+    clientsTitle: 'Principais clientes', clientSlot: 'logo do cliente', validUntil: 'válido até',
     certsTitle: 'Certificações', certsLead: 'Qualidade, meio ambiente e metrologia auditados por terceiros, ano após ano.',
     certNo: 'Certificado', since: 'desde', sinceConfirm: 'desde: a confirmar', compliance: 'Conformidade ambiental',
     productsTitle: 'Produtos', explore3d: 'Explorar em 3D', back: 'Voltar',
     viewerSub: 'Modelo interativo — toque e arraste para girar, pinça para aproximar',
-    modeRotate: 'Girar', modeCut: 'Corte', modeExplode: 'Explodida', modeTemp: 'Temperatura', modeScale: 'Escala real',
+    modeRotate: 'Girar', modeCut: 'Raio-X', modeExplode: 'Explodida', modeTemp: 'Temperatura', modeScale: 'Escala real',
     rotateTitle: 'Tamanho do elemento', rotateHint: 'Toque e arraste para girar. Dois dedos aproximam.',
-    cutTitle: 'Por dentro do CWW', cutHint: 'O corpo de alumina é cortado ao meio para mostrar as espirais de platina.',
+    cutTitle: 'Por dentro do CWW', cutHint: 'O corpo de alumina fica translúcido para revelar as espirais de platina dentro dos capilares.',
     explodeTitle: 'Peça por peça', explodeHint: 'Cada componente afastado para ver como o elemento é construído.',
     tempTitle: 'Resposta à temperatura', tempHint: 'Arraste para aquecer ou resfriar. A resistência muda com a temperatura.',
     resistance: 'Resistência', cvdNote: 'Curva Callendar–Van Dusen, IEC 60751 (α = 0,003851 /°C).',
     scaleTitle: 'Tamanho real', scaleHint: 'O elemento ao lado de uma moeda de R$ 1, em escala.', element: 'Elemento', coin: 'Moeda de R$ 1',
-    partBody: 'Corpo de alumina', partCoil: 'Espiral de platina', partLead: 'Terminais', partSeal: 'Selo vítreo', partFill: 'Enchimento cerâmico', partCap: 'Vidrado das pontas',
-    partBodyD: 'cerâmica de alta pureza, dois furos longitudinais', partCoilD: 'fio de platina enrolado em cada furo', partLeadD: 'saída para o circuito de medição',
-    partSealD: 'vidro que fixa e protege as espirais', partFillD: 'massa cerâmica que envolve o fio', partCapD: 'proteção das extremidades',
+    partBody: 'Corpo de alumina', partCoil: 'Espiral de platina', partLead: 'Terminais', partSeal: 'Selo vítreo', partFill: 'Pó cerâmico', partCap: 'Vidrados de selagem',
+    partBodyD: 'alumina de alta pureza com dois capilares de precisão', partCoilD: 'hélice de platina em cada capilar — espira nunca toca espira', partLeadD: 'fios de platina soldados às espirais, saída para o circuito de medição',
+    partSealD: 'vidro que fixa e protege as espirais', partFillD: 'pó fino em que as espirais se assentam e se movem livremente', partCapD: 'domo azul-cobalto sela a ponta; glaze branco fecha a saída dos terminais',
     coinLabel: 'Moeda de R$ 1 · 27 mm', rulerLabel: 'mm',
     adminTitle: 'Configuração', adminIdle: 'Volta à atração após', adminVersion: 'Versão', adminFs: 'Tela cheia', adminFsBtn: 'Ativar', adminClose: 'Fechar painel', close: 'Fechar',
     rotate: 'Gire o aparelho para a horizontal.',
@@ -5096,21 +5144,21 @@ const I18N = {
     worldCap: 'countries receive sensors made in Diadema',
     regions: { Americas: 'Americas', Europe: 'Europe', Asia: 'Asia', Africa: 'Africa', Oceania: 'Oceania' },
     marketsTitle: 'Markets and applications', applications: 'Applications', productsUsed: 'Products used',
-    clientsTitle: 'Key clients', clientSlot: 'client logo',
+    clientsTitle: 'Key clients', clientSlot: 'client logo', validUntil: 'valid until',
     certsTitle: 'Certifications', certsLead: 'Quality, environment and metrology audited by third parties, year after year.',
     certNo: 'Certificate', since: 'since', sinceConfirm: 'since: to be confirmed', compliance: 'Environmental compliance',
     productsTitle: 'Products', explore3d: 'Explore in 3D', back: 'Back',
     viewerSub: 'Interactive model — touch and drag to rotate, pinch to zoom',
-    modeRotate: 'Rotate', modeCut: 'Cutaway', modeExplode: 'Exploded', modeTemp: 'Temperature', modeScale: 'Real size',
+    modeRotate: 'Rotate', modeCut: 'X-ray', modeExplode: 'Exploded', modeTemp: 'Temperature', modeScale: 'Real size',
     rotateTitle: 'Element size', rotateHint: 'Touch and drag to rotate. Two fingers to zoom.',
-    cutTitle: 'Inside the CWW', cutHint: 'The alumina body is cut in half to reveal the platinum coils.',
+    cutTitle: 'Inside the CWW', cutHint: 'The alumina body turns translucent to reveal the platinum coils inside the capillaries.',
     explodeTitle: 'Part by part', explodeHint: 'Each component pulled apart to show how the element is built.',
     tempTitle: 'Temperature response', tempHint: 'Drag to heat or cool. Resistance changes with temperature.',
     resistance: 'Resistance', cvdNote: 'Callendar–Van Dusen curve, IEC 60751 (α = 0.003851 /°C).',
     scaleTitle: 'Real size', scaleHint: 'The element next to a 27 mm coin, to scale.', element: 'Element', coin: '27 mm coin',
-    partBody: 'Alumina body', partCoil: 'Platinum coil', partLead: 'Lead wires', partSeal: 'Glass seal', partFill: 'Ceramic filling', partCap: 'End glaze',
-    partBodyD: 'high-purity ceramic with two longitudinal bores', partCoilD: 'platinum wire coiled inside each bore', partLeadD: 'connection to the measuring circuit',
-    partSealD: 'glass that fixes and protects the coils', partFillD: 'ceramic mass surrounding the wire', partCapD: 'protection of the ends',
+    partBody: 'Alumina body', partCoil: 'Platinum coil', partLead: 'Lead wires', partSeal: 'Glass seal', partFill: 'Ceramic powder', partCap: 'Sealing glazes',
+    partBodyD: 'high-purity alumina with two precision capillaries', partCoilD: 'platinum helix in each capillary — turn never touches turn', partLeadD: 'platinum wires welded to the coils, connection to the measuring circuit',
+    partSealD: 'glass that fixes and protects the coils', partFillD: 'fine powder in which the coils rest and move freely', partCapD: 'cobalt-blue dome seals the tip; white glaze closes the lead end',
     coinLabel: '27 mm coin', rulerLabel: 'mm',
     adminTitle: 'Settings', adminIdle: 'Back to attract after', adminVersion: 'Version', adminFs: 'Full screen', adminFsBtn: 'Enable', adminClose: 'Close panel', close: 'Close',
     rotate: 'Rotate the device to landscape.',
@@ -5280,7 +5328,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.09-1025';
+const BUILD = '2026.11.09-1532';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -5644,7 +5692,7 @@ const World = {
   render() {
     const list = $('#world-list'); list.innerHTML = '';
     const sorted = exportCountries.slice().sort((a, b) => L({ pt: a.pt, en: a.en }).localeCompare(L({ pt: b.pt, en: b.en }), LANG === 'pt' ? 'pt' : 'en'));
-    sorted.forEach((c) => { const s = document.createElement('span'); s.dataset.a2 = c.a2; s.textContent = L({ pt: c.pt, en: c.en }); list.appendChild(s); });
+    sorted.forEach((c) => { const s = document.createElement('span'); s.dataset.a2 = c.a2; const f = document.createElement('img'); f.className = 'flag'; f.src = `flags/${c.a2.toLowerCase()}.svg`; f.alt = ''; f.draggable = false; f.decoding = 'async'; f.onerror = () => f.remove(); s.appendChild(f); s.appendChild(document.createTextNode(L({ pt: c.pt, en: c.en }))); list.appendChild(s); });
     const reg = {}; exportCountries.forEach((c) => { reg[c.region] = (reg[c.region] || 0) + 1; });
     const order = ['Americas', 'Europe', 'Asia', 'Africa', 'Oceania'];
     const max = Math.max(1, ...Object.values(reg));
@@ -5674,14 +5722,21 @@ function renderPicker(pickerEl, detailEl, items, renderDetail, state) {
   renderDetail(items[state.i], detailEl);
 }
 const Markets = {
-  st: { i: 0 },
+  st: { i: 0 }, slideTimer: 0,
   render() { renderPicker($('#markets-picker'), $('#markets-detail'), D.markets, Markets.detail, Markets.st); },
   detail(m, el) {
     const prods = (m.products || []).map((id) => D.products.find((p) => p.id === id)).filter(Boolean);
+    const photos = (m.photos || []).filter(Boolean);
     el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap');
-    el.innerHTML = `<div class="i-big">${ICONS[m.icon] || ''}</div><h3>${L(m.name)}</h3><p class="sum">${L(m.summary)}</p>
+    el.innerHTML = `${photos.length ? `<div class="photo">${photos.map((p, i) => `<img class="ph${i === 0 ? ' on' : ''}" src="${p}" alt="" draggable="false" decoding="async"${i > 0 ? ' loading="lazy"' : ''}>`).join('')}<span class="badge">${ICONS[m.icon] || ''}</span>${photos.length > 1 ? `<span class="dots">${photos.map((_, i) => `<i${i === 0 ? ' class="on"' : ''}></i>`).join('')}</span>` : ''}</div>` : `<div class="i-big">${ICONS[m.icon] || ''}</div>`}
+      <h3>${L(m.name)}</h3><p class="sum">${L(m.summary)}</p>
       <ul>${(m.apps[LANG] || m.apps.pt).map((a) => `<li>${a}</li>`).join('')}</ul>
       ${prods.length ? `<div class="tags"><span class="tag" style="border-style:dashed">${T('productsUsed')}</span>${prods.map((p) => `<span class="tag">${L(p.name)}</span>`).join('')}</div>` : ''}`;
+    clearInterval(Markets.slideTimer);
+    if (photos.length > 1) {
+      let i = 0; const imgs = $$('.photo .ph', el), dots = $$('.photo .dots i', el);
+      Markets.slideTimer = setInterval(() => { if (!el.isConnected || !imgs[0].isConnected) { clearInterval(Markets.slideTimer); return; } i = (i + 1) % imgs.length; imgs.forEach((im, k) => im.classList.toggle('on', k === i)); dots.forEach((d, k) => d.classList.toggle('on', k === i)); }, 5200);
+    }
   },
 };
 const Products = {
@@ -5707,10 +5762,10 @@ const Clients = {
     let cols = n <= 4 ? n : 4;
     if (n > 4) { const opts = [4, 5, 6].map((c) => ({ c, rest: (c - (n % c)) % c, rows: Math.ceil(n / c) })).filter((o) => o.rows <= 4); opts.sort((a, b) => a.rest - b.rest || a.c - b.c); cols = (opts[0] || { c: 6 }).c; }
     w.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    list.forEach((c) => {
-      const t = document.createElement('div'); t.className = 'tile';
+    list.forEach((c, k) => {
+      const t = document.createElement('div'); t.className = 'tile'; t.style.setProperty('--k', k);
       if (!c) { t.classList.add('empty'); t.textContent = T('clientSlot'); }
-      else if (c.logo) { const img = document.createElement('img'); img.src = c.logo; img.alt = c.name || ''; img.draggable = false; t.appendChild(img); }
+      else if (c.logo) { const img = document.createElement('img'); img.src = c.logo; img.alt = c.name || ''; img.draggable = false; img.decoding = 'async'; if (c.w) img.style.setProperty('--w', c.w + '%'); img.onerror = () => { t.innerHTML = `<span class="nm">${c.name}</span>`; }; t.appendChild(img); }
       else { t.innerHTML = `<span class="nm">${c.name}</span>`; }
       w.appendChild(t);
     });
@@ -5722,8 +5777,11 @@ const Certs = {
     D.certifications.forEach((c) => {
       const d = document.createElement('div'); d.className = 'cert';
       const since = c.since ? `${T('since')} <b>${c.since}</b>` : `<span style="color:var(--glow)">${T('sinceConfirm')}</span>`;
+      const seals = (c.seals || []).map((sl) => `<span class="seal"><img src="${sl.img}" alt="${sl.alt || ''}" draggable="false"></span>`).join('');
+      const body = c.body ? `<span class="body"><b>${L(c.body)}</b>${c.valid ? `${T('validUntil')} ${c.valid}` : ''}</span>` : '';
       d.innerHTML = `<div class="std">${c.std}<small>${c.ver ? c.std.split(' ')[0] + ' ' + (c.std.split(' ')[1] || '') + ':' + c.ver : ''}</small></div>
         <div class="what">${L(c.what)}</div><div class="desc">${L(c.desc)}</div>
+        ${seals || body ? `<div class="seals">${seals}${body}</div>` : ''}
         <div class="meta"><span>${T('certNo')} <b>${c.cert}</b></span><span class="since">${since}</span></div>`;
       el.appendChild(d);
     });
@@ -5913,7 +5971,7 @@ const Globe = (function () {
   function spotlight(list) {
     const next = (Array.isArray(list) ? list : (list ? [{ a2: list }] : [])).map((x) => Object.assign({}, x, { c: countryByA2.get(x.a2) })).filter((x) => x.c);
     const same = next.length === spots.length && next.every((x, i) => x.a2 === spots[i].a2);
-    if (same) { spots.forEach((x, i) => { x.label = next[i].label; }); if (labelEl && tourCountry && spots[spotCur]) labelEl.textContent = spots[spotCur].label || labelEl.textContent; return; }
+    if (same) { spots.forEach((x, i) => { x.label = next[i].label; }); if (labelEl && tourCountry && spots[spotCur]) setLabel(spots[spotCur].label || labelEl.textContent, spots[spotCur].a2); return; }
     spots = next;
     const set = new Set(spots.map((x) => x.c.i)), setA2 = new Set(spots.map((x) => x.a2));
     if (dotsGeo) {
@@ -5983,6 +6041,7 @@ const Globe = (function () {
 
   // Passeio pelos países (rótulo)
   function ensureLabel() { if (!labelEl) { labelEl = document.createElement('div'); labelEl.className = 'lbl3d hero'; labels.appendChild(labelEl); } return labelEl; }
+  function setLabel(text, a2) { const el = ensureLabel(); el.textContent = ''; if (a2) { const f = document.createElement('img'); f.className = 'flag'; f.src = `flags/${a2.toLowerCase()}.svg`; f.alt = ''; f.draggable = false; f.onerror = () => f.remove(); el.appendChild(f); } el.appendChild(document.createTextNode(text)); }
   const tmp = new THREE.Vector3();
   function tour(now) {
     if (!exportCountries.length) return;
@@ -5992,7 +6051,7 @@ const Globe = (function () {
         const sp = spots[spotCur]; tourCountry = sp.c; spotT = now; tourT = now;
         const v = latLon(sp.c.lat, sp.c.lon, R * 1.004);
         active.geometry.attributes.position.set([v.x, v.y, v.z]); active.geometry.attributes.position.needsUpdate = true;
-        ensureLabel().textContent = sp.label || L({ pt: sp.c.pt, en: sp.c.en });
+        setLabel(sp.label || L({ pt: sp.c.pt, en: sp.c.en }), sp.a2);
         if (mode === 'world') World.highlight(sp.a2);
         faceSpot(false);
       }
@@ -6000,7 +6059,7 @@ const Globe = (function () {
       tourT = now; tourI = (tourI + 1) % exportCountries.length; tourCountry = exportCountries[tourI];
       const v = latLon(tourCountry.lat, tourCountry.lon, R * 1.004);
       active.geometry.attributes.position.set([v.x, v.y, v.z]); active.geometry.attributes.position.needsUpdate = true;
-      const el = ensureLabel(); el.textContent = L({ pt: tourCountry.pt, en: tourCountry.en });
+      setLabel(L({ pt: tourCountry.pt, en: tourCountry.en }), tourCountry.a2);
       if (mode === 'world') World.highlight(tourCountry.a2);
     }
     if (!tourCountry) return;
@@ -6060,113 +6119,126 @@ const Globe = (function () {
 })();
 
 /* ------------------------------------------------------------
-   Visualizador 3D do CWW
+   Visualizador 3D do CWW — leve e realista
+   Materiais padrão (sem clearcoat/sheen), sem planos de corte,
+   ambiente procedural pequeno, raio-X translúcido no lugar do corte.
    ------------------------------------------------------------ */
 const Viewer = (function () {
   const canvas = $('#viewer-canvas');
-  let renderer, scene, camera, model, parts, env, plane, localPlane, coin, ruler;
+  let renderer, scene, camera, model, parts, coin, ruler, rimLight;
   let built = false, size = D.cww.sizes[D.cww.defaultSize] || D.cww.sizes[0];
   let mode = 'rotate';
-  const tw = { cut: 0, explode: 0, scale: 0, cutT: 0, explodeT: 0, scaleT: 0 };
+  const tw = { xray: 0, explode: 0, scale: 0, xrayT: 0, explodeT: 0, scaleT: 0 };
   let yaw = 0.6, pitch = 0.15, yawV = 0, dragging = false, lastX = 0, lastY = 0, pinchD = 0, lastInteract = 0, tapT = 0;
   let camDist = 30, camDistT = 30, baseDist = 30, chip = 100, temp = 25, lookY = 0, lookYT = 0, lookX = 0, lookXT = 0;
   let w = 1, h = 1, lastFrame = 0;
   const labels = document.getElementById('labels');
   let labelEls = [];
   const MODES = [['rotate', 'modeRotate'], ['cut', 'modeCut'], ['explode', 'modeExplode'], ['temp', 'modeTemp'], ['scale', 'modeScale']];
+  const isXray = (m) => m === 'cut' || m === 'temp';
 
-  // Materiais
+  // Materiais — todos MeshStandardMaterial: um único programa de shader barato
   let M;
   function materials() {
-    localPlane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 50);
-    plane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 50);
     M = {
-      alumina: new THREE.MeshPhysicalMaterial({ color: 0xf3efe6, roughness: 0.62, metalness: 0, clearcoat: 0.08, clearcoatRoughness: 0.5, sheen: 0.35, sheenColor: new THREE.Color(0xfff6e8), clippingPlanes: [plane], side: THREE.FrontSide }),
-      aluminaIn: new THREE.MeshPhysicalMaterial({ color: 0xb9ae9e, roughness: 0.95, metalness: 0, clippingPlanes: [plane], side: THREE.DoubleSide }),
-      cut: new THREE.MeshPhysicalMaterial({ color: 0xe6dfd2, roughness: 0.95, metalness: 0, side: THREE.DoubleSide }),
-      fill: new THREE.MeshStandardMaterial({ color: 0xd7cdbd, roughness: 1, metalness: 0, transparent: true, opacity: 0.28, clippingPlanes: [plane], side: THREE.DoubleSide, depthWrite: false }),
-      glass: new THREE.MeshPhysicalMaterial({ color: 0xcfe0e8, roughness: 0.12, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.08, transparent: true, opacity: 0.62, clippingPlanes: [plane], side: THREE.DoubleSide }),
-      glaze: new THREE.MeshPhysicalMaterial({ color: 0xd8d1c6, roughness: 0.18, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.12, clippingPlanes: [plane] }),
-      platinum: new THREE.MeshStandardMaterial({ color: 0xe9e9e4, roughness: 0.28, metalness: 1, emissive: 0x000000, emissiveIntensity: 1 }),
-      lead: new THREE.MeshStandardMaterial({ color: 0xe4e2d8, roughness: 0.35, metalness: 1 }),
+      ceramic: new THREE.MeshStandardMaterial({ color: 0xeae4d6, roughness: 0.56, metalness: 0.02, transparent: true, opacity: 1, side: THREE.DoubleSide, envMapIntensity: 0.75 }),
+      glazeBlue: new THREE.MeshStandardMaterial({ color: 0x2231aa, roughness: 0.15, metalness: 0.06, transparent: true, opacity: 1, envMapIntensity: 1.4 }),
+      glazeWhite: new THREE.MeshStandardMaterial({ color: 0xf3efe6, roughness: 0.2, metalness: 0.02, transparent: true, opacity: 1, envMapIntensity: 1.1 }),
+      platinum: new THREE.MeshStandardMaterial({ color: 0xdadee6, roughness: 0.3, metalness: 0.9, emissive: 0x3a3e46, emissiveIntensity: 1, envMapIntensity: 1.25 }),
+      lead: new THREE.MeshStandardMaterial({ color: 0xd6dae2, roughness: 0.3, metalness: 0.92, envMapIntensity: 1.3 }),
+      bore: new THREE.MeshStandardMaterial({ color: 0x2e2a22, roughness: 0.9, metalness: 0, side: THREE.BackSide, transparent: true, opacity: 0.26, depthWrite: false }),
+      powder: new THREE.MeshStandardMaterial({ color: 0xf2ecdd, roughness: 0.95, metalness: 0, transparent: true, opacity: 0.16, depthWrite: false }),
       coinRing: new THREE.MeshStandardMaterial({ color: 0xc8c8c2, roughness: 0.38, metalness: 0.9, transparent: true, opacity: 0 }),
       coinCore: new THREE.MeshStandardMaterial({ color: 0xc9a96a, roughness: 0.42, metalness: 0.85, transparent: true, opacity: 0 }),
     };
   }
 
+  // Ambiente de estúdio: equiretangular pintado em canvas (256×128) → PMREM. Barato e suficiente
+  // para reflexos suaves no vidrado e brilho na platina.
   function studioEnv() {
-    const s = new THREE.Scene();
-    s.add(new THREE.Mesh(new THREE.SphereGeometry(60, 32, 32), new THREE.MeshBasicMaterial({ color: 0x1a2028, side: THREE.BackSide })));
-    const lamp = (x, y, z, sx, sy, c, i) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(sx, sy), new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(i), side: THREE.DoubleSide })); m.position.set(x, y, z); m.lookAt(0, 0, 0); s.add(m); };
-    lamp(-18, 22, 14, 30, 16, 0xffffff, 6); lamp(22, 14, -6, 22, 30, 0xdfe8ff, 3.2); lamp(0, -20, 8, 40, 10, 0xffe6c8, 1.6); lamp(4, 8, 30, 18, 18, 0xffffff, 2.2);
-    const pm = new THREE.PMREMGenerator(renderer); const rt = pm.fromScene(s, 0.04); pm.dispose(); return rt.texture;
+    const c = document.createElement('canvas'); c.width = 256; c.height = 128; const g = c.getContext('2d');
+    const grad = g.createLinearGradient(0, 0, 0, 128);
+    grad.addColorStop(0, '#c9d3e2'); grad.addColorStop(0.42, '#5a6472'); grad.addColorStop(0.52, '#262b33'); grad.addColorStop(1, '#120f0c');
+    g.fillStyle = grad; g.fillRect(0, 0, 256, 128);
+    const soft = (x, y, r, col) => { const rg = g.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, col); rg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = rg; g.fillRect(x - r, y - r, r * 2, r * 2); };
+    soft(70, 28, 54, 'rgba(255,255,255,1)'); soft(196, 40, 40, 'rgba(224,236,255,.9)'); soft(24, 98, 46, 'rgba(255,190,130,.5)');
+    const tex = new THREE.CanvasTexture(c); tex.mapping = THREE.EquirectangularReflectionMapping; tex.colorSpace = THREE.SRGBColorSpace;
+    const pm = new THREE.PMREMGenerator(renderer); const rt = pm.fromEquirectangular(tex); pm.dispose(); tex.dispose();
+    return rt.texture;
   }
 
   class Helix extends THREE.Curve {
-    constructor(cx, rc, len, turns) { super(); this.cx = cx; this.rc = rc; this.len = len; this.turns = turns; }
-    getPoint(t, o = new THREE.Vector3()) { const a = t * this.turns * Math.PI * 2; return o.set(this.cx + this.rc * Math.cos(a), -this.len / 2 + t * this.len, this.rc * Math.sin(a)); }
+    constructor(cx, rc, len, turns, phase) { super(); this.cx = cx; this.rc = rc; this.len = len; this.turns = turns; this.phase = phase || 0; }
+    getPoint(t, o = new THREE.Vector3()) { const a = this.phase + t * this.turns * Math.PI * 2; return o.set(this.cx + this.rc * Math.cos(a), -this.len / 2 + t * this.len, this.rc * Math.sin(a)); }
   }
+  const tube = (curve, segs, r, radial) => new THREE.TubeGeometry(curve, segs, r, radial, false);
 
   function build(sz) {
     if (model) { scene.remove(model); model.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); }
     const d = sz.d, l = sz.l, Rr = d / 2, hh = l / 2;
-    const rb = Rr * 0.3, cx = Rr * 0.42, rc = rb * 0.68, rw = Math.max(0.028, Rr * 0.03), seal = Math.min(1.1, l * 0.11), lc = l - seal * 2 - 0.2;
-    const ll = Math.max(5, l * 0.75);
-    parts = {};
-    model = new THREE.Group();
-    // corpo (lathe com cantos arredondados) + paredes dos furos + enchimento: movem juntos
+    const cx = Rr * 0.45, rb = Rr * 0.33, rc = rb * 0.58, rw = Math.max(0.03, rb * 0.14);
+    const domeT = Rr * 1.03 * 1.15, domeB = Rr * 1.03 * 0.75;
+    const sealH = Math.min(Rr * 1.1, l * 0.12);
+    const coilTop = hh - rb * 1.3, coilBot = -hh + sealH + rb * 0.8, lc = coilTop - coilBot;
+    const weldY = -hh + sealH * 0.45;
+    const ll = Math.max(5, l * 0.75), rl = Math.max(0.08, Rr * 0.1);
+    const exitY = -hh - domeB * 0.6, tipY = exitY - ll, kneeY = exitY - ll * 0.62;
+    parts = {}; model = new THREE.Group();
+
+    // Corpo de alumina: tubo + duas faces de topo com os furos, capilares escuros e pó cerâmico (movem juntos)
     const bodyG = new THREE.Group(); model.add(bodyG); parts.bodyG = bodyG;
-    const f = Rr * 0.16, prof = [];
-    prof.push(new THREE.Vector2(0, -hh)); prof.push(new THREE.Vector2(Rr - f, -hh));
-    for (let i = 1; i <= 5; i++) { const a = (i / 5) * Math.PI / 2; prof.push(new THREE.Vector2(Rr - f + f * Math.sin(a), -hh + f - f * Math.cos(a))); }
-    prof.push(new THREE.Vector2(Rr, hh - f));
-    for (let i = 1; i <= 5; i++) { const a = (i / 5) * Math.PI / 2; prof.push(new THREE.Vector2(Rr - f + f * Math.cos(a), hh - f + f * Math.sin(a))); }
-    prof.push(new THREE.Vector2(0, hh));
-    parts.body = new THREE.Mesh(new THREE.LatheGeometry(prof, 72), M.alumina); bodyG.add(parts.body);
+    const shell = new THREE.Mesh(new THREE.CylinderGeometry(Rr, Rr, l, 48, 1, true), M.ceramic); shell.renderOrder = 3; bodyG.add(shell);
+    const faceShape = new THREE.Shape(); faceShape.absarc(0, 0, Rr, 0, Math.PI * 2, false);
+    [-cx, cx].forEach((x) => { const hole = new THREE.Path(); hole.absarc(x, 0, rb * 1.02, 0, Math.PI * 2, true); faceShape.holes.push(hole); });
+    const faceGeo = new THREE.ShapeGeometry(faceShape, 20);
+    const faceT = new THREE.Mesh(faceGeo, M.ceramic); faceT.rotation.x = -Math.PI / 2; faceT.position.y = hh; faceT.renderOrder = 3; bodyG.add(faceT);
+    const faceB = new THREE.Mesh(faceGeo, M.ceramic); faceB.rotation.x = Math.PI / 2; faceB.position.y = -hh; faceB.renderOrder = 3; bodyG.add(faceB);
     [-cx, cx].forEach((x, i) => {
-      const wall = new THREE.Mesh(new THREE.CylinderGeometry(rb, rb, l - 0.02, 40, 1, true), M.aluminaIn); wall.position.x = x; bodyG.add(wall);
-      const fill = new THREE.Mesh(new THREE.CylinderGeometry(rb * 0.97, rb * 0.97, lc, 24, 1), M.fill); fill.position.x = x; bodyG.add(fill); parts['fill' + i] = fill;
+      const bore = new THREE.Mesh(new THREE.CylinderGeometry(rb, rb, l - 0.02, 20, 1, true), M.bore); bore.position.x = x; bore.renderOrder = 1; bodyG.add(bore);
+      const powder = new THREE.Mesh(new THREE.CylinderGeometry(rb * 0.95, rb * 0.95, lc + rb * 1.6, 16, 1), M.powder); powder.position.set(x, (coilTop + coilBot) / 2, 0); powder.renderOrder = 2; bodyG.add(powder); parts['powder' + i] = powder;
     });
-    // face de corte (retângulo com dois rasgos) — filha do corpo
-    const shape = new THREE.Shape(); const rr = f;
-    shape.moveTo(-Rr + rr, -hh); shape.lineTo(Rr - rr, -hh); shape.quadraticCurveTo(Rr, -hh, Rr, -hh + rr); shape.lineTo(Rr, hh - rr); shape.quadraticCurveTo(Rr, hh, Rr - rr, hh); shape.lineTo(-Rr + rr, hh); shape.quadraticCurveTo(-Rr, hh, -Rr, hh - rr); shape.lineTo(-Rr, -hh + rr); shape.quadraticCurveTo(-Rr, -hh, -Rr + rr, -hh);
-    [-cx, cx].forEach((x) => { const hole = new THREE.Path(); hole.moveTo(x - rb, -hh + 0.01); hole.lineTo(x + rb, -hh + 0.01); hole.lineTo(x + rb, hh - 0.01); hole.lineTo(x - rb, hh - 0.01); hole.lineTo(x - rb, -hh + 0.01); shape.holes.push(hole); });
-    parts.face = new THREE.Mesh(new THREE.ShapeGeometry(shape, 8), M.cut); parts.face.visible = false; bodyG.add(parts.face);
-    // selos vítreos (sobem/descem na explodida)
-    [-cx, cx].forEach((x, i) => {
-      const pt = new THREE.Mesh(new THREE.CylinderGeometry(rb * 0.98, rb * 0.98, seal, 24, 1), M.glass); pt.position.set(x, hh - seal / 2, 0); model.add(pt); parts['sealT' + i] = pt;
-      const pb = new THREE.Mesh(new THREE.CylinderGeometry(rb * 0.98, rb * 0.98, seal, 24, 1), M.glass); pb.position.set(x, -hh + seal / 2, 0); model.add(pb); parts['sealB' + i] = pb;
-    });
-    // vidrado das pontas
-    parts.capT = new THREE.Mesh(new THREE.CylinderGeometry(Rr * 0.94, Rr * 0.98, 0.1, 48), M.glaze); parts.capT.position.y = hh + 0.05; model.add(parts.capT);
-    parts.capB = new THREE.Mesh(new THREE.CylinderGeometry(Rr * 0.98, Rr * 0.94, 0.1, 48), M.glaze); parts.capB.position.y = -hh - 0.05; model.add(parts.capB);
-    // espirais + ponte
+    // Vidrados: domo azul-cobalto na ponta, glaze branco arredondado na saída dos terminais
+    const capDisk = new THREE.CircleGeometry(Rr * 1.03, 28);
+    parts.capT = new THREE.Group(); parts.capT.renderOrder = 4; model.add(parts.capT);
+    const domeT_ = new THREE.Mesh(new THREE.SphereGeometry(Rr * 1.03, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2), M.glazeBlue); domeT_.scale.y = 1.15; parts.capT.add(domeT_);
+    const diskT = new THREE.Mesh(capDisk, M.glazeBlue); diskT.rotation.x = Math.PI / 2; parts.capT.add(diskT);
+    parts.capB = new THREE.Group(); parts.capB.renderOrder = 4; model.add(parts.capB);
+    const domeB_ = new THREE.Mesh(new THREE.SphereGeometry(Rr * 1.03, 28, 14, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), M.glazeWhite); domeB_.scale.y = 0.75; parts.capB.add(domeB_);
+    const diskB = new THREE.Mesh(capDisk, M.glazeWhite); diskB.rotation.x = -Math.PI / 2; parts.capB.add(diskB);
+    [domeT_, diskT, domeB_, diskB].forEach((o) => { o.renderOrder = 4; });
+    // Núcleo: duas hélices de platina (espira não toca espira), rabichos até a solda e ponte no topo
     const core = new THREE.Group(); model.add(core); parts.core = core;
-    const pitchW = rw * 3.4, turns = Math.max(12, Math.floor(lc / pitchW));
-    [-cx, cx].forEach((x, i) => {
-      const hx = new Helix(x, rc, lc, turns);
-      const coil = new THREE.Mesh(new THREE.TubeGeometry(hx, Math.min(2400, turns * 10), rw, 6, false), M.platinum); core.add(coil); parts['coil' + i] = coil;
+    const turns = Math.max(10, Math.round(lc / (rw * 6.5)));
+    [-1, 1].forEach((si, i) => {
+      const x = si * cx, phase = si < 0 ? Math.PI : 0, ex = si * (cx + rc);
+      const coil = new THREE.Mesh(tube(new Helix(x, rc, lc, turns, phase), turns * 12, rw, 6), M.platinum); coil.position.y = (coilTop + coilBot) / 2; core.add(coil); parts['coil' + i] = coil;
+      const tail = new THREE.Mesh(new THREE.CylinderGeometry(rw * 0.9, rw * 0.9, coilBot - weldY, 8), M.platinum); tail.position.set(ex, (coilBot + weldY) / 2, 0); core.add(tail);
     });
-    const bridgePts = [new THREE.Vector3(-cx + rc, -lc / 2, 0), new THREE.Vector3(-cx + rc, -lc / 2 - seal * 0.35, 0), new THREE.Vector3(0, -lc / 2 - seal * 0.55, 0), new THREE.Vector3(cx + rc, -lc / 2 - seal * 0.35, 0), new THREE.Vector3(cx + rc, -lc / 2, 0)];
-    parts.bridge = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(bridgePts), 40, rw, 6, false), M.platinum); core.add(parts.bridge);
-    // terminais
+    const bp = [new THREE.Vector3(-cx - rc, coilTop, 0), new THREE.Vector3(-cx - rc, coilTop + rb * 0.45, 0), new THREE.Vector3(0, coilTop + rb * 0.85, 0), new THREE.Vector3(cx + rc, coilTop + rb * 0.45, 0), new THREE.Vector3(cx + rc, coilTop, 0)];
+    parts.bridge = new THREE.Mesh(tube(new THREE.CatmullRomCurve3(bp), 32, rw, 6), M.platinum); core.add(parts.bridge);
+    // Terminais: colineares com os rabichos, retos até o joelho e abrindo levemente na ponta
     const leads = new THREE.Group(); model.add(leads); parts.leads = leads;
-    const rl = Math.max(0.1, Rr * 0.14), leadLen = ll + seal + 0.3;
-    [-cx, cx].forEach((x) => {
-      const lead = new THREE.Mesh(new THREE.CylinderGeometry(rl, rl, leadLen, 20), M.lead); lead.position.set(x + rc, lc / 2 - 0.15 + leadLen / 2, 0); leads.add(lead);
-      const tip = new THREE.Mesh(new THREE.SphereGeometry(rl, 16, 12), M.lead); tip.position.set(x + rc, lc / 2 - 0.15 + leadLen, 0); leads.add(tip);
+    [-1, 1].forEach((si) => {
+      const x = si * (cx + rc), xt = si * (cx + rc + Rr * 0.65);
+      const path = new THREE.CurvePath();
+      path.add(new THREE.LineCurve3(new THREE.Vector3(x, weldY, 0), new THREE.Vector3(x, kneeY, 0)));
+      path.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(x, kneeY, 0), new THREE.Vector3(x, tipY + (kneeY - tipY) * 0.3, 0), new THREE.Vector3(xt, tipY, 0)));
+      leads.add(new THREE.Mesh(tube(path, 40, rl, 8), M.lead));
+      const weld = new THREE.Mesh(new THREE.SphereGeometry(rl * 1.35, 12, 8), M.lead); weld.position.set(x, weldY, 0); leads.add(weld);
+      const tip = new THREE.Mesh(new THREE.SphereGeometry(rl, 10, 8), M.lead); tip.position.set(xt, tipY, 0); leads.add(tip);
     });
-    // moeda (de pé, virada para a câmera) e régua — modo escala real
+    // Moeda (de pé, virada para a câmera) e régua — modo escala real
     coin = new THREE.Group();
-    const ring = new THREE.Mesh(new THREE.CylinderGeometry(13.5, 13.5, 1.95, 72), M.coinRing);
-    const core2 = new THREE.Mesh(new THREE.CylinderGeometry(8.2, 8.2, 2.0, 64), M.coinCore);
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(13.5, 13.5, 1.95, 64), M.coinRing);
+    const core2 = new THREE.Mesh(new THREE.CylinderGeometry(8.2, 8.2, 2.0, 48), M.coinCore);
     coin.add(ring, core2); coin.rotation.x = Math.PI / 2; coin.visible = false; model.add(coin);
     ruler = makeRuler(40); ruler.visible = false; model.add(ruler);
     scene.add(model);
-    parts.dims = { Rr, hh, l, cx, rc, lc, seal, ll, top: hh + ll + 0.3, bottom: -hh - 0.1 };
+    parts.dims = { Rr, hh, l, cx, rc, rb, rw, rl, lc, coilTop, coilBot, weldY, ll, domeT, domeB, tipY, top: hh + domeT, bottom: tipY - rl };
     const span = parts.dims.top - parts.dims.bottom;
-    baseDist = span * 2.1 + 3;
+    baseDist = span * 2.3 + 3;
     camDistT = baseDist;
+    if (rimLight) { rimLight.position.set(-0.5, -0.36, -0.46).multiplyScalar(span); rimLight.intensity = 0.9 * rimLight.position.lengthSq(); }
     applyTween(1);
     built = true;
   }
@@ -6187,16 +6259,16 @@ const Viewer = (function () {
 
   function init() {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
     renderer.setClearColor(0x000000, 0);
-    renderer.localClippingEnabled = true;
     renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(30, 1, 0.1, 500);
-    env = studioEnv(); scene.environment = env;
-    const key = new THREE.DirectionalLight(0xfff4e6, 2.2); key.position.set(-8, 14, 12); scene.add(key);
-    const rim = new THREE.DirectionalLight(0xbfd3e6, 1.4); rim.position.set(10, 6, -10); scene.add(rim);
-    scene.add(new THREE.HemisphereLight(0x2a3340, 0x0a0d12, 0.8));
+    scene.environment = studioEnv();
+    scene.add(new THREE.HemisphereLight(0x9fb3d6, 0x2a221c, 0.9));
+    const key = new THREE.DirectionalLight(0xffffff, 2.4); key.position.set(6, 9, 10); scene.add(key);
+    const fill = new THREE.DirectionalLight(0xbfd3e6, 0.7); fill.position.set(-8, 3, 6); scene.add(fill);
+    rimLight = new THREE.PointLight(0xf0a03c, 150, 0, 2); rimLight.position.set(-9, -7, -8); scene.add(rimLight);
     materials(); build(size);
     controls();
     window.addEventListener('resize', resize); resize();
@@ -6223,31 +6295,32 @@ const Viewer = (function () {
   }
   function resetView() {
     if (mode === 'scale') { yaw = 0; pitch = 0; }
-    else if (mode === 'cut' || mode === 'temp') { yaw = 0.12; pitch = 0.12; }
+    else if (isXray(mode)) { yaw = 0.12; pitch = 0.12; }
     else { yaw = 0.6; pitch = 0.15; }
-    camDistT = baseDist * (mode === 'scale' ? scaleDistFactor() : mode === 'explode' ? 1.45 : 1);
+    camDistT = baseDist * (mode === 'scale' ? scaleDistFactor() : mode === 'explode' ? 1.3 : 1);
   }
-  function scaleBounds() { const dm = parts.dims; return { top: Math.max(dm.top, 13.5), bottom: Math.min(dm.bottom, -13.5 - 2.5 - ruler.geometry.parameters.height) }; }
-  function scaleDistFactor() { const b = scaleBounds(); const halfH = (b.top - b.bottom) / 2 * (w / h < 1.5 ? 1.32 : 1.18); return Math.max(1, (halfH / Math.tan(15 * Math.PI / 180)) / baseDist); }
+  function scaleBounds() { const dm = parts.dims; return { top: Math.max(dm.top, 13.5), bottom: Math.min(dm.bottom, -13.5) - 2.5 - ruler.geometry.parameters.height }; }
+  function scaleDistFactor() { const b = scaleBounds(); const halfH = (b.top - b.bottom) / 2 * (w / h < 1.5 ? 1.38 : 1.27); return Math.max(1, (halfH / Math.tan(15 * Math.PI / 180)) / baseDist); }
 
   // Callendar–Van Dusen (IEC 60751)
   const CVD = { A: 3.9083e-3, B: -5.775e-7, C: -4.183e-12 };
   function rOf(t, r0) { return t < 0 ? r0 * (1 + CVD.A * t + CVD.B * t * t + CVD.C * (t - 100) * t * t * t) : r0 * (1 + CVD.A * t + CVD.B * t * t); }
   function glowColor(t) {
-    if (t < 450) return { c: 0x000000, i: 0 };
+    if (t < 450) return { c: 0x3a3e46, i: 1 };
     const k = clamp((t - 450) / 400, 0, 1);
     const c = new THREE.Color(0x4a0a00).lerp(new THREE.Color(0xff5a12), ease(k));
-    return { c: c.getHex(), i: 0.15 + 1.6 * k };
+    return { c: c.getHex(), i: 0.8 + 2.2 * k };
   }
   function updateTemp() {
     $('#temp-val').textContent = fmtInt(temp);
     $('#r-val').textContent = fmtDec(rOf(temp, chip), 2);
-    const g = glowColor(temp);
+    const g = glowColor(temp), hot = clamp((temp - 450) / 400, 0, 1);
     M.platinum.emissive.setHex(g.c); M.platinum.emissiveIntensity = g.i;
+    M.platinum.color.copy(new THREE.Color(0xdadee6).lerp(new THREE.Color(0x6a4a3a), ease(hot)));
     const bodyGlow = clamp((temp - 600) / 250, 0, 1);
-    M.alumina.emissive = new THREE.Color(0xff3c0a); M.alumina.emissiveIntensity = bodyGlow * 0.35;
-    M.cut.emissive = new THREE.Color(0xff3c0a); M.cut.emissiveIntensity = bodyGlow * 0.25;
-    M.alumina.color.setHex(temp < 0 ? 0xe6edf3 : 0xf3efe6);
+    M.ceramic.emissive.setHex(0xff3c0a); M.ceramic.emissiveIntensity = bodyGlow * 0.38;
+    M.powder.emissive.setHex(0xff6a2a); M.powder.emissiveIntensity = bodyGlow * 0.8;
+    M.ceramic.color.setHex(temp < 0 ? 0xe4ebf2 : 0xeae4d6);
     drawChart();
   }
   function drawChart() {
@@ -6280,8 +6353,8 @@ const Viewer = (function () {
     const ch = $('#chips'); ch.innerHTML = '';
     D.cww.chips.forEach((c) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Pt' + c; b.classList.toggle('on', c === chip); b.addEventListener('click', () => { chip = c; $$('#chips button').forEach((x) => x.classList.toggle('on', x === b)); if (built) updateTemp(); }); ch.appendChild(b); });
     const partsList = (ids) => ids.map(([k, col]) => `<li><i style="background:${col}"></i><span><b>${T(k)}</b> — ${T(k + 'D')}</span></li>`).join('');
-    $('#cut-parts').innerHTML = partsList([['partCoil', '#E9E9E4'], ['partBody', '#F3EFE6'], ['partFill', '#D7CDBD'], ['partSeal', '#CFE0E8']]);
-    $('#explode-parts').innerHTML = partsList([['partLead', '#E4E2D8'], ['partCap', '#D8D1C6'], ['partSeal', '#CFE0E8'], ['partCoil', '#E9E9E4'], ['partBody', '#F3EFE6']]);
+    $('#cut-parts').innerHTML = partsList([['partCoil', '#DADEE6'], ['partBody', '#EAE4D6'], ['partFill', '#F2ECDD'], ['partCap', '#2231AA']]);
+    $('#explode-parts').innerHTML = partsList([['partLead', '#C9CED8'], ['partCap', '#2231AA'], ['partCoil', '#DADEE6'], ['partBody', '#EAE4D6']]);
     $('#viewer-title').textContent = L(D.products[0].name);
     const sl = $('#temp-slider'); sl.min = D.cww.tRange[0]; sl.max = D.cww.tRange[1];
     sl.oninput = () => { temp = +sl.value; lastInteract = performance.now(); if (built) updateTemp(); };
@@ -6294,31 +6367,32 @@ const Viewer = (function () {
     mode = m; lastInteract = performance.now();
     $$('#modes button').forEach((b, i) => b.classList.toggle('on', MODES[i][0] === m));
     ['rotate', 'cut', 'explode', 'temp', 'scale'].forEach((k) => $('#panel-' + k).classList.toggle('on', k === m));
-    tw.cut = (m === 'cut' || m === 'temp') ? 1 : 0; tw.explode = m === 'explode' ? 1 : 0; tw.scale = m === 'scale' ? 1 : 0;
+    tw.xray = isXray(m) ? 1 : 0; tw.explode = m === 'explode' ? 1 : 0; tw.scale = m === 'scale' ? 1 : 0;
     resetView();
     if (m !== 'temp') { temp = 25; $('#temp-slider').value = 25; }
     if (built) updateTemp();
     buildLabels();
   }
 
+  // Rótulos com linha de chamada: 'l' fica à esquerda do ponto, 'r' à direita, 'c' centrado (moeda)
   function clearLabels() { labelEls.forEach((l) => l.el.remove()); labelEls = []; }
   function buildLabels() {
     clearLabels();
     if (!built) return;
-    const add = (key, anchor, cls) => { const el = document.createElement('div'); el.className = 'lbl3d' + (cls ? ' ' + cls : ''); el.textContent = T(key); labels.appendChild(el); labelEls.push({ el, anchor }); };
+    const add = (key, anchor, side, cls) => { const el = document.createElement('div'); el.className = 'lbl3d ' + (side || 'c') + (cls ? ' ' + cls : ''); el.textContent = T(key); labels.appendChild(el); labelEls.push({ el, anchor }); };
     const dm = parts.dims;
     if (mode === 'explode') {
-      add('partLead', () => new THREE.Vector3(dm.cx + dm.rc + 0.6, dm.hh + dm.ll * 0.55 + parts.leads.position.y, 0));
-      add('partCap', () => new THREE.Vector3(dm.Rr + 0.6, parts.capT.position.y, 0));
-      add('partSeal', () => new THREE.Vector3(dm.cx + 0.6, parts.sealT1.position.y, 0));
-      add('partCoil', () => new THREE.Vector3(dm.cx + 0.6, -dm.lc * 0.15, 0));
-      add('partBody', () => new THREE.Vector3(parts.bodyG.position.x - dm.Rr - 0.6, -dm.hh * 0.3, 0));
-    } else if (mode === 'cut' || mode === 'temp') {
-      add('partCoil', () => new THREE.Vector3(dm.cx + 0.7, dm.lc * 0.22, 0));
-      add('partBody', () => new THREE.Vector3(-dm.Rr - 0.7, -dm.hh * 0.5, 0));
-      add('partSeal', () => new THREE.Vector3(-dm.cx - 0.7, dm.hh - dm.seal / 2, 0));
+      add('partCap', () => new THREE.Vector3(dm.Rr * 0.75, parts.capT.position.y + dm.domeT * 0.55, 0), 'r');
+      add('partCoil', () => new THREE.Vector3(dm.cx + dm.rc + dm.rw, dm.coilTop - dm.lc * 0.3, 0), 'r');
+      add('partLead', () => new THREE.Vector3(dm.cx + dm.rc + dm.rl, dm.weldY - dm.ll * 0.3 + parts.leads.position.y, 0), 'r');
+      add('partBody', () => new THREE.Vector3(parts.bodyG.position.x - dm.Rr, -dm.hh * 0.25, 0), 'l');
+    } else if (isXray(mode)) {
+      add('partCap', () => new THREE.Vector3(-dm.Rr * 0.72, dm.hh + dm.domeT * 0.6, 0), 'l');
+      add('partCoil', () => new THREE.Vector3(dm.cx + dm.rc + dm.rw, dm.coilTop - dm.lc * 0.22, 0), 'r');
+      add('partBody', () => new THREE.Vector3(-dm.Rr, dm.coilTop - dm.lc * 0.5, 0), 'l');
+      add('partFill', () => new THREE.Vector3(dm.cx + dm.rb * 0.9, dm.coilBot + dm.lc * 0.22, 0), 'r');
     } else if (mode === 'scale') {
-      add('coinLabel', () => new THREE.Vector3(coin.position.x, coin.position.y - 13.5 - 1.2, 0), 'hero');
+      add('coinLabel', () => new THREE.Vector3(coin.position.x, coin.position.y - 13.5 - 1.2, 0), 'c', 'hero');
     }
   }
   function placeLabels() {
@@ -6326,42 +6400,44 @@ const Viewer = (function () {
     const v = new THREE.Vector3();
     labelEls.forEach(({ el, anchor }) => {
       v.copy(anchor()); model.localToWorld(v); v.project(camera);
-      const on = v.z < 1 && (mode !== 'explode' || tw.explodeT > 0.75) && (mode !== 'cut' || tw.cutT > 0.85) && (mode !== 'temp' || tw.cutT > 0.85) && (mode !== 'scale' || tw.scaleT > 0.75);
+      const on = v.z < 1 && (mode !== 'explode' || tw.explodeT > 0.75) && (!isXray(mode) || tw.xrayT > 0.85) && (mode !== 'scale' || tw.scaleT > 0.75);
       el.classList.toggle('on', on);
       el.style.left = ((v.x * 0.5 + 0.5) * w) + 'px'; el.style.top = ((-v.y * 0.5 + 0.5) * h) + 'px';
     });
   }
 
   function applyTween(k) {
-    tw.cutT = lerp(tw.cutT, tw.cut, k); tw.explodeT = lerp(tw.explodeT, tw.explode, k); tw.scaleT = lerp(tw.scaleT, tw.scale, k);
-    const dm = parts.dims, e = ease(tw.explodeT);
-    // corte: plano local z = const, de fora (Rr+0.6) até 0; convertido para o espaço do mundo
-    const cz = lerp(dm.Rr + 0.6, 0, ease(tw.cutT));
-    localPlane.constant = cz; parts.face.position.z = cz; parts.face.visible = tw.cutT > 0.02;
-    // explodida: peças ao longo do eixo, corpo para o lado
-    parts.leads.position.set(0, e * dm.l * 0.32, 0);
-    parts.capT.position.y = dm.hh + 0.05 + e * dm.l * 0.3; parts.capB.position.y = -dm.hh - 0.05 - e * dm.l * 0.3;
-    [0, 1].forEach((i) => { parts['sealT' + i].position.y = dm.hh - dm.seal / 2 + e * dm.l * 0.17; parts['sealB' + i].position.y = -dm.hh + dm.seal / 2 - e * dm.l * 0.17; });
-    parts.bodyG.position.set(-e * dm.Rr * 2.9, 0, 0);
+    tw.xrayT = lerp(tw.xrayT, tw.xray, k); tw.explodeT = lerp(tw.explodeT, tw.explode, k); tw.scaleT = lerp(tw.scaleT, tw.scale, k);
+    const dm = parts.dims, e = ease(tw.explodeT), x = ease(tw.xrayT);
+    // raio-X: cerâmica e vidrados ficam translúcidos; o corpo deixa de escrever profundidade para
+    // que as duas paredes (frente/fundo) se misturem sem artefatos
+    M.ceramic.opacity = lerp(1, 0.32, x); M.ceramic.depthWrite = x < 0.02;
+    M.glazeBlue.opacity = lerp(1, 0.5, x); M.glazeWhite.opacity = lerp(1, 0.45, x);
+    // explodida: vidrados para fora, terminais para baixo, corpo para o lado — o núcleo fica no lugar
+    parts.capT.position.y = dm.hh - 0.02 + e * dm.l * 0.3;
+    parts.capB.position.y = -dm.hh + 0.02 - e * dm.l * 0.3;
+    parts.leads.position.set(0, -e * dm.l * 0.42, 0);
+    parts.bodyG.position.set(-e * dm.Rr * 3.1, 0, 0);
     // escala real: moeda de pé à esquerda, régua embaixo
     const s = ease(tw.scaleT);
     coin.visible = tw.scaleT > 0.01; ruler.visible = tw.scaleT > 0.01;
     M.coinRing.opacity = s; M.coinCore.opacity = s; ruler.material.opacity = s * 0.95;
     coin.position.set(-(dm.Rr + 13.5 + 4), 0, 0);
     const wmm = ruler.geometry.parameters.width, hmm = ruler.geometry.parameters.height, x0 = coin.position.x - 13.5;
-    ruler.position.set(x0 + wmm / 2 - ruler.userData.pad, -13.5 - 2.5 - hmm / 2, 0); // marca 0 sob a borda esquerda da moeda
+    ruler.position.set(x0 + wmm / 2 - ruler.userData.pad, Math.min(dm.bottom, -13.5) - 2.5 - hmm / 2, 0); // marca 0 sob a borda esquerda da moeda
     const sb = scaleBounds();
-    lookXT = s * (x0 + 23); lookYT = s * ((sb.top + sb.bottom) / 2) + (1 - s) * ((dm.top + dm.bottom) / 2 + e * dm.l * 0.05);
+    const exTop = dm.top + e * dm.l * 0.3, exBot = dm.bottom - e * dm.l * 0.42;
+    lookXT = s * (x0 + 23); lookYT = s * ((sb.top + sb.bottom) / 2) + (1 - s) * ((exTop + exBot) / 2);
   }
 
   let visible = false;
   function show() {
-    canvas.hidden = false; visible = true;
+    canvas.hidden = false; visible = true; document.body.classList.add('viewer-on');
     if (!renderer) init(); else resize();
     setMode('rotate'); yaw = 0.6; pitch = 0.15; camDist = baseDist * 1.25; camDistT = baseDist; lastInteract = performance.now(); lastFrame = performance.now();
     updateTemp();
   }
-  function hide() { visible = false; canvas.hidden = true; clearLabels(); }
+  function hide() { visible = false; canvas.hidden = true; document.body.classList.remove('viewer-on'); clearLabels(); }
   function settle() { if (!built) return; applyTween(1); camDist = camDistT; lookY = lookYT; lookX = lookXT; yawV = 0; }
   function render(now) {
     if (!visible || !built) return;
@@ -6370,9 +6446,9 @@ const Viewer = (function () {
     if (!dragging) { yaw += yawV; yawV *= Math.pow(0.01, dt); if (now - lastInteract > 5000 && mode !== 'scale') yaw += 0.15 * dt; }
     const kc = 1 - Math.pow(0.004, dt);
     camDist = lerp(camDist, camDistT, kc); lookY = lerp(lookY, lookYT, kc); lookX = lerp(lookX, lookXT, kc);
-    model.rotation.set(pitch, yaw, 0); model.updateMatrixWorld();
-    plane.copy(localPlane).applyMatrix4(model.matrixWorld);
+    model.rotation.set(pitch, yaw, 0);
     camera.position.set(lookX, lookY + camDist * 0.1, camDist); camera.lookAt(lookX, lookY, 0);
+    model.updateMatrixWorld();
     placeLabels();
     renderer.render(scene, camera);
   }
