@@ -84,9 +84,10 @@ ol { padding-left: 20px; color: var(--text-2); } li { margin-bottom: 6px; }
 </div>
 
 <div class="card">
-  <div class="switch"><div><b>Vídeos na tela de atração</b><small>Intercala os vídeos institucionais com o globo, sem som</small></div><label class="toggle"><input type="checkbox" id="vd-enabled"><span></span></label></div>
+  <div class="switch"><div><b>Vídeo institucional na tela de atração</b><small>Depois de um tempo parado na tela de boas-vindas/globo, o vídeo entra em tela cheia e volta ao globo ao terminar</small></div><label class="toggle"><input type="checkbox" id="vd-enabled"><span></span></label></div>
+  <div class="switch"><div><b>Som do vídeo</b><small>Desligado, o vídeo passa mudo</small></div><label class="toggle"><input type="checkbox" id="vd-sound" checked><span></span></label></div>
   <div class="row">
-    <div><label for="vd-every">Intervalo entre vídeos (segundos de globo)</label><input type="number" id="vd-every" min="20" max="900" value="75"></div>
+    <div><label for="vd-every">Tempo de tela parada antes do vídeo (minutos)</label><input type="number" id="vd-every" min="1" max="240" value="30"></div>
     <div><label for="vd-lang">Idioma padrão do app</label><select id="vd-lang"><option value="pt">Português</option><option value="en">Inglês</option></select></div>
   </div>
   <div id="vd-list" class="hint"></div>
@@ -181,7 +182,7 @@ ol { padding-left: 20px; color: var(--text-2); } li { margin-bottom: 6px; }
     $('#w-pt').value = w.linePt || '';
     $('#v-mode').value = v.mode || 'auto'; $('#v-every').value = v.everyMinutes || 15; $('#v-audio').value = v.audio || '';
     $('#v-text').value = v.text || '';
-    $('#vd-enabled').checked = !!vd.enabled; $('#vd-every').value = vd.everySeconds || 75; $('#vd-lang').value = cfg.defaultLang || 'pt';
+    $('#vd-enabled').checked = !!vd.enabled; $('#vd-every').value = Math.max(1, Math.round((vd.everySeconds || 1800) / 60)); $('#vd-sound').checked = vd.muted !== true; $('#vd-lang').value = cfg.defaultLang || 'pt';
     const items = (vd.items || []);
     $('#vd-list').textContent = items.length ? 'Vídeos publicados: ' + items.map((i) => (i.title && (i.title.pt || i.title.en)) || i.src).join(' · ') : 'Nenhum vídeo publicado ainda — envie os arquivos que eu os incluo no repositório.';
     pills();
@@ -201,7 +202,7 @@ ol { padding-left: 20px; color: var(--text-2); } li { margin-bottom: 6px; }
     delete w.guest; delete w.guestNative; delete w.title; delete w.honorific; delete w.company; delete w.country; delete w.countryNative; delete w.lineEn;
     w.linePt = $('#w-pt').value.trim();
     w.voice = Object.assign({}, w.voice || {}, { mode: $('#v-mode').value, everyMinutes: +$('#v-every').value || 15, audio: $('#v-audio').value.trim(), text: $('#v-text').value.trim() });
-    const vd = Object.assign({}, cfg.videos || {}, { enabled: $('#vd-enabled').checked, everySeconds: +$('#vd-every').value || 75 });
+    const vd = Object.assign({}, cfg.videos || {}, { enabled: $('#vd-enabled').checked, everySeconds: Math.max(1, +$('#vd-every').value || 30) * 60, muted: !$('#vd-sound').checked });
     return Object.assign({}, cfg, { defaultLang: $('#vd-lang').value, welcome: w, videos: vd });
   }
   async function save() {

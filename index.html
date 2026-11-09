@@ -369,10 +369,16 @@ body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display:
 .w-voice[hidden] { display: none; }
 
 /* ---------- vídeos intercalados na atração ---------- */
-.video-layer { position: fixed; inset: 0; z-index: 8; background: #000; pointer-events: auto; }
+.video-layer { position: fixed; inset: 0; z-index: 8; background: #000; pointer-events: auto; opacity: 0; transition: opacity .7s var(--ease); }
+.video-layer.on { opacity: 1; }
 .video-layer[hidden] { display: none; }
-.video-layer video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.video-layer video { width: 100%; height: 100%; object-fit: cover; display: block; background: #000; }
+body.video-on #top, body.video-on #rail { opacity: 0 !important; pointer-events: none; } /* !important: go() define a opacidade do topo inline */
+#top { transition: opacity .5s var(--ease); }
+.video-hint { position: absolute; left: 50%; bottom: clamp(18px, 3vh, 36px); transform: translateX(-50%); font-size: clamp(13px, 1vw, 17px); color: rgba(255, 255, 255, .85); background: rgba(5, 7, 11, .45); border: 1px solid rgba(255, 255, 255, .18); padding: 7px 16px; border-radius: 999px; backdrop-filter: blur(6px); opacity: 0; animation: hintIn .8s var(--ease) 6s forwards; }
+@keyframes hintIn { to { opacity: 1; } }
 .video-layer .vcap { position: absolute; left: var(--pad); bottom: clamp(40px, 7vh, 80px); display: flex; flex-direction: column; gap: 6px; text-shadow: 0 2px 12px rgba(0, 0, 0, .7); }
+.video-layer .vcap[hidden] { display: none; }
 .video-layer .vcap-logo { height: clamp(36px, 4.6vh, 60px); width: auto; display: block; margin-bottom: 6px; }
 .video-layer #vcap-title { font-size: clamp(22px, 2.4vw, 40px); font-weight: 600; font-stretch: 106%; color: var(--text); }
 
@@ -573,15 +579,16 @@ body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display:
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.07-1154</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-1025</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
   <div id="rotate-hint" data-i18n="rotate"></div>
   <div id="toast" class="toast"></div>
   <div id="video-layer" class="video-layer" hidden>
-    <video id="video-el" muted playsinline preload="auto"></video>
-    <div class="vcap"><img class="vcap-logo" src="logo.png" alt="Sensor Technology" draggable="false"><span id="vcap-title"></span></div>
+    <video id="video-el" playsinline preload="auto"></video>
+    <div class="vcap" hidden><img class="vcap-logo" src="logo.png" alt="Sensor Technology" draggable="false"><span id="vcap-title"></span></div>
+    <div class="video-hint" id="video-hint"></div>
   </div>
   <audio id="welcome-audio" preload="auto"></audio>
 </div>
@@ -5273,7 +5280,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.07-1154';
+const BUILD = '2026.11.09-1025';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -5312,7 +5319,7 @@ const Updater = {
 const DEFAULT_CONFIG = {
   defaultLang: 'pt',
   welcome: { enabled: false },
-  videos: { enabled: false, everySeconds: 75, items: [] },
+  videos: { enabled: false, everySeconds: 1800, muted: false, items: [] },
 };
 const PREVIEW = new URLSearchParams(location.search).get('preview');
 const RemoteConfig = {
@@ -5416,7 +5423,13 @@ const Welcome = {
     if (voice.mode !== 'auto') return;
     const every = (voice.everyMinutes || 10) * 60000;
     if (this.lastSpoke && performance.now() - this.lastSpoke < every) return;
-    setTimeout(() => { if (current === 'attract' && Welcome.active) Welcome.speak(true); }, 1800);
+    setTimeout(() => { if (current === 'attract' && Welcome.active && !Videos.playing) Welcome.speak(true); }, 1800);
+  },
+  voiceUntil: 0,
+  busy() {
+    // Está falando? (áudio HTML em andamento, ou janela estimada quando o Fully toca o som)
+    if (this.audio && !this.audio.paused && !this.audio.ended) return true;
+    return performance.now() < this.voiceUntil;
   },
   onMotion() {
     // Disparado pelo Fully quando a câmera detecta alguém se aproximando (Motion Detection + JavaScript Interface)
@@ -5433,14 +5446,16 @@ const Welcome = {
     if (this.pendingAuto) { this.pendingAuto = false; this.speak(true); }
   },
   speak(auto) {
+    if (Videos.playing) { if (!auto) { Videos.stop(true); } else return; } // nunca por cima do vídeo
     const voice = this.cfg.voice || {};
     const btn = $('#w-voice');
-    const done = () => btn.classList.remove('playing');
+    const secs = Math.max(10, +voice.seconds || 45);                       // duração estimada (Fully toca fora do DOM)
+    const done = () => { btn.classList.remove('playing'); Welcome.voiceUntil = 0; };
     this.lastSpoke = performance.now();
     if (voice.audio) {
       const abs = new URL(voice.audio, location.href).href;
       try {
-        if (window.fully && typeof fully.playSound === 'function') { fully.playSound(abs, false); btn.classList.add('playing'); setTimeout(done, 30000); return; }
+        if (window.fully && typeof fully.playSound === 'function') { fully.playSound(abs, false); btn.classList.add('playing'); this.voiceUntil = performance.now() + secs * 1000; setTimeout(done, secs * 1000); return; }
       } catch (e) {}
       const a = this.audio || (this.audio = $('#welcome-audio'));
       if (a.getAttribute('src') !== voice.audio) a.src = voice.audio;
@@ -5453,6 +5468,7 @@ const Welcome = {
       });
       return;
     }
+    this.voiceUntil = performance.now() + secs * 1000; setTimeout(done, secs * 1000);
     this.speakTts(voice);
   },
   speakTts(voice) {
@@ -5470,13 +5486,23 @@ const Welcome = {
   },
 };
 
+/* ------------------------------------------------------------
+   Vídeos institucionais intercalados na tela de atração.
+   config.json → videos: { enabled, everySeconds, muted, volume, items: [{ src, title?, maxSeconds? }] }
+   - Entra depois de `everySeconds` sem toque na tela de atração (contado a partir da
+     entrada na atração ou do fim do último vídeo) e volta ao globo ao terminar.
+   - Toque no vídeo → interrompe e vai para o início do app.
+   - Não começa enquanto a voz de boas-vindas estiver falando, e a voz não fala durante o vídeo.
+   - Com som por padrão; se o WebView ainda não liberou áudio (sem gesto), toca mudo.
+   ------------------------------------------------------------ */
 const Videos = {
-  items: [], every: 75, enabled: false, idx: -1, playing: false, lastEnd: 0, timer: 0, prefetched: new Set(),
+  items: [], every: 75, enabled: false, muted: false, volume: 1, idx: -1, playing: false, lastEnd: 0, timer: 0, guard: 0, hideT: 0, prefetched: new Set(),
   apply(v) {
     this.enabled = !!v.enabled && Array.isArray(v.items) && v.items.length > 0;
     this.items = this.enabled ? v.items.filter((it) => it && it.src) : [];
     this.every = Math.max(20, +v.everySeconds || 75);
-    this.muted = v.muted !== false;
+    this.muted = v.muted === true;
+    this.volume = v.volume == null ? 1 : Math.min(1, Math.max(0, +v.volume || 0));
     if (!this.enabled) this.stop(false);
     clearInterval(this.timer);
     if (this.enabled) { this.timer = setInterval(() => Videos.tick(), 1000); setTimeout(() => Videos.prefetch(), 20000); }
@@ -5484,6 +5510,7 @@ const Videos = {
   onAttract() { this.lastEnd = performance.now(); },
   tick() {
     if (!this.enabled || this.playing || current !== 'attract') return;
+    if (Welcome.busy()) return;                      // espera a voz terminar
     const idle = (performance.now() - lastTouch) / 1000;
     const since = (performance.now() - Math.max(this.lastEnd, Attract.t0 || 0)) / 1000;
     if (idle < 15 || since < this.every) return;
@@ -5491,22 +5518,31 @@ const Videos = {
   },
   play(item) {
     const layer = $('#video-layer'), v = $('#video-el');
-    this.playing = true;
-    $('#vcap-title').textContent = L(item.title || '');
-    v.muted = this.muted; v.loop = false; v.src = item.src;
-    layer.hidden = false;
+    this.playing = true; clearTimeout(this.hideT);
+    const title = L(item.title || '');
+    $('#vcap-title').textContent = title; $('#video-layer .vcap').hidden = !title;
+    $('#video-hint').textContent = T('tap');
+    v.muted = this.muted || item.muted === true; v.volume = item.volume == null ? this.volume : Math.min(1, Math.max(0, +item.volume || 0));
+    v.loop = false; v.src = item.src;
+    layer.hidden = false; layer.classList.remove('on'); void layer.offsetWidth; layer.classList.add('on');
+    document.body.classList.add('video-on');
     $('#globe-canvas').classList.add('hidden');
     const end = () => Videos.stop(true);
     v.onended = end; v.onerror = end;
-    v.play().catch(end);
-    clearTimeout(this.guard); this.guard = setTimeout(end, Math.max(30, +item.maxSeconds || 300) * 1000);
+    v.play().catch((err) => {
+      if (!v.muted && err && err.name === 'NotAllowedError') { v.muted = true; v.play().catch(end); } // sem gesto ainda: mostra mudo
+      else end();
+    });
+    clearTimeout(this.guard); this.guard = setTimeout(end, Math.max(30, +item.maxSeconds || 600) * 1000);
   },
   stop(backToGlobe) {
     if (!this.playing) return;
     this.playing = false; this.lastEnd = performance.now(); clearTimeout(this.guard);
     const layer = $('#video-layer'), v = $('#video-el');
     try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {}
-    layer.hidden = true;
+    document.body.classList.remove('video-on');
+    layer.classList.remove('on');
+    clearTimeout(this.hideT); this.hideT = setTimeout(() => { if (!Videos.playing) layer.hidden = true; }, backToGlobe ? 700 : 0);
     if (backToGlobe && current === 'attract') $('#globe-canvas').classList.remove('hidden');
   },
   async prefetch() {

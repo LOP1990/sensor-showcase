@@ -71,9 +71,15 @@
     }
   },
   "videos": {
-    "enabled": false,
-    "everySeconds": 75,
-    "muted": true,
-    "items": []
+    "enabled": true,
+    "everySeconds": 1800,
+    "muted": false,
+    "volume": 1,
+    "items": [
+      {
+        "src": "videos/institucional-us-2022.mp4",
+        "maxSeconds": 240
+      }
+    ]
   }
 }
