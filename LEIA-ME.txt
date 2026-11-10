@@ -56,3 +56,13 @@ Nosso time (organograma)
   das pessoas de cada uma (vazia = bolinha "em breve"). Fotos: pasta team/ com o nome indicado em
   "photo" (ex.: team/lucas-pereira.jpg) — sem o arquivo, aparecem as iniciais. Retratos verticais,
   rosto centralizado no terço superior, pelo menos 600×750 px.
+
+Apresentação guiada (narração)
+  Botão "Apresentação guiada" no Início (inglês por padrão; chips para 日本語 e Deutsch). A barra no pé da
+  tela tem pausar/retomar, anterior/próximo, a timeline com um trecho por passo (toque para pular) e a
+  legenda do que está sendo narrado. Navegar pelo trilho durante a narração pausa; ▶ retoma de onde parou
+  (voltando à tela do passo). Enquanto a narração toca, o quiosque não volta sozinho à tela de atração.
+  Roteiro (textos, telas, deixas): build/tour-script.json. Áudios: audio/tour/<idioma>/<passo>.mp3,
+  gerados offline (en/ja: Kokoro; de: VITS Coqui) pelo script tts-en/make_tour_audio.py; sem o arquivo,
+  o app usa o sintetizador do aparelho e, sem voz instalada, avança por tempo. Para mudar um texto:
+  edite o JSON, gere o áudio de novo e recompile.
