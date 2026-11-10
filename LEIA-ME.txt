@@ -58,7 +58,8 @@ Nosso time (organograma)
   rosto centralizado no terço superior, pelo menos 600×750 px.
 
 Apresentação guiada (narração)
-  Botão "Apresentação guiada" no Início (inglês por padrão; chips para 日本語 e Deutsch). A barra no pé da
+  Botão "Apresentação guiada" no Início (inglês por padrão; chips para 日本語, Deutsch e Português — voz
+  feminina pt-BR, Kokoro pf_dora, adicionada em 10/11). A barra no pé da
   tela tem pausar/retomar, anterior/próximo, a timeline com um trecho por passo (toque para pular) e a
   legenda do que está sendo narrado. Navegar pelo trilho durante a narração pausa; ▶ retoma de onde parou
   (voltando à tela do passo). Enquanto a narração toca, o quiosque não volta sozinho à tela de atração.
@@ -132,3 +133,17 @@ Telas grandes — painel BenQ 86" e similares (10/11)
   ?z=0 desliga a ampliação; ?z=1.5 força um fator. Se o painel usar um PC com Windows, o mais simples
   é a escala do Windows em 200% (4K → 1920×1080) — aí o app nem precisa ampliar.
   Fotos novas em Mercados: HVAC (chiller/central de água gelada e data center) e Alimentos (UHT).
+
+Ajustes de 10/11 (tarde) — telas baixas, parede de clientes, barra do vídeo
+  - Altura útil curta (PC com barra do navegador, painel com a barra da apresentação aberta): o app mede
+    innerHeight − topo − faixa da barra e liga body.h-s (< 720 px) / body.h-xs (< 560 px); o CSS compacta
+    títulos, cartões do painel de energia (sem legendas secundárias), certificações, seletores e a história
+    para caber sem cortar. Testado em 1389×740 com e sem a barra.
+  - Clientes: colunas e altura das linhas calculadas para TODOS os logos caberem na área disponível (sem
+    rolagem), refeitas a cada mudança de tamanho (ResizeObserver).
+  - Painel de energia: o botão "Assistir ao vídeo" fica ao lado do título (grid), sem sobrepor.
+  - Início e história: centralização por margens automáticas — quando falta altura o bloco alinha ao topo
+    em vez de subir por trás da faixa de boas-vindas.
+  - Vídeos: barra com play/pause, tempo e busca por toque/arrasto (também nos passos da apresentação). A
+    camada do vídeo agora fica acima do app: nenhum botão invisível do trilho recebe toques por baixo.
+
