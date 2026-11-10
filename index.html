@@ -1174,7 +1174,7 @@ body.mobile .tour-tab:active { transform: translateX(-50%) translateY(-2px); }
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-1452</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-1537</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -5819,7 +5819,7 @@ const SENSOR_DATA = {
   },
 
   kiosk: {
-    idleSeconds: 120,     // sem toque por este tempo → volta à tela de atração
+    idleSeconds: 0,       // sem toque por este tempo → volta à tela de atração; 0 = desligado (config.json → idleSeconds religa)
     tourSeconds: 4,       // intervalo entre países no passeio do globo
     historyAutoSeconds: 9, // avanço automático da linha do tempo (0 desliga)
     hidden: ['team'],      // telas fora do ar por enquanto (some do trilho e não abre); esvazie para publicar
@@ -6111,7 +6111,7 @@ function applyI18n() {
   $('#world-big').textContent = exportCountries.length;
   $('#stat-people').textContent = fmtInt(D.company.employees);
   $('#viewer-sub').textContent = T('viewerSub');
-  $('#admin-idle').textContent = D.kiosk.idleSeconds + ' ' + T('seconds');
+  $('#admin-idle').textContent = +D.kiosk.idleSeconds > 0 ? D.kiosk.idleSeconds + ' ' + T('seconds') : (LANG === 'pt' ? 'desligado' : 'off');
   History.render(); About.render(); World.render(); Markets.render(); Clients.render(); Certs.render(); Products.render(); Viewer.renderPanels(); Team.render(); Energy.render();
   const sb = $('#env-video'); if (sb) { sb.hidden = !(D.media && D.media.solar); $('span', sb).textContent = T('watchSolar'); sb.onclick = () => Videos.playManual(D.media.solar, 'solar'); }
 }
@@ -6132,7 +6132,8 @@ function kioskGuards() {
   ['pointerdown', 'pointermove', 'keydown', 'wheel'].forEach((ev) => document.addEventListener(ev, touch, { passive: true }));
   setInterval(() => {
     const idle = (performance.now() - lastTouch) / 1000;
-    if (!IS_MOBILE && idle > D.kiosk.idleSeconds && current !== 'attract' && !(Tour.on && Tour.playing) && !Videos.playing) { go('attract'); userChoseLang = false; const dl = RemoteConfig.cfg && RemoteConfig.cfg.defaultLang; if (dl && dl !== LANG) setLang(dl); }
+    const lim = +D.kiosk.idleSeconds || 0; // 0 = desligado (padrão desde 10/11: o retorno automático cortava vídeos e apresentações)
+    if (lim > 0 && !IS_MOBILE && idle > lim && current !== 'attract' && !Tour.on && !Videos.playing) { go('attract'); userChoseLang = false; const dl = RemoteConfig.cfg && RemoteConfig.cfg.defaultLang; if (dl && dl !== LANG) setLang(dl); }
   }, 1000);
   // Mantém a tela acesa
   let lock = null;
@@ -6163,7 +6164,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.10-1452';
+const BUILD = '2026.11.10-1537';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -6227,6 +6228,7 @@ const RemoteConfig = {
     Motion.apply(Welcome.cfg.voice || {});
     Videos.apply(cfg.videos || {});
     Sfx.apply(cfg.sfx);
+    if (cfg.idleSeconds != null && +cfg.idleSeconds >= 0) { D.kiosk.idleSeconds = +cfg.idleSeconds; const ai = $('#admin-idle'); if (ai) ai.textContent = +D.kiosk.idleSeconds > 0 ? D.kiosk.idleSeconds + ' ' + T('seconds') : (LANG === 'pt' ? 'desligado' : 'off'); }
     const cf = Array.isArray(cfg.clientsFirst) ? cfg.clientsFirst : [];
     if (cf.join('|') !== (Clients.first || []).join('|')) { Clients.first = cf; Clients.render(); }
     if (Array.isArray(cfg.hidden)) { const nh = new Set(cfg.hidden); if ([...nh].join() !== [...HIDDEN].join()) { HIDDEN = nh; buildRail(); applyI18n(); if (HIDDEN.has(current)) go('home'); else go(current); } }
@@ -6356,9 +6358,6 @@ const Welcome = {
   },
   speak(auto) {
     if (Videos.playing) { if (!auto) { Videos.stop(true); } else return; } // nunca por cima do vídeo
-    // saudação automática (movimento / intervalo): um sinal sonoro curto chama a atenção antes da voz
-    if (auto && Sfx.on && !this.chimed) { this.chimed = true; Sfx.play('hit', 1.2); setTimeout(() => { Welcome.chimed = false; if (Welcome.active && current === 'attract') Welcome.speak(true); }, 1100); return; }
-    this.chimed = false;
     const voice = this.cfg.voice || {};
     const btn = $('#w-voice');
     const secs = Math.max(10, +voice.seconds || 45);                       // duração estimada (Fully toca fora do DOM)
@@ -7940,7 +7939,7 @@ const Tour = {
     this.lang = TOUR_LANG_NAMES[lang] ? lang : (TOUR.default || 'en');
     this.on = true; this.ended = false; document.body.classList.add('tour-on');
     if (Videos.playing) Videos.stop(false);
-    Welcome.stopVoice(); Sfx.warm(); Sfx.play('hit');
+    Welcome.stopVoice(); Sfx.warm(); Sfx.play('ding');
     $('#tour').hidden = false; this.buildBar();
     this.goStep(0, true);
   },

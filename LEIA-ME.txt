@@ -109,14 +109,18 @@ Vídeos dentro da apresentação (10/11)
   área acima da barra; a barra pausa/retoma e avança (▶▶ pula o filme), tocar no filme pausa/retoma,
   e ao terminar a apresentação segue sozinha. Os botões "Assistir ao vídeo" das telas, com a
   apresentação ligada, pulam direto para o passo do vídeo (sem a narração) e depois ela continua;
-  sem a apresentação, o vídeo toca e volta para a mesma tela. O quiosque nunca volta à atração
-  enquanto um vídeo toca (era isso que mandava a tela para o início no meio do filme).
+  sem a apresentação, o vídeo toca e volta para a mesma tela.
+  Retorno automático à tela de boas-vindas por inatividade: DESLIGADO desde 10/11 (cortava o vídeo
+  institucional aos 120 s e voltava ao início no meio da apresentação). Para religar, config.json →
+  "idleSeconds": 300 (segundos sem toque; vale em até 1 min, sem recompilar) — e mesmo ligado ele nunca
+  dispara durante um vídeo ou com a apresentação guiada aberta. Confira também no Fully Kiosk que não há
+  temporizador próprio (Settings → Web Auto Reload / Screensaver: tempos de inatividade em 0).
 
 Efeitos sonoros (10/11)
-  Cinco recortes da trilha do vídeo Netsushin, em volume baixo, só no quiosque (não no celular):
-  "hit" ao iniciar a apresentação e antes da saudação automática por movimento (chama a atenção antes
-  da voz), "tick" ao trocar de passo/seção/produto, "ding" ao abrir a orelhinha e no fim, "ticks" ao
-  abrir o 3D. Arquivos: audio/sfx/sfx-*.mp3 (trocáveis por outros com o mesmo nome).
+  Recortes da trilha do vídeo Netsushin, em volume baixo, só no quiosque (não no celular): "ding" ao
+  iniciar a apresentação, ao abrir a orelhinha e no fim; "tick" ao trocar de passo/seção/produto;
+  "ticks" ao abrir o 3D. (O "hit" antes da saudação foi retirado às 15h40 de 10/11: entrava em laço.)
+  Arquivos: audio/sfx/sfx-*.mp3 (trocáveis por outros com o mesmo nome).
   config.json → "sfx": false desliga; "sfx": { "volume": 0.5 } ajusta (padrão 0.35). data.js →
   kiosk.sfx: false também desliga.
 
