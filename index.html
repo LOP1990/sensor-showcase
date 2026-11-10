@@ -863,12 +863,12 @@ body.tour-on .vpanel { max-height: calc(calc(100 * var(--vh)) - var(--top-h) - v
 body.tour-on #s-env .screen-h2, body.tour-on #s-env h2 { font-size: clamp(26px, calc(2.6 * var(--vw)), 42px); }
 body.tour-on .env-head .lead { font-size: clamp(13px, calc(1 * var(--vw)), 16px); max-width: 90ch; margin-top: 4px; }
 body.tour-on .env-grid { margin-top: 10px; gap: clamp(10px, calc(1 * var(--vw)), 14px); }
-body.tour-on .tile { padding: 8px 12px; }
-body.tour-on .tile .k { font-size: clamp(11px, calc(.8 * var(--vw)), 12.5px); }
-body.tour-on .tile .v { margin-top: 2px; }
-body.tour-on .tile .v .n { font-size: clamp(22px, calc(2 * var(--vw)), 34px); }
-body.tour-on .tile .v small { font-size: clamp(11px, calc(.85 * var(--vw)), 13px); }
-body.tour-on .tile .s { font-size: clamp(10px, calc(.75 * var(--vw)), 11.5px); margin-top: 3px; }
+body.tour-on .env-kpis .tile { padding: 8px 12px; }
+body.tour-on .env-kpis .tile .k { font-size: clamp(11px, calc(.8 * var(--vw)), 12.5px); }
+body.tour-on .env-kpis .tile .v { margin-top: 2px; }
+body.tour-on .env-kpis .tile .v .n { font-size: clamp(22px, calc(2 * var(--vw)), 34px); }
+body.tour-on .env-kpis .tile .v small { font-size: clamp(11px, calc(.85 * var(--vw)), 13px); }
+body.tour-on .env-kpis .tile .s { font-size: clamp(10px, calc(.75 * var(--vw)), 11.5px); margin-top: 3px; }
 body.tour-on .env-green .pct { font-size: clamp(44px, calc(5 * var(--vw)), 84px); }
 body.tour-on .env-foot { margin-top: 6px; }
 body.tour-on #s-about h2 { font-size: clamp(26px, calc(2.6 * var(--vw)), 42px); }
@@ -980,7 +980,8 @@ body.h-s .logo-wall { margin-top: 10px; }
 body.h-s .about-grid { margin-top: 10px; gap: 14px; align-items: start; }
 body.h-s .about-col .about-card { flex: none; }
 body.h-s .about-ph { min-height: 100px; }
-body.h-xs .about-ph { display: none; }
+body.h-xs .about-card { grid-template-columns: clamp(100px, calc(10 * var(--vw)), 150px) 1fr; }
+body.h-xs .about-ph { min-height: 70px; }
 body.h-s .about-txt { padding-top: 10px; padding-bottom: 10px; }
 body.h-s .about-txt h3 { font-size: 17px; margin-bottom: 4px; }
 body.h-s .about-txt p { font-size: 13px; line-height: 1.4; }
@@ -991,12 +992,12 @@ body.h-s .mvv-item .mi { width: 34px; height: 34px; }
 body.h-s .env-head .lead { max-width: 100ch; margin-top: 4px; }
 body.h-s .env-grid { margin-top: 8px; gap: 10px; }
 body.h-s .card { padding: 10px 12px; }
-body.h-s .tile { padding: 6px 10px; justify-content: flex-start; }
-body.h-s .tile .k { font-size: clamp(10px, calc(.8 * var(--vw)), 12px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-body.h-s .tile .v { margin-top: 1px; }
-body.h-s .tile .v .n { font-size: clamp(20px, calc(1.9 * var(--vw)), 30px); }
-body.h-s .tile .v small { font-size: clamp(10px, calc(.85 * var(--vw)), 12px); }
-body.h-s .tile .s { display: none; }
+body.h-s .env-kpis .tile { padding: 6px 10px; justify-content: flex-start; }
+body.h-s .env-kpis .tile .k { font-size: clamp(10px, calc(.8 * var(--vw)), 12px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.h-s .env-kpis .tile .v { margin-top: 1px; }
+body.h-s .env-kpis .tile .v .n { font-size: clamp(20px, calc(1.9 * var(--vw)), 30px); }
+body.h-s .env-kpis .tile .v small { font-size: clamp(10px, calc(.85 * var(--vw)), 12px); }
+body.h-s .env-kpis .tile .s { display: none; }
 body.h-s .flow-note { display: none; }
 body.h-s .env-green .leaf { width: 34px; height: 34px; }
 body.h-s .env-green .pct { font-size: clamp(36px, calc(4.2 * var(--vw)), 64px); }
@@ -1012,8 +1013,8 @@ body.h-xs .env-chartcard { grid-column: 1; grid-row: 2; }
 body.h-xs .env-green { grid-column: 2; grid-row: 1 / 3; }
 body.h-xs .env-green .sub, body.h-xs .env-green .bar-lbl { display: none; }
 body.h-xs .env-foot { display: none; }
-body.h-xs .tile { padding: 5px 8px; }
-body.h-xs .tile .v .n { font-size: clamp(16px, calc(1.5 * var(--vw)), 24px); }
+body.h-xs .env-kpis .tile { padding: 5px 8px; }
+body.h-xs .env-kpis .tile .v .n { font-size: clamp(16px, calc(1.5 * var(--vw)), 24px); }
 
 </style>
 </head>
@@ -1290,7 +1291,7 @@ body.h-xs .tile .v .n { font-size: clamp(16px, calc(1.5 * var(--vw)), 24px); }
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-1605</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-1617</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -6296,7 +6297,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.10-1605';
+const BUILD = '2026.11.10-1617';
 const Updater = {
   pending: null, failures: 0,
   start() {
