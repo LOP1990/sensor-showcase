@@ -824,6 +824,27 @@ body.mobile .tcap { font-size: 13px; max-height: 2.9em; }
 body.mobile.tour-on .screen .content { padding-bottom: 190px; }
 body.mobile .tour-start .btn.primary { padding: 12px 18px; }
 
+/* ---- rolagem de reserva quando o conteúdo não cabe (telas baixas, zoom do navegador) ---- */
+#s-about .content, #s-certs .content, #s-env .content, #s-clients .content { overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(191, 211, 230, .35) transparent; }
+.detail { overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(191, 211, 230, .35) transparent; }
+.about-grid { align-items: start; flex: none; }
+.about-col .about-card { flex: none; }
+.screen .content::-webkit-scrollbar, .detail::-webkit-scrollbar { width: 6px; }
+.screen .content::-webkit-scrollbar-thumb, .detail::-webkit-scrollbar-thumb { background: rgba(191, 211, 230, .3); border-radius: 3px; }
+@media (max-height: 880px) {
+  .about-ph { min-height: 120px; }
+  .about-txt { padding-top: 12px; padding-bottom: 12px; }
+  .about-txt h3 { font-size: 18px; margin-bottom: 6px; }
+  .about-txt p { font-size: 13px; line-height: 1.45; }
+  .mvv-item { padding: 12px 16px; }
+  .mvv-item p { font-size: 14px; }
+  .mvv-item .mi { width: 38px; height: 38px; }
+  .about-grid { margin-top: 10px; gap: 14px; }
+  .about-col { gap: 12px; }
+}
+.qr[hidden] { display: none !important; }
+@media (min-height: 940px) { .about-grid { align-items: stretch; } .about-col .about-card { flex: 1; } }
+
 </style>
 </head>
 <body>
@@ -1099,7 +1120,7 @@ body.mobile .tour-start .btn.primary { padding: 12px 18px; }
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-1231</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-1339</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -5747,6 +5768,7 @@ const SENSOR_DATA = {
     tourSeconds: 4,       // intervalo entre países no passeio do globo
     historyAutoSeconds: 9, // avanço automático da linha do tempo (0 desliga)
     hidden: ['team'],      // telas fora do ar por enquanto (some do trilho e não abre); esvazie para publicar
+    qr: false,             // cartão "Leve no celular" com QR code (desligado a pedido em 10/11)
   },
 };
 
@@ -5990,7 +6012,7 @@ function go(name) {
   if (name === 'world') World.enter();
   if (name === 'env') Energy.enter(); else if (prev === 'env') Energy.leave();
   if (name === 'team') Team.enter(); else if (prev === 'team') Team.leave();
-  if (prev === 'attract' && name !== 'attract') Videos.stop(false);
+  if (prev === 'attract' && name !== 'attract') { Videos.stop(false); Welcome.stopVoice(); }
   if (IS_MOBILE) { window.scrollTo(0, 0); const rb = $('#rail button.on'); if (rb) { const r = $('#rail'); r.scrollTo({ left: rb.offsetLeft - (r.clientWidth - rb.offsetWidth) / 2, behavior: 'smooth' }); } }
 }
 
@@ -6084,7 +6106,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.10-1231';
+const BUILD = '2026.11.10-1339';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -6146,6 +6168,8 @@ const RemoteConfig = {
     if (!userChoseLang && cfg.defaultLang && I18N[cfg.defaultLang] && cfg.defaultLang !== LANG) setLang(cfg.defaultLang);
     Welcome.apply(cfg.welcome || {});
     Videos.apply(cfg.videos || {});
+    const cf = Array.isArray(cfg.clientsFirst) ? cfg.clientsFirst : [];
+    if (cf.join('|') !== (Clients.first || []).join('|')) { Clients.first = cf; Clients.render(); }
     if (Array.isArray(cfg.hidden)) { const nh = new Set(cfg.hidden); if ([...nh].join() !== [...HIDDEN].join()) { HIDDEN = nh; buildRail(); applyI18n(); if (HIDDEN.has(current)) go('home'); else go(current); } }
     if (!prev) return;
   },
@@ -6246,6 +6270,14 @@ const Welcome = {
     if (this.lastSpoke && performance.now() - this.lastSpoke < cool) return;
     this.speak(true);
   },
+  stopVoice() {
+    // ao sair da tela de boas-vindas (ou começar a apresentação guiada) a saudação para na hora
+    this.pendingAuto = false; this.voiceUntil = 0;
+    try { if (this.audio && !this.audio.paused) { this.audio.pause(); this.audio.currentTime = 0; } } catch (e) {}
+    try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
+    try { if (window.fully && typeof fully.stopSound === 'function') fully.stopSound(); } catch (e) {}
+    $('#w-voice').classList.remove('playing');
+  },
   pendingAuto: false,
   unlock() {
     // Primeiro toque do dia: destrava o áudio no WebView e toca o que ficou pendente
@@ -6327,14 +6359,13 @@ const Videos = {
     const layer = $('#video-layer'), v = $('#video-el');
     this.playing = true; this.manual = !!(opts && opts.manual); clearTimeout(this.hideT);
     try { if (Welcome.audio && !Welcome.audio.paused) Welcome.audio.pause(); if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
-    const title = L(item.title || '');
-    $('#vcap-title').textContent = title; $('#video-layer .vcap').hidden = !title;
+    $('#video-layer .vcap').hidden = true; // sem logo/título sobre o vídeo
     $('#video-hint').textContent = this.manual ? T('tapBack') : T('tap');
     v.muted = this.muted || item.muted === true; v.volume = item.volume == null ? this.volume : Math.min(1, Math.max(0, +item.volume || 0));
     v.loop = false; v.src = item.src;
     layer.hidden = false; layer.classList.remove('on'); void layer.offsetWidth; layer.classList.add('on');
     document.body.classList.add('video-on');
-    if (!this.manual) $('#globe-canvas').classList.add('hidden');
+    $('#globe-canvas').classList.add('hidden'); // o 3D para enquanto o vídeo toca (laço principal pula o render)
     const end = () => Videos.stop(true);
     v.onended = end; v.onerror = end;
     v.play().catch((err) => {
@@ -6351,14 +6382,15 @@ const Videos = {
     document.body.classList.remove('video-on');
     layer.classList.remove('on');
     clearTimeout(this.hideT); this.hideT = setTimeout(() => { if (!Videos.playing) layer.hidden = true; }, backToGlobe ? 700 : 0);
-    if (backToGlobe && current === 'attract' && !wasManual) $('#globe-canvas').classList.remove('hidden');
+    if (backToGlobe || wasManual) $('#globe-canvas').classList.toggle('hidden', current === 'viewer' || current === 'home');
   },
   playManual(media) { if (!media || !media.src) return; this.play({ src: media.src, title: media.title, maxSeconds: 900 }, { manual: true }); },
   async prefetch() {
     if (!this.enabled || location.protocol === 'file:' || !navigator.onLine) return;
-    for (const it of this.items) {
+    const all = [...this.items, ...Object.values(D.media || {})].filter((it) => it && it.src);
+    for (const it of all) {
       if (this.prefetched.has(it.src)) continue;
-      try { await fetch(it.src, { cache: 'force-cache' }); this.prefetched.add(it.src); } catch (e) { /* tenta na próxima */ }
+      try { const r = await fetch(it.src, { cache: 'force-cache' }); if (r.body) { try { await r.body.cancel(); } catch (e) {} } this.prefetched.add(it.src); } catch (e) { /* tenta na próxima */ }
     }
   },
 };
@@ -6560,9 +6592,13 @@ const About = {
    Clientes e certificações
    ------------------------------------------------------------ */
 const Clients = {
+  first: [],
   render() {
     const w = $('#logo-wall'); w.innerHTML = '';
-    const list = D.clients.length ? D.clients : Array.from({ length: D.clientsPlaceholders || 12 }, () => null);
+    const key = (n) => String(n || '').toLowerCase();
+    const pinned = (this.first || []).map(key);
+    const ordered = D.clients.slice().sort((a, b) => { const ia = pinned.indexOf(key(a.name)), ib = pinned.indexOf(key(b.name)); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
+    const list = ordered.length ? ordered : Array.from({ length: D.clientsPlaceholders || 12 }, () => null);
     const n = list.length;
     let cols = n <= 4 ? n : 4;
     if (n > 4) { const opts = [4, 5, 6, 7].map((c) => ({ c, rest: (c - (n % c)) % c, rows: Math.ceil(n / c) })).filter((o) => o.rows <= 4); opts.sort((a, b) => a.rest - b.rest || a.c - b.c); cols = (opts[0] || { c: 6 }).c; }
@@ -7768,7 +7804,7 @@ const Tour = {
     this.lang = TOUR_LANG_NAMES[lang] ? lang : (TOUR.default || 'en');
     this.on = true; this.ended = false; document.body.classList.add('tour-on');
     if (Videos.playing) Videos.stop(false);
-    try { if (Welcome.audio && !Welcome.audio.paused) Welcome.audio.pause(); } catch (e) {}
+    Welcome.stopVoice();
     $('#tour').hidden = false; this.buildBar();
     this.goStep(0, true);
   },
@@ -7937,7 +7973,7 @@ const Tour = {
    Laço principal
    ------------------------------------------------------------ */
 function loop(now) {
-  if (current === 'viewer' || Viewer.heroActive()) Viewer.render(now); else Globe.render(now);
+  if (!Videos.playing) { if (current === 'viewer' || Viewer.heroActive()) Viewer.render(now); else Globe.render(now); }
   requestAnimationFrame(loop);
 }
 
@@ -7945,6 +7981,7 @@ buildRail();
 kioskGuards();
 applyI18n();
 if (IS_MOBILE) { setLang((navigator.language || 'pt').toLowerCase().startsWith('pt') ? 'pt' : 'en', true); }
+$$('.qr').forEach((q) => { q.hidden = D.kiosk.qr === false; });
 go(IS_MOBILE ? 'home' : 'attract');
 if (IS_MOBILE && new URLSearchParams(location.search).get('qr')) setTimeout(() => toast(T('qrHello')), 1200);
 if (DESKTOP_SITE_ON_PHONE) setTimeout(() => toast(T('desktopHint'), 8000), 2600);

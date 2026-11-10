@@ -66,3 +66,11 @@ Apresentação guiada (narração)
   gerados offline (en/ja: Kokoro; de: VITS Coqui) pelo script tts-en/make_tour_audio.py; sem o arquivo,
   o app usa o sintetizador do aparelho e, sem voz instalada, avança por tempo. Para mudar um texto:
   edite o JSON, gere o áudio de novo e recompile.
+
+Ajustes de 10/11 (visita OGG + IST)
+  - config.json → "clientsFirst": ["OGG"] põe a OGG na primeira posição da parede de clientes. É
+    temporário: depois da visita, apague a linha (ou deixe []) — o app relê o config.json a cada minuto.
+  - O cartão "Leve no celular" (QR code) está desligado em data.js → kiosk.qr: false.
+  - Sair da tela de boas-vindas (ou iniciar a apresentação guiada) interrompe a saudação por voz.
+  - Vídeos: a primeira reprodução vem direto da rede (começa na hora) enquanto o service worker grava o
+    arquivo no cache; das próximas vezes toca do cache. O 3D fica parado enquanto o vídeo toca.

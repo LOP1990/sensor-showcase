@@ -81,5 +81,8 @@
         "maxSeconds": 240
       }
     ]
-  }
+  },
+  "clientsFirst": [
+    "OGG"
+  ]
 }
