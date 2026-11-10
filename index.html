@@ -952,7 +952,7 @@ body.mobile .brand-rep { margin-top: 12px; }
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-2359</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-0609</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -5522,7 +5522,8 @@ const SENSOR_DATA = {
   kiosk: {
     idleSeconds: 120,     // sem toque por este tempo → volta à tela de atração
     tourSeconds: 4,       // intervalo entre países no passeio do globo
-    historyAutoSeconds: 9 // avanço automático da linha do tempo (0 desliga)
+    historyAutoSeconds: 9, // avanço automático da linha do tempo (0 desliga)
+    hidden: ['team'],      // telas fora do ar por enquanto (some do trilho e não abre); esvazie para publicar
   },
 };
 
@@ -5696,6 +5697,8 @@ const RAIL = [
   ['clients', 'navClients'], ['certs', 'navCerts'], ['env', 'navEnv'], ['products', 'navProducts'],
 ];
 let current = 'attract';
+// Telas ocultas (data.js kiosk.hidden; config.json "hidden" sobrepõe sem recompilar)
+let HIDDEN = new Set(D.kiosk.hidden || []);
 let viewerFrom = 'products'; // tela de onde o 3D foi aberto (Voltar retorna para ela)
 let lastTouch = performance.now();
 // Modo celular: layout em coluna com rolagem, sem atração/voz/vídeo/inatividade (o quiosque é 1920×1080 paisagem)
@@ -5714,6 +5717,7 @@ const DESKTOP_SITE_ON_PHONE = IS_MOBILE && !FORCE_M && window.innerHeight > wind
   && matchMedia('(pointer: coarse)').matches && (window.devicePixelRatio || 1) < 1.5;
 
 function go(name) {
+  if (HIDDEN.has(name)) name = 'home';
   if (!SCREENS.includes(name)) return;
   const prev = current;
   current = name;
@@ -5741,7 +5745,7 @@ function go(name) {
 function buildRail() {
   const rail = $('#rail');
   rail.innerHTML = '';
-  RAIL.forEach(([s, k], idx) => {
+  RAIL.filter(([s]) => !HIDDEN.has(s)).forEach(([s, k], idx) => {
     const b = document.createElement('button');
     b.type = 'button';
     b.dataset.screen = s;
@@ -5819,7 +5823,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.09-2359';
+const BUILD = '2026.11.10-0609';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -5881,6 +5885,7 @@ const RemoteConfig = {
     if (!userChoseLang && cfg.defaultLang && I18N[cfg.defaultLang] && cfg.defaultLang !== LANG) setLang(cfg.defaultLang);
     Welcome.apply(cfg.welcome || {});
     Videos.apply(cfg.videos || {});
+    if (Array.isArray(cfg.hidden)) { const nh = new Set(cfg.hidden); if ([...nh].join() !== [...HIDDEN].join()) { HIDDEN = nh; buildRail(); applyI18n(); if (HIDDEN.has(current)) go('home'); else go(current); } }
     if (!prev) return;
   },
 };

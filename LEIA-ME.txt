@@ -48,6 +48,9 @@ Aba Ambiental (energia solar)
   (os percentuais do selo "100% renovável"), loadPeakKw/loadBaseKw (carga simulada).
 
 Nosso time (organograma)
+  FORA DO AR POR ENQUANTO: a aba está oculta (data.js → kiosk.hidden: ['team']). Para publicar,
+  basta pedir a remoção dessa lista — ou criar a chave "hidden": [] no config.json, que vale
+  sem recompilar (o app relê o config.json a cada minuto).
   As pessoas ficam em SENSOR_DATA.leaders (id, nome, cargo PT/EN, frase, trajetória, hobbies, foto) e
   o organograma em SENSOR_DATA.org: board = ids da direção (na ordem), areas = áreas com a lista de ids
   das pessoas de cada uma (vazia = bolinha "em breve"). Fotos: pasta team/ com o nome indicado em
