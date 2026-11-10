@@ -421,8 +421,38 @@ body.viewer-on .vpanel { background: rgba(11, 16, 23, .9); }
 body.viewer-on .modes { background: rgba(11, 16, 23, .88); }
 body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
 
-/* ---------- nosso time ---------- */
-#s-team .content { justify-content: center; }
+/* ---------- nosso time: direção + produção ---------- */
+#s-team .content { justify-content: flex-start; }
+.team-head { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.team-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 999px; border: 1px solid var(--line); background: rgba(11, 16, 23, .7); }
+.team-tabs button { padding: 10px 20px; border-radius: 999px; font-weight: 500; color: var(--text-2); min-height: 44px; font-size: clamp(14px, 1.05vw, 17px); transition: background .25s, color .25s; }
+.team-tabs button.on { background: var(--plat); color: var(--bg); font-weight: 600; }
+#s-team[data-view="mgmt"] .team, #s-team[data-view="prod"] .leaders-wrap { display: none; }
+.leaders-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.leaders-wrap .lead { margin-top: 6px; }
+.leaders { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 1.6vw, 28px); margin-top: clamp(16px, 2.4vh, 28px); align-items: stretch; }
+.leader { display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(180deg, rgba(16, 22, 31, .92), rgba(16, 22, 31, .5)); overflow: hidden; animation: tileIn .6s var(--ease) both; }
+.leader:nth-child(2) { animation-delay: .08s; } .leader:nth-child(3) { animation-delay: .16s; }
+.lphoto { position: relative; flex: none; height: clamp(150px, 30vh, 320px); background: linear-gradient(160deg, #1a2330, #0d131c); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--line); }
+.lphoto .ini { font-size: clamp(44px, 4.6vw, 76px); font-weight: 650; font-stretch: 112%; letter-spacing: .02em; color: rgba(191, 211, 230, .35); }
+.lphoto .ph-hint { position: absolute; right: 12px; bottom: 10px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); border: 1px dashed var(--line-2); border-radius: 999px; padding: 3px 9px; }
+.lphoto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.lphoto.has .ini, .lphoto.has .ph-hint { display: none; }
+.lbody { padding: clamp(14px, 1.5vw, 24px); display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.lbody h3 { font-size: clamp(20px, 1.8vw, 30px); line-height: 1.1; letter-spacing: -.01em; }
+.lrole { color: var(--plat); font-size: clamp(13px, 1vw, 16px); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.lbody blockquote { margin: 6px 0 0; padding: 0 0 0 14px; border-left: 2px solid var(--plat); color: var(--text); font-size: clamp(14px, 1.15vw, 19px); line-height: 1.4; font-style: italic; }
+.lbody blockquote .pflag { display: block; font-style: normal; color: var(--glow); font-size: 11px; margin-top: 4px; }
+.lbio { color: var(--text-2); font-size: clamp(13px, 1.02vw, 16px); line-height: 1.45; margin-top: 4px; }
+.lmeta { display: flex; flex-direction: column; gap: 2px; padding-top: 8px; margin-top: auto; border-top: 1px solid var(--line); font-size: clamp(13px, 1vw, 16px); color: var(--text); }
+.lmeta .k { color: var(--text-3); font-size: clamp(11px, .85vw, 13px); letter-spacing: .08em; text-transform: uppercase; }
+.brand-rep { display: inline-flex; align-items: center; gap: 14px; margin-top: 16px; padding: 10px 16px 10px 10px; border-radius: 12px; background: #fff; color: #1d2430; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
+.brand-rep img { height: clamp(34px, 3.4vh, 46px); width: auto; display: block; }
+.brand-rep b { font-weight: 700; font-size: 18px; letter-spacing: .04em; }
+.brand-rep span { display: flex; flex-direction: column; font-size: clamp(13px, 1vw, 16px); font-weight: 600; line-height: 1.2; }
+.brand-rep span small { font-weight: 500; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #5b6573; }
+#s-team .team-head + .team { margin-top: clamp(16px, 2.6vh, 32px); }
+.team { flex: 1; min-height: 0; align-content: center; }
 .team { display: grid; grid-template-columns: minmax(320px, 1fr) minmax(0, 1.15fr); gap: clamp(28px, 3.6vw, 72px); align-items: center; }
 .eyebrow { font-size: clamp(12px, .95vw, 15px); letter-spacing: .14em; text-transform: uppercase; color: var(--plat); font-weight: 600; margin-bottom: 14px; }
 .team-text h2 { font-size: clamp(32px, 3.6vw, 58px); }
@@ -632,6 +662,20 @@ body.mobile .lbl3d { font-size: 12px; padding: 4px 8px; }
 body.mobile .admin { position: fixed; right: 12px; left: 12px; width: auto; }
 body.mobile .toast { bottom: 18px; }
 
+/* celular: direção empilhada no estilo lista (foto à esquerda), anos da linha do tempo só no ativo */
+body.mobile .team-head { align-items: flex-start; flex-direction: column; gap: 12px; }
+body.mobile .leaders { grid-template-columns: 1fr; gap: 12px; }
+body.mobile .leader { flex-direction: row; align-items: stretch; }
+body.mobile .lphoto { width: 34%; min-width: 110px; height: auto; min-height: 170px; border-bottom: 0; border-right: 1px solid var(--line); }
+body.mobile .lphoto .ini { font-size: 34px; }
+body.mobile .lphoto .ph-hint { right: 8px; bottom: 8px; font-size: 10px; padding: 2px 7px; }
+body.mobile .lbody { padding: 12px 14px; }
+body.mobile .lbody h3 { font-size: 19px; }
+body.mobile .lbody blockquote { font-size: 14px; }
+body.mobile .lbio { font-size: 14px; }
+body.mobile .tl .years span:not(.on) { visibility: hidden; }
+body.mobile .brand-rep { margin-top: 12px; }
+
 </style>
 </head>
 <body>
@@ -724,8 +768,16 @@ body.mobile .toast { bottom: 18px; }
       </div>
     </section>
 
-    <section id="s-team" class="screen" data-screen="team">
+    <section id="s-team" class="screen" data-screen="team" data-view="mgmt">
       <div class="content">
+        <div class="team-head">
+          <h2 data-i18n="teamTitle"></h2>
+          <div class="team-tabs" id="team-tabs" role="tablist"><button type="button" data-view="mgmt"></button><button type="button" data-view="prod"></button></div>
+        </div>
+        <div class="leaders-wrap">
+          <p class="lead" id="leaders-lead"></p>
+          <div class="leaders" id="leaders"></div>
+        </div>
         <div class="team reveal">
           <div class="team-text">
             <div class="eyebrow" data-i18n="teamTitle"></div>
@@ -865,7 +917,7 @@ body.mobile .toast { bottom: 18px; }
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-2154</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-2203</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -5150,27 +5202,50 @@ const SENSOR_DATA = {
   ],
 
   history: [
-    { year: null, label: { pt: 'Origem', en: 'Origins' },
-      title: { pt: 'Mais de um século de know-how em platina', en: 'More than a century of platinum know-how' },
-      text: { pt: 'A operação nasce como a unidade brasileira de sensores de platina do grupo Heraeus, herdando mais de 100 anos de experiência em sensores de temperatura.',
-              en: 'The operation was born as the Brazilian platinum-sensor unit of the Heraeus group, inheriting more than 100 years of experience in temperature sensors.' },
-      confirm: true },
+    { year: 1989,
+      title: { pt: 'Nasce a divisão de RTD da Heraeus no Brasil', en: 'The Heraeus RTD division is born in Brazil' },
+      text: { pt: 'Criada a divisão de RTD da Heraeus Electro-Nite Brasil e iniciado o "Projekt 2000": a fabricação de sensores RTD de platina CWW em Diadema, herdando mais de um século de know-how do grupo em platina.',
+              en: 'The RTD division of Heraeus Electro-Nite Brasil is created and "Projekt 2000" begins: the manufacture of CWW platinum RTD sensors in Diadema, inheriting more than a century of the group\'s platinum know-how.' } },
     { year: 1993,
       title: { pt: 'Qualidade certificada', en: 'Certified quality' },
       text: { pt: 'Certificação ISO 9001 do sistema de gestão da qualidade (certificado BR044900), mantida desde então.',
               en: 'ISO 9001 certification of the quality management system (certificate BR044900), maintained ever since.' } },
+    { year: 2004,
+      title: { pt: 'Empresa própria e laboratório de calibração', en: 'Own company and calibration laboratory' },
+      text: { pt: 'A divisão de RTD torna-se uma empresa independente dentro do grupo — Heraeus Sensor-Nite Brasil, depois Heraeus Sensor Technology Ltda. — e nasce o laboratório de calibração HST Brasil.',
+              en: 'The RTD division becomes a separate legal entity within the group — Heraeus Sensor-Nite Brasil, later Heraeus Sensor Technology Ltda. — and the HST Brasil calibration laboratory is born.' } },
+    { year: 2005,
+      title: { pt: 'Termômetro de referência de platina', en: 'Platinum reference thermometer' },
+      text: { pt: 'Desenvolvimento e produção do termômetro de referência de platina SP-H01 (hoje SP-01), padrão de temperatura para laboratórios e indústria.',
+              en: 'Development and production of the SP-H01 platinum reference thermometer (today SP-01), a temperature standard for laboratories and industry.' } },
+    { year: 2006,
+      title: { pt: 'Mini elementos PRTD', en: 'Mini PRTD elements' },
+      text: { pt: 'Desenvolvimento dos mini elementos PRTD com 0,8 mm e 0,5 mm de diâmetro — fio de platina enrolado em corpos cerâmicos mais finos que um palito de fósforo.',
+              en: 'Development of the mini PRTD elements with 0.8 mm and 0.5 mm diameters — platinum wire wound into ceramic bodies thinner than a matchstick.' } },
     { year: 2008,
-      title: { pt: 'Laboratório de calibração acreditado', en: 'Accredited calibration laboratory' },
+      title: { pt: 'Laboratório acreditado ISO/IEC 17025', en: 'ISO/IEC 17025 accredited laboratory' },
       text: { pt: 'Acreditação ISO/IEC 17025 do laboratório de calibração (CAL 0405): medições com rastreabilidade reconhecida internacionalmente.',
               en: 'ISO/IEC 17025 accreditation of the calibration laboratory (CAL 0405): measurements with internationally recognised traceability.' } },
     { year: 2011,
-      title: { pt: 'Uma empresa independente', en: 'An independent company' },
-      text: { pt: 'Em março de 2011 a Sensor Technology torna-se uma empresa independente, mantendo a equipe, os processos e todo o know-how acumulado.',
-              en: 'In March 2011 Sensor Technology became an independent company, keeping its team, its processes and all the accumulated know-how.' } },
+      title: { pt: 'Independência: nasce a Sensor Technology Ltda.', en: 'Independence: Sensor Technology Ltda. is born' },
+      text: { pt: 'Concluído o MBO (management buyout) do grupo Heraeus: Rui Pereira e Luis Bombonatti, executivos da casa, assumem a empresa em partes iguais. Nasce a Sensor Technology Ltda., independente, com a mesma equipe, os mesmos processos e todo o know-how acumulado.',
+              en: 'The management buyout from the Heraeus Group is completed: Rui Pereira and Luis Bombonatti, executives of the house, take over the company in equal shares. Sensor Technology Ltda. is born — independent, with the same team, the same processes and all the accumulated know-how.' } },
+    { year: 2018,
+      title: { pt: 'Sensores de ranhura e elemento EW', en: 'Slot sensors and the EW element' },
+      text: { pt: 'Lançamento dos sensores tipo ranhura (slot) para grandes geradores e motores elétricos, com até 3 m de comprimento, e do elemento EW — micro-aquecedor e sensor de precisão para medidores de vazão de ar e gases.',
+              en: 'Launch of slot-type sensors for large generators and electric motors, up to 3 m long, and of the EW element — a micro-heater and precision sensor for air and gas flow meters.' } },
+    { year: 2019,
+      title: { pt: 'Fios de termopar de metais nobres', en: 'Noble-metal thermocouple wires' },
+      text: { pt: 'Início do fornecimento de fios de termopar de metais nobres (tipos R, S e B) no Brasil e no exterior, em representação da SAFINA.',
+              en: 'Start of the supply of noble-metal thermocouple wires (types R, S and B) in Brazil and abroad, representing SAFINA.' } },
+    { year: 2022,
+      title: { pt: 'Gestão ambiental certificada', en: 'Certified environmental management' },
+      text: { pt: 'Certificação ABNT NBR ISO 14001 do sistema de gestão ambiental (certificado BR044902): resíduos, água e energia sob gestão auditada.',
+              en: 'ABNT NBR ISO 14001 certification of the environmental management system (certificate BR044902): waste, water and energy under audited management.' } },
     { year: 2026, label: { pt: 'Hoje', en: 'Today' },
       title: { pt: 'Cerca de 500 mil sensores por ano, em {n} países', en: 'About 500,000 sensors a year, in {n} countries' },
-      text: { pt: 'Cerca de 100 colaboradores em Diadema, gestão ambiental ISO 14001 e exportação para {n} países na Europa, nas Américas, na Ásia, na África e na Oceania.',
-              en: 'About 100 people in Diadema, ISO 14001 environmental management and exports to {n} countries across Europe, the Americas, Asia, Africa and Oceania.' } },
+      text: { pt: 'Cerca de 100 colaboradores em Diadema, energia solar própria no telhado da fábrica e exportação para {n} países na Europa, nas Américas, na Ásia, na África e na Oceania.',
+              en: 'About 100 people in Diadema, our own solar power on the factory roof and exports to {n} countries across Europe, the Americas, Asia, Africa and Oceania.' } },
   ],
 
   // Clientes: só o logo (arquivos em clients/). w = largura máxima dentro do cartão (%), para equilibrar
@@ -5303,15 +5378,23 @@ const SENSOR_DATA = {
       kind: { pt: 'Fabricação própria', en: 'Made in-house' },
       summary: { pt: 'O elemento CWW montado do jeito que a aplicação pede: bainha, cabo, conector e isolação, pronto para instalar.',
                  en: 'The CWW element built the way the application needs: sheath, cable, connector and insulation, ready to install.' },
-      bullets: { pt: ['Ligação a 2, 3 ou 4 fios', 'Bainhas em aço inox e outras ligas', 'Cabos, conectores e terminações sob desenho'],
-                 en: ['2-, 3- or 4-wire connection', 'Stainless-steel and other alloy sheaths', 'Cables, connectors and terminations to drawing'] } },
+      bullets: { pt: ['Ligação a 2, 3 ou 4 fios', 'Bainhas em aço inox e outras ligas', 'Sensores de ranhura (slot) para geradores e motores, com até 3 m', 'Cabos, conectores e terminações sob desenho'],
+                 en: ['2-, 3- or 4-wire connection', 'Stainless-steel and other alloy sheaths', 'Slot sensors for generators and motors, up to 3 m long', 'Cables, connectors and terminations to drawing'] } },
     { id: 'calibration', icon: 'calib',
       name: { pt: 'Calibração acreditada', en: 'Accredited calibration' },
       kind: { pt: 'Serviço · ISO/IEC 17025 · CAL 0405', en: 'Service · ISO/IEC 17025 · CAL 0405' },
       summary: { pt: 'Laboratório acreditado para calibrar sensores e termômetros, com certificado rastreável para o seu produto ou o seu processo.',
                  en: 'Accredited laboratory for calibrating sensors and thermometers, with a traceable certificate for your product or your process.' },
-      bullets: { pt: ['Certificado de calibração rastreável', 'Sensores de platina, termopares e termômetros', 'Lotes e amostras de produção'],
-                 en: ['Traceable calibration certificate', 'Platinum sensors, thermocouples and thermometers', 'Production batches and samples'] } },
+      bullets: { pt: ['Certificado de calibração rastreável', 'Sensores de platina, termopares e termômetros', 'Termômetro de referência de platina SP-01, de fabricação própria', 'Lotes e amostras de produção'],
+                 en: ['Traceable calibration certificate', 'Platinum sensors, thermocouples and thermometers', 'SP-01 platinum reference thermometer, made in-house', 'Production batches and samples'] } },
+    { id: 'tcwire', icon: 'wire', brand: { name: 'SAFINA', logo: 'brands/safina.svg', note: { pt: 'Representante SAFINA no Brasil', en: 'SAFINA representative in Brazil' } },
+      name: { pt: 'Fios de termopar de metais nobres', en: 'Noble-metal thermocouple wires' },
+      kind: { pt: 'Distribuição · desde 2019', en: 'Distribution · since 2019' },
+      summary: { pt: 'Fios de platina e platina-ródio para termopares dos tipos R, S e B, fornecidos no Brasil e no exterior em representação da SAFINA, refinadora e fabricante de metais preciosos da República Tcheca.',
+                 en: 'Platinum and platinum-rhodium wires for type R, S and B thermocouples, supplied in Brazil and abroad representing SAFINA, a precious-metals refiner and manufacturer from the Czech Republic.' },
+      bullets: { pt: ['Tipos R (Pt-13%Rh/Pt), S (Pt-10%Rh/Pt) e B (Pt-30%Rh/Pt-6%Rh)', 'Tolerâncias conforme IEC 60584', 'Diâmetros e comprimentos sob consulta, com certificado de lote'],
+                 en: ['Types R (Pt-13%Rh/Pt), S (Pt-10%Rh/Pt) and B (Pt-30%Rh/Pt-6%Rh)', 'Tolerances to IEC 60584', 'Diameters and lengths on request, with batch certificate'] },
+      confirm: true },
     { id: 'thinfilm', icon: 'chip',
       name: { pt: 'Sensores thin-film de platina', en: 'Platinum thin-film sensors' },
       kind: { pt: 'Distribuição', en: 'Distribution' },
@@ -5319,6 +5402,28 @@ const SENSOR_DATA = {
                  en: 'Platinum thin-film elements for fast-response, high-volume applications, complementing the CWW line.' },
       bullets: { pt: ['Pt100 a Pt1000 em formatos compactos', 'Resposta rápida', 'Pronta entrega para volumes de série'],
                  en: ['Pt100 to Pt1000 in compact formats', 'Fast response', 'Stock availability for series volumes'] } },
+  ],
+
+  // Direção — perfis no estilo "management team" (fotos: team/<arquivo>; sem o arquivo aparecem as iniciais)
+  leaders: [
+    { name: 'Lucas Pereira', photo: 'team/lucas-pereira.jpg',
+      role: { pt: 'Diretor de Operações', en: 'Chief Operating Officer' },
+      quote: { pt: 'Precisão é hábito: medir, melhorar e repetir — todos os dias.', en: 'Precision is a habit: measure, improve and repeat — every day.' }, quoteConfirm: true,
+      bio: { pt: 'Responsável pela operação da Sensor Technology — produção, sistemas, finanças e os projetos de digitalização da fábrica — e sucessor na condução da empresa, ao lado dos sócios fundadores.',
+             en: 'Responsible for Sensor Technology\'s operations — production, systems, finance and the factory\'s digitalisation projects — and successor in leading the company alongside the founding partners.' },
+      hobbies: { pt: 'Natação, kart e tempo com a família', en: 'Swimming, karting and family time' } },
+    { name: 'Rui Pereira', photo: 'team/rui-pereira.jpg',
+      role: { pt: 'Sócio · Conselheiro', en: 'Partner · Board Advisor' },
+      quote: { pt: 'Uma empresa se constrói com números confiáveis e pessoas de confiança.', en: 'A company is built on reliable numbers and people you can rely on.' }, quoteConfirm: true,
+      bio: { pt: 'Começou como controller na operação brasileira da Heraeus e, no MBO de 2011, tornou-se sócio da Sensor Technology em partes iguais com Luis Bombonatti. Hoje, fora do dia a dia da operação, atua como conselheiro da empresa.',
+             en: 'Started as controller of the Heraeus operation in Brazil and, in the 2011 management buyout, became a partner of Sensor Technology in equal shares with Luis Bombonatti. Today, outside day-to-day operations, he serves as the company\'s board advisor.' },
+      hobbies: { pt: 'Corrida e cinema', en: 'Running and movies' } },
+    { name: 'Luis Bombonatti', photo: 'team/luis-bombonatti.jpg',
+      role: { pt: 'Sócio · Diretor Comercial e Técnico', en: 'Partner · Sales & Technical Director' },
+      quote: { pt: 'Cada sensor que sai daqui leva o nosso nome — e a nossa palavra.', en: 'Every sensor that leaves here carries our name — and our word.' }, quoteConfirm: true,
+      bio: { pt: 'Sócio da Sensor Technology desde o MBO de 2011, em partes iguais com Rui Pereira. Dirige a área comercial e a área técnica: clientes, aplicações e o desenvolvimento dos produtos.',
+             en: 'Partner of Sensor Technology since the 2011 management buyout, in equal shares with Rui Pereira. He leads the sales and the technical areas: customers, applications and product development.' },
+      hobbies: { pt: 'Ciclismo e vela', en: 'Cycling and sailing' } },
   ],
 
   // Nosso time — números do site institucional (confirmar)
@@ -5385,7 +5490,8 @@ const I18N = {
     qrTitle: 'Leve no celular', qrText: 'Aponte a câmera para abrir esta apresentação no seu telefone.', qrHello: 'Bem-vindo! Navegue pelas seções acima.',
     navHome: 'Início', navHistory: 'História', navWorld: 'Presença global', navMarkets: 'Mercados e aplicações',
     navClients: 'Clientes', navCerts: 'Certificações', navProducts: 'Produtos', navTeam: 'Nosso time', navEnv: 'Ambiental',
-    teamTitle: 'Nosso time',
+    sinceAt: 'Na Sensor desde {y}',
+    teamTitle: 'Nosso time', teamMgmt: 'Direção', teamProd: 'Produção', teamMgmtLead: 'Quem conduz a Sensor Technology.', hobbies: 'Fora do trabalho', photoHint: 'foto', brandRep: 'Marca representada',
     envTitle: 'Energia limpa, medida em tempo real', envLead: 'A fábrica de Diadema gera a própria energia com {kwp} kWp de painéis fotovoltaicos no telhado ({modules} módulos). O que não vem do sol vem da rede brasileira, de matriz predominantemente hídrica.',
     envFlow: 'Fluxo de energia agora', envPv: 'Fotovoltaica', envGrid: 'Rede', envLoad: 'Fábrica',
     envNowPv: 'Gerando agora', envTodayPv: 'Gerado hoje', envSelf: 'Autossuficiência no mês', envMonthPv: 'Gerado no mês', envLifetime: 'Gerado desde o início', envCo2: 'CO₂ evitado',
@@ -5429,7 +5535,8 @@ const I18N = {
     qrTitle: 'Take it with you', qrText: 'Point your camera to open this presentation on your phone.', qrHello: 'Welcome! Browse the sections above.',
     navHome: 'Home', navHistory: 'History', navWorld: 'Global presence', navMarkets: 'Markets and applications',
     navClients: 'Clients', navCerts: 'Certifications', navProducts: 'Products', navTeam: 'Our team', navEnv: 'Environment',
-    teamTitle: 'Our team',
+    sinceAt: 'At Sensor since {y}',
+    teamTitle: 'Our team', teamMgmt: 'Management', teamProd: 'Production', teamMgmtLead: 'The people who lead Sensor Technology.', hobbies: 'Outside work', photoHint: 'photo', brandRep: 'Represented brand',
     envTitle: 'Clean energy, measured in real time', envLead: 'The Diadema plant generates its own power with {kwp} kWp of rooftop photovoltaic panels ({modules} modules). What does not come from the sun comes from the Brazilian grid, which is predominantly hydroelectric.',
     envFlow: 'Energy flow right now', envPv: 'Photovoltaic', envGrid: 'Grid', envLoad: 'Factory',
     envNowPv: 'Generating now', envTodayPv: 'Generated today', envSelf: 'Self-sufficiency this month', envMonthPv: 'Generated this month', envLifetime: 'Generated since start', envCo2: 'CO₂ avoided',
@@ -5648,7 +5755,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.09-2154';
+const BUILD = '2026.11.09-2203';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -6078,7 +6185,8 @@ const Products = {
   render() { renderPicker($('#products-picker'), $('#products-detail'), D.products, Products.detail, Products.st); },
   detail(p, el) {
     el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap');
-    el.innerHTML = `<div class="i-big">${ICONS[p.icon] || ''}</div><h3>${L(p.name)}</h3><div class="kind">${L(p.kind)}</div><p class="sum">${L(p.summary)}</p>
+    const brand = p.brand ? `<div class="brand-rep"><img src="${p.brand.logo}" alt="${p.brand.name}" draggable="false" onerror="this.replaceWith(Object.assign(document.createElement('b'),{textContent:'${p.brand.name}'}))"><span><small>${T('brandRep')}</small>${L(p.brand.note)}</span></div>` : '';
+    el.innerHTML = `<div class="i-big">${ICONS[p.icon] || ''}</div><h3>${L(p.name)}</h3><div class="kind">${L(p.kind)}</div><p class="sum">${L(p.summary)}</p>${brand}
       <ul>${(p.bullets[LANG] || p.bullets.pt).map((a) => `<li>${a}</li>`).join('')}</ul>
       <div class="foot">${p.has3d ? `<button type="button" class="btn primary" id="btn-3d">${T('explore3d')}</button>` : ''}${p.confirm && D.provisional ? `<span class="tag" style="color:var(--glow);border-color:rgba(255,210,122,.4)">${T('confirmFlag')}</span>` : ''}</div>`;
     const b = $('#btn-3d', el); if (b) b.addEventListener('click', () => go('viewer'));
@@ -6128,15 +6236,38 @@ const Certs = {
    Nosso time
    ------------------------------------------------------------ */
 const Team = {
-  timer: 0, i: 0,
+  timer: 0, i: 0, view: 'mgmt',
   render() {
     const t = D.team; if (!t) return;
+    // Direção (estilo "management team")
+    const ini = (n) => n.split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+    $('#leaders').innerHTML = (D.leaders || []).map((l) => `
+      <article class="leader">
+        <div class="lphoto"><span class="ini">${ini(l.name)}</span><span class="ph-hint">${T('photoHint')}</span>${l.photo ? `<img src="${l.photo}" alt="${l.name}" draggable="false" decoding="async" onload="this.parentNode.classList.add('has')" onerror="this.remove()">` : ''}</div>
+        <div class="lbody">
+          <h3>${l.name}</h3>
+          <div class="lrole">${L(l.role)}</div>
+          ${l.quote ? `<blockquote>“${L(l.quote)}”${l.quoteConfirm && D.provisional ? `<i class="pflag">${T('confirmFlag')}</i>` : ''}</blockquote>` : ''}
+          <p class="lbio">${L(l.bio)}</p>
+          ${l.since ? `<div class="lmeta"><span class="k">${T('sinceAt', { y: l.since })}</span></div>` : ''}
+          ${l.hobbies ? `<div class="lmeta"><span class="k">${T('hobbies')}</span><span>${L(l.hobbies)}</span></div>` : ''}
+        </div>
+      </article>`).join('');
+    $('#leaders-lead').textContent = T('teamMgmtLead');
+    // Produção (artesãs)
     $('#team-title').textContent = L(t.title);
     $('#team-lead').textContent = L(t.lead);
     $('#team-stats').innerHTML = t.stats.map((x) => `<div class="tstat"><div class="v">${x.v}</div><div class="k">${L(x.k)}${x.confirm && D.provisional ? ` <i class="pflag">${T('confirmFlag')}</i>` : ''}</div></div>`).join('');
     $('#team-pillars').innerHTML = ((t.pillars && (t.pillars[LANG] || t.pillars.pt)) || []).map((x) => `<span class="pill">${x}</span>`).join('');
     const ph = $('#team-photos'); ph.innerHTML = (t.photos || []).map((src, i) => `<img class="ph${i === 0 ? ' on' : ''}" src="${src}" alt="" draggable="false" decoding="async">`).join('') + `<div class="dots">${(t.photos || []).map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>`;
     this.i = 0;
+    $$('#team-tabs button').forEach((b) => { b.textContent = T(b.dataset.view === 'mgmt' ? 'teamMgmt' : 'teamProd'); b.onclick = () => Team.show(b.dataset.view); });
+    this.show(this.view);
+  },
+  show(v) {
+    this.view = v; const sec = $('#s-team'); sec.dataset.view = v;
+    $$('#team-tabs button').forEach((b) => b.classList.toggle('on', b.dataset.view === v));
+    if (IS_MOBILE) window.scrollTo(0, 0);
   },
   enter() { clearInterval(this.timer); const n = (D.team.photos || []).length; if (n < 2) return; this.timer = setInterval(() => { this.i = (this.i + 1) % n; $$('#team-photos .ph').forEach((im, k) => im.classList.toggle('on', k === this.i)); $$('#team-photos .dots i').forEach((d, k) => d.classList.toggle('on', k === this.i)); }, 6000); },
   leave() { clearInterval(this.timer); },
