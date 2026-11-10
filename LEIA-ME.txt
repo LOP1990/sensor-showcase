@@ -105,9 +105,9 @@ Apresentação guiada — orelhinha e navegação
   dela (nada fica escondido) e a legenda, maior, rola sozinha acompanhando a voz quando o texto não cabe.
 
 Vídeos dentro da apresentação (10/11)
-  Dois passos de vídeo: o institucional (depois de "Hoje", na história) e o da usina solar (depois de
-  "Energia limpa"). Em cada um, uma narração curta apresenta o filme e ele toca inteiro, ajustado à
-  área acima da barra; a barra pausa/retoma e avança (▶▶ pula o filme), tocar no filme pausa/retoma,
+  O vídeo institucional abre sozinho ao fim da narração de "Hoje" (história) e o da usina solar ao fim de
+  "Energia limpa" — a última frase de cada passo apresenta o filme, que toca inteiro, ajustado à área
+  acima da barra; a barra pausa/retoma e avança (▶▶ pula o filme), tocar no filme pausa/retoma,
   e ao terminar a apresentação segue sozinha. Os botões "Assistir ao vídeo" das telas, com a
   apresentação ligada, pulam direto para o passo do vídeo (sem a narração) e depois ela continua;
   sem a apresentação, o vídeo toca e volta para a mesma tela.
@@ -146,4 +146,14 @@ Ajustes de 10/11 (tarde) — telas baixas, parede de clientes, barra do vídeo
     em vez de subir por trás da faixa de boas-vindas.
   - Vídeos: barra com play/pause, tempo e busca por toque/arrasto (também nos passos da apresentação). A
     camada do vídeo agora fica acima do app: nenhum botão invisível do trilho recebe toques por baixo.
+
+Linha do tempo narrada marco a marco (10/11, 16h40)
+  Os passos da história são compostos de trechos ("segments" no tour-script.json), um por marco: o gerador
+  sintetiza cada trecho em separado, emenda com pausa e grava no manifesto o instante em que cada trecho
+  começa, por idioma. No app isso vira deixas {history, at:{en,ja,de,pt}} e a linha do tempo pula para o
+  marco no momento exato em que a voz chega nele (1989 → 1993 → 2004 → 2005 → 2006 → 2008 e 2011 → 2018 →
+  2019 → 2022 → Hoje). Tocar num marco durante a narração leva a voz direto àquele trecho; tocar no
+  primeiro marco recomeça o passo. Com a apresentação aberta, o avanço automático da história (9 s)
+  fica desligado. Para mudar um texto: edite o trecho no JSON e gere de novo
+  (STEPS=history1,history2 python3 tts-en/make_tour_audio.py en ja de pt).
 
