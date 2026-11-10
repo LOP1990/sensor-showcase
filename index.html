@@ -3,6 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script>
+/* Telas grandes (ex.: painel BenQ 86" em 4K): acima de 1300 px CSS no lado menor, o app usa o layout de 1920×1080 ampliado.
+   Android: o navegador amplia pela meta viewport (width=1920). Outros: zoom CSS na raiz (+ unidades vw/vh divididas pelo zoom).
+   ?m=1 (modo celular) e ?z=0 desligam; ?z=1.5 força um fator. */
+(function () {
+  try {
+    var q = new URLSearchParams(location.search), zq = q.get('z');
+    var w = window.innerWidth || screen.width || 0, h = window.innerHeight || screen.height || 0;
+    window.UI_ZOOM = 1;
+    if (zq === '0' || q.get('m') === '1') return;
+    var auto = Math.min(w, h) > 1300 && w > h;
+    var z = zq ? +zq : (auto ? w / 1920 : 0);
+    if (!(z > 1.05)) return;
+    if (/Android/i.test(navigator.userAgent) && !zq) {
+      var m = document.querySelector('meta[name="viewport"]');
+      if (m) { m.setAttribute('content', 'width=1920, user-scalable=no, viewport-fit=cover'); window.UI_VIEWPORT = 1920; }
+      return;
+    }
+    z = Math.round(z * 100) / 100; window.UI_ZOOM = z;
+    var r = document.documentElement.style; r.zoom = z;
+    ['vw', 'vh', 'vmin', 'vmax'].forEach(function (u) { r.setProperty('--' + u, (1 / z) + u); });
+  } catch (e) {}
+})();
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -38,12 +62,15 @@
   --glow: #FFD27A;
   --ok: #7FD4A6;
   --font: 'Archivo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --rail-w: clamp(230px, 19vw, 310px);
-  --pad: clamp(24px, 3.2vw, 60px);
-  --logo-h: clamp(64px, min(9.4vh, 10.6vw), 110px);
-  --top-h: calc(var(--logo-h) + clamp(22px, 2.6vh, 30px));
+  --rail-w: clamp(230px, calc(19 * var(--vw)), 310px);
+  --pad: clamp(24px, calc(3.2 * var(--vw)), 60px);
+  --logo-h: clamp(64px, min(calc(9.4 * var(--vh)), calc(10.6 * var(--vw))), 110px);
+  --top-h: calc(var(--logo-h) + clamp(22px, calc(2.6 * var(--vh)), 30px));
   --radius: 14px;
   --ease: cubic-bezier(.2, .7, .2, 1);
+  /* unidades de viewport indiretas: em telas grandes o <head> aplica zoom na raiz e redefine estas variáveis */
+  --vw: 1vw; --vh: 1vh; --vmin: 1vmin; --vmax: 1vmax;
+  --reserve: 0px; /* faixa reservada embaixo para a barra da apresentação guiada */
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -52,7 +79,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
-  font-size: clamp(16px, 1.2vw, 20px);
+  font-size: clamp(16px, calc(1.2 * var(--vw)), 20px);
   line-height: 1.5;
   overflow: hidden;
   overscroll-behavior: none;
@@ -82,7 +109,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 #labels { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 .lbl3d {
   position: absolute; transform: translate(-50%, -50%);
-  font-size: clamp(13px, 1vw, 16px); color: var(--plat-2); white-space: nowrap;
+  font-size: clamp(13px, calc(1 * var(--vw)), 16px); color: var(--plat-2); white-space: nowrap;
   padding: 6px 10px; border-radius: 999px;
   background: rgba(11, 16, 23, .72); border: 1px solid var(--line-2);
   opacity: 0; transition: opacity .35s;
@@ -90,7 +117,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 }
 .lbl3d.on { opacity: 1; }
 /* rótulos do visualizador com linha de chamada até o ponto da peça */
-.lbl3d.l, .lbl3d.r { --gap: clamp(30px, 2.6vw, 48px); }
+.lbl3d.l, .lbl3d.r { --gap: clamp(30px, calc(2.6 * var(--vw)), 48px); }
 .lbl3d.r { transform: translate(0, -50%); margin-left: var(--gap); }
 .lbl3d.l { transform: translate(-100%, -50%); margin-left: calc(-1 * var(--gap)); }
 .lbl3d.l::before, .lbl3d.r::before { content: ''; position: absolute; top: 50%; width: calc(var(--gap) - 3px); height: 1px; background: var(--plat-2); opacity: .75; }
@@ -99,7 +126,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .lbl3d.l::after, .lbl3d.r::after { content: ''; position: absolute; top: 50%; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%; background: var(--plat-2); box-shadow: 0 0 0 3px rgba(11, 16, 23, .55); }
 .lbl3d.r::after { right: calc(100% + var(--gap) - 3.5px); }
 .lbl3d.l::after { left: calc(100% + var(--gap) - 3.5px); }
-.lbl3d.hero { font-size: clamp(16px, 1.3vw, 22px); padding: 8px 14px; display: flex; align-items: center; gap: 10px; }
+.lbl3d.hero { font-size: clamp(16px, calc(1.3 * var(--vw)), 22px); padding: 8px 14px; display: flex; align-items: center; gap: 10px; }
 .lbl3d.hero .flag { width: 1.35em; aspect-ratio: 4 / 3; height: auto; border-radius: 2px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .15); flex: none; }
 .lbl3d .leader { position: absolute; left: 50%; top: 100%; width: 1px; height: 26px; background: var(--line-2); }
 
@@ -119,7 +146,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .brand-fallback[hidden] { display: none; }
 .brand-mark { width: 14px; height: 14px; border-radius: 50%; background: var(--plat-2);
   box-shadow: 0 0 0 4px rgba(191, 211, 230, .18), 0 0 24px rgba(191, 211, 230, .35); }
-.brand-name { font-size: clamp(15px, 1.15vw, 19px); font-weight: 600; font-stretch: 110%; letter-spacing: .02em; }
+.brand-name { font-size: clamp(15px, calc(1.15 * var(--vw)), 19px); font-weight: 600; font-stretch: 110%; letter-spacing: .02em; }
 .top-right { display: flex; align-items: center; gap: 18px; }
 .prov { font-size: 12px; color: var(--glow); border: 1px solid rgba(255, 210, 122, .4); padding: 4px 10px; border-radius: 999px; }
 .prov[hidden] { display: none; }
@@ -129,7 +156,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 
 /* ---------- trilho (navegação) ---------- */
 #rail {
-  position: absolute; left: var(--pad); top: calc(var(--top-h) + 2vh); bottom: 3vh;
+  position: absolute; left: var(--pad); top: calc(var(--top-h) + calc(2 * var(--vh))); bottom: calc(var(--reserve) + calc(3 * var(--vh)));
   width: var(--rail-w);
   display: flex; flex-direction: column; justify-content: center; gap: 4px;
   opacity: 0; transform: translateX(-24px); pointer-events: none;
@@ -141,9 +168,9 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 #rail:not(.on) button { pointer-events: none; } /* trilho escondido não pode roubar toques (ex.: do Voltar do 3D) */
 #rail button {
   display: flex; align-items: center; gap: 14px;
-  min-height: clamp(52px, 6.2vh, 68px);
+  min-height: clamp(52px, calc(6.2 * var(--vh)), 68px);
   padding: 6px 14px 6px 0;
-  font-size: clamp(15px, 1.25vw, 20px); font-weight: 500; text-align: left;
+  font-size: clamp(15px, calc(1.25 * var(--vw)), 20px); font-weight: 500; text-align: left;
   color: var(--text-2); border-left: 2px solid transparent; border-radius: 0 10px 10px 0;
   transition: color .25s, border-color .25s, background .25s;
 }
@@ -163,13 +190,13 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 }
 .screen.active { opacity: 1; visibility: visible; transition: opacity .55s var(--ease); }
 .screen .content {
-  position: absolute; top: var(--top-h); bottom: 0;
-  left: calc(var(--pad) + var(--rail-w) + clamp(24px, 3vw, 56px)); right: var(--pad);
+  position: absolute; top: var(--top-h); bottom: var(--reserve); transition: bottom .4s var(--ease);
+  left: calc(var(--pad) + var(--rail-w) + clamp(24px, calc(3 * var(--vw)), 56px)); right: var(--pad);
   display: flex; flex-direction: column;
-  padding-top: 2vh; padding-bottom: 3vh;
+  padding-top: calc(2 * var(--vh)); padding-bottom: calc(3 * var(--vh));
 }
-.screen h2 { font-size: clamp(30px, 3.4vw, 54px); font-stretch: 106%; line-height: 1.05; letter-spacing: -.01em; }
-.screen .lead { font-size: clamp(16px, 1.35vw, 22px); color: var(--text-2); max-width: 62ch; margin-top: 10px; }
+.screen h2 { font-size: clamp(30px, calc(3.4 * var(--vw)), 54px); font-stretch: 106%; line-height: 1.05; letter-spacing: -.01em; }
+.screen .lead { font-size: clamp(16px, calc(1.35 * var(--vw)), 22px); color: var(--text-2); max-width: 62ch; margin-top: 10px; }
 .reveal > * { opacity: 0; transform: translateY(14px); }
 .active .reveal > * { opacity: 1; transform: none; transition: opacity .6s var(--ease), transform .6s var(--ease); }
 .active .reveal > *:nth-child(2) { transition-delay: .08s; }
@@ -178,16 +205,16 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 
 /* ---------- atração ---------- */
 #s-attract .hero {
-  position: absolute; left: var(--pad); bottom: clamp(60px, 10vh, 120px); max-width: 46vw;
+  position: absolute; left: var(--pad); bottom: clamp(60px, calc(10 * var(--vh)), 120px); max-width: calc(46 * var(--vw));
 }
 #s-attract h1 {
-  font-size: clamp(40px, 5.6vw, 92px); font-stretch: 118%; font-weight: 650;
+  font-size: clamp(40px, calc(5.6 * var(--vw)), 92px); font-stretch: 118%; font-weight: 650;
   line-height: .95; letter-spacing: -.015em;
 }
-#s-attract .hero p { margin-top: 20px; font-size: clamp(17px, 1.5vw, 24px); color: var(--text-2); max-width: 36ch; }
+#s-attract .hero p { margin-top: 20px; font-size: clamp(17px, calc(1.5 * var(--vw)), 24px); color: var(--text-2); max-width: 36ch; }
 #s-attract .tap {
-  position: absolute; left: 50%; bottom: clamp(22px, 4vh, 44px); transform: translateX(-50%);
-  display: flex; align-items: center; gap: 12px; font-size: clamp(14px, 1.1vw, 18px); color: var(--plat);
+  position: absolute; left: 50%; bottom: clamp(22px, calc(4 * var(--vh)), 44px); transform: translateX(-50%);
+  display: flex; align-items: center; gap: 12px; font-size: clamp(14px, calc(1.1 * var(--vw)), 18px); color: var(--plat);
   animation: tapPulse 2.6s ease-in-out infinite;
 }
 .tap .ring { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--plat); position: relative; }
@@ -195,30 +222,30 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 @keyframes tapPulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
 @keyframes ringOut { 0% { transform: scale(.4); opacity: .7; } 100% { transform: scale(1.6); opacity: 0; } }
 #s-attract .counter {
-  position: absolute; left: var(--pad); top: calc(var(--top-h) + 4vh); text-align: left;
+  position: absolute; left: var(--pad); top: calc(var(--top-h) + calc(4 * var(--vh))); text-align: left;
 }
-.counter .num { font-size: clamp(34px, 3.6vw, 60px); font-weight: 600; font-stretch: 108%; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -.01em; }
-.counter .cap { color: var(--text-3); margin-top: 8px; font-size: clamp(13px, 1vw, 16px); }
+.counter .num { font-size: clamp(34px, calc(3.6 * var(--vw)), 60px); font-weight: 600; font-stretch: 108%; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -.01em; }
+.counter .cap { color: var(--text-3); margin-top: 8px; font-size: clamp(13px, calc(1 * var(--vw)), 16px); }
 
 /* ---------- início (hero 3D: CWW + EW à direita, texto à esquerda) ---------- */
 #s-home .content { justify-content: center; }
-#s-home .intro { max-width: 37vw; }
-#s-home .intro h2 { font-size: clamp(34px, 3.8vw, 64px); font-stretch: 110%; line-height: 1.02; letter-spacing: -.015em; }
+#s-home .intro { max-width: calc(37 * var(--vw)); }
+#s-home .intro h2 { font-size: clamp(34px, calc(3.8 * var(--vw)), 64px); font-stretch: 110%; line-height: 1.02; letter-spacing: -.015em; }
 #s-home .intro .lead { max-width: 48ch; }
-.hero-hint { display: inline-flex; align-items: center; gap: 12px; margin-top: clamp(20px, 3vh, 36px); font-size: clamp(13px, 1vw, 16px); color: var(--plat); }
+.hero-hint { display: inline-flex; align-items: center; gap: 12px; margin-top: clamp(20px, calc(3 * var(--vh)), 36px); font-size: clamp(13px, calc(1 * var(--vw)), 16px); color: var(--plat); }
 .hero-hint .ring { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--plat); position: relative; flex: none; }
 .hero-hint .ring::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; border: 1px solid var(--plat); opacity: .5; animation: ringOut 2.6s ease-out infinite; }
 body.hero-on .lbl3d { pointer-events: none; }
 body.mobile.hero-on #viewer-canvas { touch-action: pan-y; }
-#s-home .stats { display: flex; gap: clamp(28px, 4vw, 72px); margin-top: clamp(22px, 3vh, 40px); flex-wrap: wrap; align-items: flex-end; }
+#s-home .stats { display: flex; gap: clamp(28px, calc(4 * var(--vw)), 72px); margin-top: clamp(22px, calc(3 * var(--vh)), 40px); flex-wrap: wrap; align-items: flex-end; }
 #s-home .stat.wide { flex-basis: 100%; }
-#s-home .stat.wide .v { font-size: clamp(34px, 3.6vw, 60px); color: var(--plat-2); }
-.stat .v { font-size: clamp(28px, 2.8vw, 46px); font-weight: 600; font-stretch: 108%; font-variant-numeric: tabular-nums; line-height: 1; }
-.stat .k { color: var(--text-3); margin-top: 8px; font-size: clamp(13px, 1vw, 16px); }
+#s-home .stat.wide .v { font-size: clamp(34px, calc(3.6 * var(--vw)), 60px); color: var(--plat-2); }
+.stat .v { font-size: clamp(28px, calc(2.8 * var(--vw)), 46px); font-weight: 600; font-stretch: 108%; font-variant-numeric: tabular-nums; line-height: 1; }
+.stat .k { color: var(--text-3); margin-top: 8px; font-size: clamp(13px, calc(1 * var(--vw)), 16px); }
 
 /* ---------- história ---------- */
 #s-history .content { justify-content: center; }
-.tl { position: relative; margin-top: clamp(24px, 4vh, 48px); }
+.tl { position: relative; margin-top: clamp(24px, calc(4 * var(--vh)), 48px); }
 .tl .track { position: relative; height: 2px; background: var(--line); margin: 0 10px; }
 .tl .track .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--plat); transition: width .6s var(--ease); }
 .tl .nodes { display: flex; justify-content: space-between; margin-top: -11px; }
@@ -227,13 +254,13 @@ body.mobile.hero-on #viewer-canvas { touch-action: pan-y; }
 .tl .node.past { border-color: var(--plat); }
 .tl .node.on { background: var(--plat-2); border-color: var(--plat-2); transform: scale(1.25); box-shadow: 0 0 24px rgba(232, 241, 251, .45); }
 .tl .years { display: flex; justify-content: space-between; margin-top: 12px; }
-.tl .years span { width: 20px; display: flex; justify-content: center; white-space: nowrap; font-size: clamp(13px, 1vw, 16px); color: var(--text-3); font-variant-numeric: tabular-nums; }
+.tl .years span { width: 20px; display: flex; justify-content: center; white-space: nowrap; font-size: clamp(13px, calc(1 * var(--vw)), 16px); color: var(--text-3); font-variant-numeric: tabular-nums; }
 .tl .years span.on { color: var(--text); }
-.tl-card { display: grid; grid-template-columns: minmax(140px, .9fr) 2fr; gap: clamp(20px, 3vw, 48px); align-items: start; min-height: clamp(180px, 28vh, 260px); margin-top: clamp(28px, 5vh, 56px); }
-.tl-card .y { font-size: clamp(56px, 7vw, 120px); font-weight: 650; font-stretch: 112%; line-height: .9; letter-spacing: -.02em; color: var(--plat-2); font-variant-numeric: tabular-nums; }
-.tl-card .y.txt { font-size: clamp(34px, 3.8vw, 64px); }
-.tl-card h3 { font-size: clamp(22px, 2.1vw, 34px); line-height: 1.15; }
-.tl-card p { margin-top: 14px; color: var(--text-2); max-width: 58ch; font-size: clamp(16px, 1.3vw, 21px); }
+.tl-card { display: grid; grid-template-columns: minmax(140px, .9fr) 2fr; gap: clamp(20px, calc(3 * var(--vw)), 48px); align-items: start; min-height: clamp(180px, calc(28 * var(--vh)), 260px); margin-top: clamp(28px, calc(5 * var(--vh)), 56px); }
+.tl-card .y { font-size: clamp(56px, calc(7 * var(--vw)), 120px); font-weight: 650; font-stretch: 112%; line-height: .9; letter-spacing: -.02em; color: var(--plat-2); font-variant-numeric: tabular-nums; }
+.tl-card .y.txt { font-size: clamp(34px, calc(3.8 * var(--vw)), 64px); }
+.tl-card h3 { font-size: clamp(22px, calc(2.1 * var(--vw)), 34px); line-height: 1.15; }
+.tl-card p { margin-top: 14px; color: var(--text-2); max-width: 58ch; font-size: clamp(16px, calc(1.3 * var(--vw)), 21px); }
 .tl-card .flag { margin-top: 14px; font-size: 13px; color: var(--glow); }
 .tl-nav { display: flex; gap: 12px; margin-top: 10px; }
 .tl-nav button, .btn { border: 1px solid var(--line-2); border-radius: 999px; padding: 12px 22px; font-weight: 500; color: var(--text); min-height: 48px; transition: background .2s, border-color .2s; }
@@ -248,29 +275,29 @@ body.mobile.hero-on #viewer-canvas { touch-action: pan-y; }
 
 /* ---------- presença global ---------- */
 #s-world .content { flex-direction: column; }
-#s-world .side { width: clamp(280px, 26vw, 420px); display: flex; flex-direction: column; flex: 1; min-height: 0; }
-#s-world .side .big { font-size: clamp(64px, 8vw, 140px); font-weight: 650; font-stretch: 114%; line-height: .9; letter-spacing: -.02em; color: var(--plat-2); font-variant-numeric: tabular-nums; }
-#s-world .side .cap { color: var(--text-2); font-size: clamp(16px, 1.3vw, 22px); margin-top: 10px; max-width: 24ch; }
-#s-world .side .hint { margin-top: clamp(14px, 2.4vh, 28px); color: var(--text-3); font-size: clamp(13px, 1vw, 16px); }
-#s-world .list { display: flex; gap: clamp(14px, 1.6vw, 28px); font-size: clamp(12px, .95vw, 15px); color: var(--text-2); line-height: 1.6; margin-top: 14px; padding: 12px 18px 10px; border-radius: var(--radius); background: rgba(5, 7, 11, .62); border: 1px solid var(--line); backdrop-filter: blur(8px); }
+#s-world .side { width: clamp(280px, calc(26 * var(--vw)), 420px); display: flex; flex-direction: column; flex: 1; min-height: 0; }
+#s-world .side .big { font-size: clamp(64px, calc(8 * var(--vw)), 140px); font-weight: 650; font-stretch: 114%; line-height: .9; letter-spacing: -.02em; color: var(--plat-2); font-variant-numeric: tabular-nums; }
+#s-world .side .cap { color: var(--text-2); font-size: clamp(16px, calc(1.3 * var(--vw)), 22px); margin-top: 10px; max-width: 24ch; }
+#s-world .side .hint { margin-top: clamp(14px, calc(2.4 * var(--vh)), 28px); color: var(--text-3); font-size: clamp(13px, calc(1 * var(--vw)), 16px); }
+#s-world .list { display: flex; gap: clamp(14px, calc(1.6 * var(--vw)), 28px); font-size: clamp(12px, calc(.95 * var(--vw)), 15px); color: var(--text-2); line-height: 1.6; margin-top: 14px; padding: 12px 18px 10px; border-radius: var(--radius); background: rgba(5, 7, 11, .62); border: 1px solid var(--line); backdrop-filter: blur(8px); }
 #s-world .grp { flex: var(--cols, 1); min-width: 0; }
 #s-world .grp-stack { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
-#s-world .grp h5 { margin: 0 0 6px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 4px 5px; border-bottom: 1px solid var(--line-2); font-size: clamp(11px, .85vw, 13px); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
-#s-world .grp h5 b { font-size: clamp(15px, 1.25vw, 21px); line-height: 1; color: var(--plat-2); font-weight: 650; font-variant-numeric: tabular-nums; }
+#s-world .grp h5 { margin: 0 0 6px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 4px 5px; border-bottom: 1px solid var(--line-2); font-size: clamp(11px, calc(.85 * var(--vw)), 13px); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+#s-world .grp h5 b { font-size: clamp(15px, calc(1.25 * var(--vw)), 21px); line-height: 1; color: var(--plat-2); font-weight: 650; font-variant-numeric: tabular-nums; }
 #s-world .grp .items { columns: var(--cols, 1); column-gap: 12px; }
 #s-world .list button { display: flex; align-items: center; gap: 9px; width: 100%; break-inside: avoid; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 1px 4px; border-radius: 6px; color: var(--text-2); transition: color .3s, background .3s; }
 #s-world .list button:active { background: rgba(191, 211, 230, .14); }
-#s-world .list button .flag { width: clamp(18px, 1.35vw, 24px); height: auto; aspect-ratio: 4 / 3; border-radius: 2px; flex: none; box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); object-fit: cover; opacity: .92; }
+#s-world .list button .flag { width: clamp(18px, calc(1.35 * var(--vw)), 24px); height: auto; aspect-ratio: 4 / 3; border-radius: 2px; flex: none; box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); object-fit: cover; opacity: .92; }
 #s-world .list button.on { color: var(--plat-2); background: rgba(255, 210, 122, .08); }
 #s-world .list button.on .flag { opacity: 1; box-shadow: 0 0 0 1px rgba(255, 210, 122, .8), 0 0 10px rgba(255, 210, 122, .35); }
 
 /* ---------- mercados / produtos (seletor + detalhe) ---------- */
-.split { display: grid; grid-template-columns: minmax(260px, 1fr) 1.6fr; gap: clamp(24px, 3vw, 64px); flex: 1; min-height: 0; margin-top: clamp(16px, 2.5vh, 32px); }
+.split { display: grid; grid-template-columns: minmax(260px, 1fr) 1.6fr; grid-template-rows: minmax(0, 1fr); gap: clamp(24px, calc(3 * var(--vw)), 64px); flex: 1; min-height: 0; margin-top: clamp(16px, calc(2.5 * var(--vh)), 32px); } /* linha única limitada à altura: o detalhe rola em vez de vazar */
 .picker { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
 .picker button {
   display: flex; align-items: center; gap: 16px; text-align: left;
-  min-height: clamp(50px, 6vh, 66px); padding: 6px 16px 6px 12px;
-  font-size: clamp(16px, 1.45vw, 24px); font-weight: 500; color: var(--text-2);
+  min-height: clamp(50px, calc(6 * var(--vh)), 66px); padding: 6px 16px 6px 12px;
+  font-size: clamp(16px, calc(1.45 * var(--vw)), 24px); font-weight: 500; color: var(--text-2);
   border-radius: 10px; border: 1px solid transparent;
   transition: color .25s, background .25s, border-color .25s;
 }
@@ -279,36 +306,36 @@ body.mobile.hero-on #viewer-canvas { touch-action: pan-y; }
 .picker button.on { color: var(--text); background: var(--surface); border-color: var(--line); }
 .picker button.on .i { opacity: 1; }
 .picker button:active { background: var(--surface-2); }
-.detail { position: relative; border-left: 1px solid var(--line); padding-left: clamp(24px, 3vw, 56px); overflow: hidden; min-height: 0; display: flex; flex-direction: column; }
-.detail .i-big { width: clamp(56px, 5.5vw, 88px); height: clamp(56px, 5.5vw, 88px); color: var(--plat); margin-bottom: 16px; }
-.detail .photo { position: relative; flex: none; width: 100%; height: clamp(170px, 34vh, 400px); border-radius: var(--radius); overflow: hidden; margin-bottom: clamp(14px, 2.2vh, 24px); background: var(--surface); box-shadow: 0 18px 50px rgba(0, 0, 0, .45); isolation: isolate; }
+.detail { position: relative; border-left: 1px solid var(--line); padding-left: clamp(24px, calc(3 * var(--vw)), 56px); overflow: hidden; min-height: 0; display: flex; flex-direction: column; }
+.detail .i-big { width: clamp(56px, calc(5.5 * var(--vw)), 88px); height: clamp(56px, calc(5.5 * var(--vw)), 88px); color: var(--plat); margin-bottom: 16px; }
+.detail .photo { position: relative; flex: none; width: 100%; height: clamp(170px, calc(34 * var(--vh)), 400px); border-radius: var(--radius); overflow: hidden; margin-bottom: clamp(14px, calc(2.2 * var(--vh)), 24px); background: var(--surface); box-shadow: 0 18px 50px rgba(0, 0, 0, .45); isolation: isolate; }
 .detail .photo .ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.08); transition: opacity 1.3s var(--ease); }
 .detail .photo .ph.on { opacity: 1; animation: kenburns 7s linear forwards; }
-.detail .photo.prod { background: radial-gradient(ellipse at 50% 60%, rgba(191, 211, 230, .16), rgba(16, 22, 31, .9) 70%); height: clamp(140px, 23vh, 270px); }
+.detail .photo.prod { background: radial-gradient(ellipse at 50% 60%, rgba(191, 211, 230, .16), rgba(16, 22, 31, .9) 70%); height: clamp(140px, calc(23 * var(--vh)), 270px); }
 .detail .photo .ph-3d { position: absolute; right: 16px; bottom: 14px; z-index: 2; display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; min-height: 44px; box-shadow: 0 10px 30px rgba(0, 0, 0, .45); }
 .detail .photo .ph-3d svg { width: 18px; height: 18px; }
-.detail .photo.prod.contain .ph { object-fit: contain; padding: clamp(14px, 2vw, 32px); animation: none; transform: none; filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .55)); }
+.detail .photo.prod.contain .ph { object-fit: contain; padding: clamp(14px, calc(2 * var(--vw)), 32px); animation: none; transform: none; filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .55)); }
 .detail .photo.prod.tall .ph { object-fit: contain; padding: 10px; animation: none; transform: rotate(90deg) scale(1.9); transform-origin: center; filter: drop-shadow(0 14px 24px rgba(0, 0, 0, .55)); }
-.detail .photo.prod.cover { height: clamp(170px, 32vh, 380px); }
+.detail .photo.prod.cover { height: clamp(170px, calc(32 * var(--vh)), 380px); }
 .detail .photo.prod::after { background: linear-gradient(180deg, rgba(5, 7, 11, 0) 70%, rgba(5, 7, 11, .45) 100%); }
-.pillars { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(10px, 1.2vw, 18px); margin: clamp(10px, 1.6vh, 18px) 0 6px; }
-.pillar { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(16, 22, 31, .72); padding: clamp(12px, 1.3vw, 20px); }
-.pillar .pi { display: inline-flex; width: clamp(34px, 2.8vw, 44px); height: clamp(34px, 2.8vw, 44px); color: var(--plat); margin-bottom: 8px; }
+.pillars { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(10px, calc(1.2 * var(--vw)), 18px); margin: clamp(10px, calc(1.6 * var(--vh)), 18px) 0 6px; }
+.pillar { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(16, 22, 31, .72); padding: clamp(12px, calc(1.3 * var(--vw)), 20px); }
+.pillar .pi { display: inline-flex; width: clamp(34px, calc(2.8 * var(--vw)), 44px); height: clamp(34px, calc(2.8 * var(--vw)), 44px); color: var(--plat); margin-bottom: 8px; }
 .pillar .pi svg { width: 100%; height: 100%; }
-.pillar b { display: block; font-size: clamp(15px, 1.2vw, 19px); margin-bottom: 4px; }
-.pillar p { color: var(--text-2); font-size: clamp(13px, 1vw, 16px); line-height: 1.4; margin: 0; }
+.pillar b { display: block; font-size: clamp(15px, calc(1.2 * var(--vw)), 19px); margin-bottom: 4px; }
+.pillar p { color: var(--text-2); font-size: clamp(13px, calc(1 * var(--vw)), 16px); line-height: 1.4; margin: 0; }
 @keyframes kenburns { from { transform: scale(1.08) translate(1.2%, .6%); } to { transform: scale(1) translate(0, 0); } }
 .detail .photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 7, 11, 0) 55%, rgba(5, 7, 11, .55) 100%), linear-gradient(90deg, rgba(5, 7, 11, .25), rgba(5, 7, 11, 0) 40%); pointer-events: none; }
-.detail .photo .badge { position: absolute; left: 16px; bottom: 14px; width: clamp(40px, 3.6vw, 56px); height: clamp(40px, 3.6vw, 56px); border-radius: 14px; background: rgba(11, 16, 23, .7); border: 1px solid var(--line-2); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; color: var(--plat-2); z-index: 1; }
+.detail .photo .badge { position: absolute; left: 16px; bottom: 14px; width: clamp(40px, calc(3.6 * var(--vw)), 56px); height: clamp(40px, calc(3.6 * var(--vw)), 56px); border-radius: 14px; background: rgba(11, 16, 23, .7); border: 1px solid var(--line-2); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; color: var(--plat-2); z-index: 1; }
 .detail .photo .badge svg { width: 60%; height: 60%; }
 .detail .photo .dots { position: absolute; right: 16px; bottom: 18px; display: flex; gap: 6px; z-index: 1; }
 .detail .photo .dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .35); transition: background .4s, transform .4s; }
 .detail .photo .dots i.on { background: var(--plat-2); transform: scale(1.3); }
-.detail h3 { font-size: clamp(26px, 2.6vw, 42px); line-height: 1.1; letter-spacing: -.01em; }
-.detail .kind { color: var(--text-3); margin-top: 8px; font-size: clamp(13px, 1vw, 16px); }
-.detail .sum { color: var(--text-2); margin-top: 16px; max-width: 56ch; font-size: clamp(16px, 1.3vw, 21px); }
+.detail h3 { font-size: clamp(26px, calc(2.6 * var(--vw)), 42px); line-height: 1.1; letter-spacing: -.01em; }
+.detail .kind { color: var(--text-3); margin-top: 8px; font-size: clamp(13px, calc(1 * var(--vw)), 16px); }
+.detail .sum { color: var(--text-2); margin-top: 16px; max-width: 56ch; font-size: clamp(16px, calc(1.3 * var(--vw)), 21px); }
 .detail ul { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 10px; max-width: 60ch; }
-.detail li { display: flex; gap: 14px; align-items: flex-start; color: var(--text); font-size: clamp(15px, 1.2vw, 19px); }
+.detail li { display: flex; gap: 14px; align-items: flex-start; color: var(--text); font-size: clamp(15px, calc(1.2 * var(--vw)), 19px); }
 .detail li::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--plat); flex: none; margin-top: .55em; }
 .detail .foot { margin-top: 26px; padding-top: 0; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .detail .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
@@ -317,57 +344,57 @@ body.mobile.hero-on #viewer-canvas { touch-action: pan-y; }
 @keyframes swapIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
 /* ---------- clientes: cartões claros, marcas nas cores originais ---------- */
-.logo-wall { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: clamp(120px, 21.5vh, 236px); gap: clamp(12px, 1.4vw, 22px); margin-top: clamp(18px, 3vh, 36px); align-content: start; }
-.logo-wall .tile { display: flex; align-items: center; justify-content: center; border-radius: var(--radius); background: linear-gradient(180deg, #ffffff, #f1f4f8); border: 1px solid rgba(255, 255, 255, .55); box-shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 #fff; padding: clamp(10px, 1.2vw, 20px); min-height: 0; animation: tileIn .6s var(--ease) both; }
+.logo-wall { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: clamp(120px, calc(21.5 * var(--vh)), 236px); gap: clamp(12px, calc(1.4 * var(--vw)), 22px); margin-top: clamp(18px, calc(3 * var(--vh)), 36px); align-content: start; }
+.logo-wall .tile { display: flex; align-items: center; justify-content: center; border-radius: var(--radius); background: linear-gradient(180deg, #ffffff, #f1f4f8); border: 1px solid rgba(255, 255, 255, .55); box-shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 #fff; padding: clamp(10px, calc(1.2 * var(--vw)), 20px); min-height: 0; animation: tileIn .6s var(--ease) both; }
 .logo-wall .tile:nth-child(n) { animation-delay: calc(var(--k, 0) * 40ms); }
 .logo-wall .tile img { width: var(--w, 68%); max-width: 100%; max-height: 66%; object-fit: contain; display: block; }
-.logo-wall .tile.empty { border-style: dashed; border-color: var(--line-2); background: transparent; box-shadow: none; color: var(--text-3); font-size: clamp(12px, 1vw, 15px); text-align: center; }
-.logo-wall .tile .nm { font-size: clamp(16px, 1.6vw, 26px); font-weight: 600; font-stretch: 108%; color: #1d2430; letter-spacing: .01em; text-align: center; }
+.logo-wall .tile.empty { border-style: dashed; border-color: var(--line-2); background: transparent; box-shadow: none; color: var(--text-3); font-size: clamp(12px, calc(1 * var(--vw)), 15px); text-align: center; }
+.logo-wall .tile .nm { font-size: clamp(16px, calc(1.6 * var(--vw)), 26px); font-weight: 600; font-stretch: 108%; color: #1d2430; letter-spacing: .01em; text-align: center; }
 @keyframes tileIn { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
 
 /* ---------- certificações ---------- */
-.certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 1.6vw, 28px); margin-top: clamp(18px, 3vh, 36px); }
-.cert { position: relative; border: 1px solid var(--line); background: linear-gradient(180deg, var(--surface), rgba(16, 22, 31, .4)); border-radius: var(--radius); padding: clamp(18px, 2vw, 32px); min-height: clamp(200px, 30vh, 300px); display: flex; flex-direction: column; overflow: hidden; }
+.certs { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, calc(1.6 * var(--vw)), 28px); margin-top: clamp(18px, calc(3 * var(--vh)), 36px); }
+.cert { position: relative; border: 1px solid var(--line); background: linear-gradient(180deg, var(--surface), rgba(16, 22, 31, .4)); border-radius: var(--radius); padding: clamp(18px, calc(2 * var(--vw)), 32px); min-height: clamp(200px, calc(30 * var(--vh)), 300px); display: flex; flex-direction: column; overflow: hidden; }
 .cert::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--plat); opacity: .8; }
-.cert .std { font-size: clamp(28px, 2.9vw, 46px); font-weight: 650; font-stretch: 112%; line-height: 1; letter-spacing: -.01em; }
+.cert .std { font-size: clamp(28px, calc(2.9 * var(--vw)), 46px); font-weight: 650; font-stretch: 112%; line-height: 1; letter-spacing: -.01em; }
 .cert .std small { display: block; font-size: .42em; font-weight: 500; font-stretch: 100%; color: var(--text-3); margin-top: 8px; letter-spacing: 0; }
-.cert .what { margin-top: 16px; font-size: clamp(16px, 1.35vw, 22px); color: var(--text); }
-.cert .desc { margin-top: 8px; color: var(--text-2); font-size: clamp(14px, 1.1vw, 17px); max-width: 34ch; }
-.cert .seals { margin-top: auto; padding-top: clamp(14px, 2vh, 22px); display: flex; align-items: center; gap: 12px; }
-.cert .seal { height: clamp(58px, 8.4vh, 92px); padding: 8px 12px; border-radius: 12px; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(0, 0, 0, .3); }
+.cert .what { margin-top: 16px; font-size: clamp(16px, calc(1.35 * var(--vw)), 22px); color: var(--text); }
+.cert .desc { margin-top: 8px; color: var(--text-2); font-size: clamp(14px, calc(1.1 * var(--vw)), 17px); max-width: 34ch; }
+.cert .seals { margin-top: auto; padding-top: clamp(14px, calc(2 * var(--vh)), 22px); display: flex; align-items: center; gap: 12px; }
+.cert .seal { height: clamp(58px, calc(8.4 * var(--vh)), 92px); padding: 8px 12px; border-radius: 12px; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(0, 0, 0, .3); }
 .cert .seal img { height: 100%; width: auto; max-width: 160px; object-fit: contain; display: block; }
-.cert .body { margin-left: auto; text-align: right; font-size: clamp(12px, .95vw, 15px); color: var(--text-3); line-height: 1.35; max-width: 14ch; }
+.cert .body { margin-left: auto; text-align: right; font-size: clamp(12px, calc(.95 * var(--vw)), 15px); color: var(--text-3); line-height: 1.35; max-width: 14ch; }
 .cert .body b { display: block; color: var(--text-2); font-weight: 600; }
-.cert .meta { padding-top: 14px; margin-top: 12px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; font-size: clamp(13px, 1vw, 16px); color: var(--text-2); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+.cert .meta { padding-top: 14px; margin-top: 12px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; font-size: clamp(13px, calc(1 * var(--vw)), 16px); color: var(--text-2); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
 .cert .meta b { color: var(--text); font-weight: 600; }
 .cert .since { color: var(--plat-2); }
-.compliance { margin-top: clamp(18px, 3vh, 36px); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.compliance .t { color: var(--text-3); font-size: clamp(13px, 1vw, 16px); }
-.compliance .pill { border: 1px solid var(--line-2); border-radius: 999px; padding: 10px 18px; font-weight: 600; font-size: clamp(14px, 1.1vw, 18px); display: flex; align-items: center; gap: 10px; }
+.compliance { margin-top: clamp(18px, calc(3 * var(--vh)), 36px); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.compliance .t { color: var(--text-3); font-size: clamp(13px, calc(1 * var(--vw)), 16px); }
+.compliance .pill { border: 1px solid var(--line-2); border-radius: 999px; padding: 10px 18px; font-weight: 600; font-size: clamp(14px, calc(1.1 * var(--vw)), 18px); display: flex; align-items: center; gap: 10px; }
 .compliance .pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
 
 /* ---------- visualizador 3D ---------- */
 #s-viewer .content { left: var(--pad); }
 #s-viewer .vtop { display: flex; align-items: center; gap: 16px; }
-#s-viewer .vtop h2 { font-size: clamp(22px, 2.2vw, 36px); }
-#s-viewer .vtop .sub { color: var(--text-3); font-size: clamp(13px, 1vw, 16px); }
+#s-viewer .vtop h2 { font-size: clamp(22px, calc(2.2 * var(--vw)), 36px); }
+#s-viewer .vtop .sub { color: var(--text-3); font-size: clamp(13px, calc(1 * var(--vw)), 16px); }
 .back { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line-2); border-radius: 999px; padding: 10px 18px 10px 14px; font-weight: 500; min-height: 46px; }
 .back:active { background: rgba(191, 211, 230, .14); }
-.modes { position: absolute; left: 50%; bottom: clamp(18px, 3vh, 36px); transform: translateX(-50%); display: flex; gap: 6px; padding: 6px; border-radius: 999px; background: rgba(11, 16, 23, .78); border: 1px solid var(--line); backdrop-filter: blur(10px); }
-.modes button { padding: 12px 20px; border-radius: 999px; font-weight: 500; color: var(--text-2); min-height: 48px; font-size: clamp(14px, 1.1vw, 18px); white-space: nowrap; transition: background .25s, color .25s; }
+.modes { position: absolute; left: 50%; bottom: clamp(18px, calc(3 * var(--vh)), 36px); transform: translateX(-50%); display: flex; gap: 6px; padding: 6px; border-radius: 999px; background: rgba(11, 16, 23, .78); border: 1px solid var(--line); backdrop-filter: blur(10px); }
+.modes button { padding: 12px 20px; border-radius: 999px; font-weight: 500; color: var(--text-2); min-height: 48px; font-size: clamp(14px, calc(1.1 * var(--vw)), 18px); white-space: nowrap; transition: background .25s, color .25s; }
 .modes button.on { background: var(--plat); color: var(--bg); font-weight: 600; }
-.vpanel { position: absolute; right: 0; top: clamp(70px, 9vh, 110px); width: clamp(280px, 26vw, 400px); border-radius: var(--radius); background: rgba(11, 16, 23, .8); border: 1px solid var(--line); backdrop-filter: blur(10px);
-  /* (no visualizador 3D o desfoque é desligado — ver body.viewer-on) */ padding: clamp(16px, 1.6vw, 26px); opacity: 0; transform: translateX(16px); pointer-events: none; transition: opacity .4s var(--ease), transform .4s var(--ease); }
+.vpanel { position: absolute; right: 0; top: clamp(70px, calc(9 * var(--vh)), 110px); width: clamp(280px, calc(26 * var(--vw)), 400px); border-radius: var(--radius); background: rgba(11, 16, 23, .8); border: 1px solid var(--line); backdrop-filter: blur(10px);
+  /* (no visualizador 3D o desfoque é desligado — ver body.viewer-on) */ padding: clamp(16px, calc(1.6 * var(--vw)), 26px); opacity: 0; transform: translateX(16px); pointer-events: none; transition: opacity .4s var(--ease), transform .4s var(--ease); }
 .vpanel.on { opacity: 1; transform: none; pointer-events: auto; }
-.vpanel h4 { margin: 0; font-size: clamp(15px, 1.15vw, 19px); font-weight: 600; }
-.vpanel .hint { color: var(--text-3); font-size: clamp(12px, .95vw, 15px); margin-top: 6px; }
+.vpanel h4 { margin: 0; font-size: clamp(15px, calc(1.15 * var(--vw)), 19px); font-weight: 600; }
+.vpanel .hint { color: var(--text-3); font-size: clamp(12px, calc(.95 * var(--vw)), 15px); margin-top: 6px; }
 .readout { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; }
-.readout .t { font-size: clamp(34px, 3.2vw, 54px); font-weight: 650; font-stretch: 108%; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
-.readout .u { color: var(--text-3); font-size: clamp(16px, 1.3vw, 22px); }
+.readout .t { font-size: clamp(34px, calc(3.2 * var(--vw)), 54px); font-weight: 650; font-stretch: 108%; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.readout .u { color: var(--text-3); font-size: clamp(16px, calc(1.3 * var(--vw)), 22px); }
 .readout.r .t { color: var(--plat-2); }
 .rrow { display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
-.rrow .k { color: var(--text-3); font-size: clamp(12px, .95vw, 15px); }
-.rrow .v { font-size: clamp(22px, 2vw, 34px); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--plat-2); }
+.rrow .k { color: var(--text-3); font-size: clamp(12px, calc(.95 * var(--vw)), 15px); }
+.rrow .v { font-size: clamp(22px, calc(2 * var(--vw)), 34px); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--plat-2); }
 .rrow .v small { font-size: .55em; color: var(--text-2); margin-left: 4px; font-weight: 500; }
 input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 44px; background: transparent; margin: 10px 0 0; touch-action: pan-x; }
 input[type=range]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, #4C6A8A 0%, #8FA9C4 26%, #E8E1D5 55%, #FF7A1A 80%, #FFD27A 100%); }
@@ -376,14 +403,14 @@ input[type=range]::-moz-range-track { height: 6px; border-radius: 3px; backgroun
 input[type=range]::-moz-range-thumb { width: 30px; height: 30px; border-radius: 50%; background: var(--plat-2); border: 3px solid var(--bg); box-shadow: 0 0 0 2px var(--plat); }
 .scale-lbl { display: flex; justify-content: space-between; color: var(--text-3); font-size: 12px; font-variant-numeric: tabular-nums; }
 .chips { display: flex; gap: 6px; margin-top: 14px; }
-.chips button { flex: 1; padding: 10px 0; border-radius: 10px; border: 1px solid var(--line-2); font-size: clamp(13px, 1vw, 16px); font-weight: 600; color: var(--text-2); min-height: 44px; }
+.chips button { flex: 1; padding: 10px 0; border-radius: 10px; border: 1px solid var(--line-2); font-size: clamp(13px, calc(1 * var(--vw)), 16px); font-weight: 600; color: var(--text-2); min-height: 44px; }
 .chips button.on { background: var(--plat); color: var(--bg); border-color: var(--plat); }
-#rt-chart { width: 100%; height: clamp(100px, 13vh, 150px); display: block; margin-top: 14px; }
+#rt-chart { width: 100%; height: clamp(100px, calc(13 * var(--vh)), 150px); display: block; margin-top: 14px; }
 .sizes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 12px; }
-.sizes button { padding: 10px 8px; border-radius: 10px; border: 1px solid var(--line-2); font-size: clamp(13px, 1vw, 16px); font-weight: 500; color: var(--text-2); font-variant-numeric: tabular-nums; min-height: 44px; }
+.sizes button { padding: 10px 8px; border-radius: 10px; border: 1px solid var(--line-2); font-size: clamp(13px, calc(1 * var(--vw)), 16px); font-weight: 500; color: var(--text-2); font-variant-numeric: tabular-nums; min-height: 44px; }
 .sizes button.on { background: var(--plat); color: var(--bg); border-color: var(--plat); font-weight: 600; }
 .parts { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
-.parts li { display: flex; gap: 12px; align-items: baseline; font-size: clamp(14px, 1.1vw, 17px); color: var(--text-2); }
+.parts li { display: flex; gap: 12px; align-items: baseline; font-size: clamp(14px, calc(1.1 * var(--vw)), 17px); color: var(--text-2); }
 .parts li b { color: var(--text); font-weight: 600; }
 .parts li i { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--plat); transform: translateY(-1px); }
 
@@ -404,30 +431,30 @@ input[type=range]::-moz-range-thumb { width: 30px; height: 30px; border-radius: 
 }
 
 /* ---------- boas-vindas (config remota) ---------- */
-.ribbon { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 46vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(13px, 1.05vw, 17px); color: var(--glow); border: 1px solid rgba(255, 210, 122, .45); background: rgba(5, 7, 11, .55); padding: 6px 16px; border-radius: 999px; font-family: 'Noto Sans JP', var(--font); }
+.ribbon { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: calc(46 * var(--vw)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(13px, calc(1.05 * var(--vw)), 17px); color: var(--glow); border: 1px solid rgba(255, 210, 122, .45); background: rgba(5, 7, 11, .55); padding: 6px 16px; border-radius: 999px; font-family: 'Noto Sans JP', var(--font); }
 .ribbon[hidden] { display: none; }
 button.ribbon { cursor: pointer; pointer-events: auto; }
 button.ribbon:active { background: rgba(255, 210, 122, .18); }
-.welcome { position: absolute; left: calc(var(--pad) - 8px); padding-left: 8px; bottom: clamp(44px, 7vh, 90px); max-width: calc(50vw + 8px); max-height: calc(100vh - var(--top-h) - 9vh); overflow: hidden; font-family: 'Noto Sans JP', var(--font); }
+.welcome { position: absolute; left: calc(var(--pad) - 8px); padding-left: 8px; bottom: clamp(44px, calc(7 * var(--vh)), 90px); max-width: calc(calc(50 * var(--vw)) + 8px); max-height: calc(calc(100 * var(--vh)) - var(--top-h) - calc(9 * var(--vh))); overflow: hidden; font-family: 'Noto Sans JP', var(--font); }
 .welcome[hidden] { display: none; }
 body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display: none; }
-.w-from { color: var(--glow); font-size: clamp(15px, 1.25vw, 21px); letter-spacing: .02em; margin-bottom: 10px; }
+.w-from { color: var(--glow); font-size: clamp(15px, calc(1.25 * var(--vw)), 21px); letter-spacing: .02em; margin-bottom: 10px; }
 .w-from[hidden] { display: none; }
-.w-head { font-size: clamp(40px, min(5vw, 8vh), 92px); font-weight: 700; line-height: 1.05; letter-spacing: .02em; color: var(--plat-2); }
+.w-head { font-size: clamp(40px, min(calc(5 * var(--vw)), calc(8 * var(--vh))), 92px); font-weight: 700; line-height: 1.05; letter-spacing: .02em; color: var(--plat-2); }
 .w-name { margin-top: 6px; color: var(--text); }
-.w-head2 { font-family: var(--font); font-size: clamp(20px, min(2vw, 3.4vh), 36px); font-weight: 600; font-stretch: 106%; color: var(--plat); margin-bottom: clamp(8px, 1.4vh, 18px); letter-spacing: -.01em; }
-.w-guest { display: flex; align-items: center; gap: clamp(12px, 1.2vw, 20px); padding: clamp(4px, .7vh, 10px) 0; border-top: 1px solid var(--line); }
+.w-head2 { font-family: var(--font); font-size: clamp(20px, min(calc(2 * var(--vw)), calc(3.4 * var(--vh))), 36px); font-weight: 600; font-stretch: 106%; color: var(--plat); margin-bottom: clamp(8px, calc(1.4 * var(--vh)), 18px); letter-spacing: -.01em; }
+.w-guest { display: flex; align-items: center; gap: clamp(12px, calc(1.2 * var(--vw)), 20px); padding: clamp(4px, calc(.7 * var(--vh)), 10px) 0; border-top: 1px solid var(--line); }
 .w-guest:last-child { border-bottom: 1px solid var(--line); }
-.w-guest .g-photo { flex: none; width: clamp(48px, min(5vw, 8vh), 92px); height: clamp(48px, min(5vw, 8vh), 92px); border-radius: 50%; object-fit: cover; object-position: center top; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(191, 211, 230, .45); background: var(--surface-2); }
-.w-guest .g-initials { display: inline-flex; align-items: center; justify-content: center; font-family: var(--font); font-weight: 600; font-size: clamp(16px, min(1.8vw, 2.8vh), 30px); color: var(--plat); letter-spacing: .02em; }
+.w-guest .g-photo { flex: none; width: clamp(48px, min(calc(5 * var(--vw)), calc(8 * var(--vh))), 92px); height: clamp(48px, min(calc(5 * var(--vw)), calc(8 * var(--vh))), 92px); border-radius: 50%; object-fit: cover; object-position: center top; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(191, 211, 230, .45); background: var(--surface-2); }
+.w-guest .g-initials { display: inline-flex; align-items: center; justify-content: center; font-family: var(--font); font-weight: 600; font-size: clamp(16px, min(calc(1.8 * var(--vw)), calc(2.8 * var(--vh))), 30px); color: var(--plat); letter-spacing: .02em; }
 .w-guest .g-text { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; row-gap: 2px; min-width: 0; }
-.w-guest .g-name { font-size: clamp(20px, min(2.1vw, 3.4vh), 36px); font-weight: 700; line-height: 1.2; }
-.w-guest .g-alt { font-family: var(--font); font-size: clamp(13px, min(1.1vw, 1.8vh), 18px); color: var(--text-3); font-weight: 500; }
-.w-guest .g-meta { flex-basis: 100%; font-family: var(--font); font-size: clamp(12px, min(1vw, 1.7vh), 16px); color: var(--text-2); }
-.w-msg { font-weight: 450; color: var(--text-2); font-size: clamp(14px, min(1.25vw, 2.1vh), 21px); line-height: 1.6; margin-top: clamp(8px, 1.4vh, 16px); max-width: 32em; }
-.w-en { font-family: var(--font); color: var(--text-2); font-size: clamp(13px, min(1.05vw, 1.8vh), 18px); line-height: 1.45; margin-top: clamp(4px, .8vh, 8px); max-width: 46em; }
-.w-pt { font-family: var(--font); color: var(--text-3); font-size: clamp(12px, min(.95vw, 1.6vh), 15px); margin-top: 4px; }
-.w-voice { display: inline-flex; align-items: center; gap: 10px; margin-top: clamp(10px, 1.6vh, 20px); padding: 10px 20px; border-radius: 999px; border: 1px solid rgba(255, 210, 122, .55); color: var(--glow); font-size: clamp(13px, min(1.1vw, 1.9vh), 18px); font-weight: 600; min-height: 46px; font-family: 'Noto Sans JP', var(--font); pointer-events: auto; }
+.w-guest .g-name { font-size: clamp(20px, min(calc(2.1 * var(--vw)), calc(3.4 * var(--vh))), 36px); font-weight: 700; line-height: 1.2; }
+.w-guest .g-alt { font-family: var(--font); font-size: clamp(13px, min(calc(1.1 * var(--vw)), calc(1.8 * var(--vh))), 18px); color: var(--text-3); font-weight: 500; }
+.w-guest .g-meta { flex-basis: 100%; font-family: var(--font); font-size: clamp(12px, min(calc(1 * var(--vw)), calc(1.7 * var(--vh))), 16px); color: var(--text-2); }
+.w-msg { font-weight: 450; color: var(--text-2); font-size: clamp(14px, min(calc(1.25 * var(--vw)), calc(2.1 * var(--vh))), 21px); line-height: 1.6; margin-top: clamp(8px, calc(1.4 * var(--vh)), 16px); max-width: 32em; }
+.w-en { font-family: var(--font); color: var(--text-2); font-size: clamp(13px, min(calc(1.05 * var(--vw)), calc(1.8 * var(--vh))), 18px); line-height: 1.45; margin-top: clamp(4px, calc(.8 * var(--vh)), 8px); max-width: 46em; }
+.w-pt { font-family: var(--font); color: var(--text-3); font-size: clamp(12px, min(calc(.95 * var(--vw)), calc(1.6 * var(--vh))), 15px); margin-top: 4px; }
+.w-voice { display: inline-flex; align-items: center; gap: 10px; margin-top: clamp(10px, calc(1.6 * var(--vh)), 20px); padding: 10px 20px; border-radius: 999px; border: 1px solid rgba(255, 210, 122, .55); color: var(--glow); font-size: clamp(13px, min(calc(1.1 * var(--vw)), calc(1.9 * var(--vh))), 18px); font-weight: 600; min-height: 46px; font-family: 'Noto Sans JP', var(--font); pointer-events: auto; }
 .w-voice:active, .w-voice.playing { background: rgba(255, 210, 122, .16); }
 .w-voice[hidden] { display: none; }
 
@@ -438,12 +465,12 @@ body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display:
 .video-layer video { width: 100%; height: 100%; object-fit: cover; display: block; background: #000; }
 body.video-on #top, body.video-on #rail { opacity: 0 !important; pointer-events: none; } /* !important: go() define a opacidade do topo inline */
 #top { transition: opacity .5s var(--ease); }
-.video-hint { position: absolute; left: 50%; bottom: clamp(18px, 3vh, 36px); transform: translateX(-50%); font-size: clamp(13px, 1vw, 17px); color: rgba(255, 255, 255, .85); background: rgba(5, 7, 11, .45); border: 1px solid rgba(255, 255, 255, .18); padding: 7px 16px; border-radius: 999px; backdrop-filter: blur(6px); opacity: 0; animation: hintIn .8s var(--ease) 6s forwards; }
+.video-hint { position: absolute; left: 50%; bottom: clamp(18px, calc(3 * var(--vh)), 36px); transform: translateX(-50%); font-size: clamp(13px, calc(1 * var(--vw)), 17px); color: rgba(255, 255, 255, .85); background: rgba(5, 7, 11, .45); border: 1px solid rgba(255, 255, 255, .18); padding: 7px 16px; border-radius: 999px; backdrop-filter: blur(6px); opacity: 0; animation: hintIn .8s var(--ease) 6s forwards; }
 @keyframes hintIn { to { opacity: 1; } }
-.video-layer .vcap { position: absolute; left: var(--pad); bottom: clamp(40px, 7vh, 80px); display: flex; flex-direction: column; gap: 6px; text-shadow: 0 2px 12px rgba(0, 0, 0, .7); }
+.video-layer .vcap { position: absolute; left: var(--pad); bottom: clamp(40px, calc(7 * var(--vh)), 80px); display: flex; flex-direction: column; gap: 6px; text-shadow: 0 2px 12px rgba(0, 0, 0, .7); }
 .video-layer .vcap[hidden] { display: none; }
-.video-layer .vcap-logo { height: clamp(36px, 4.6vh, 60px); width: auto; display: block; margin-bottom: 6px; }
-.video-layer #vcap-title { font-size: clamp(22px, 2.4vw, 40px); font-weight: 600; font-stretch: 106%; color: var(--text); }
+.video-layer .vcap-logo { height: clamp(36px, calc(4.6 * var(--vh)), 60px); width: auto; display: block; margin-bottom: 6px; }
+.video-layer #vcap-title { font-size: clamp(22px, calc(2.4 * var(--vw)), 40px); font-weight: 600; font-stretch: 106%; color: var(--text); }
 
 /* Visualizador 3D ativo: sem desfoque de fundo sobre o canvas que redesenha a cada quadro (GPU do tablet) */
 body.viewer-on .vpanel, body.viewer-on .modes, body.viewer-on .lbl3d { backdrop-filter: none; }
@@ -453,20 +480,20 @@ body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
 
 /* ---------- nosso time: organograma (direção → áreas → base) ---------- */
 #s-team .content { justify-content: flex-start; }
-.org { flex: 1; min-height: 0; display: flex; flex-direction: column; margin-top: clamp(10px, 1.6vh, 20px); }
+.org { flex: 1; min-height: 0; display: flex; flex-direction: column; margin-top: clamp(10px, calc(1.6 * var(--vh)), 20px); }
 .org-tier { display: flex; flex-direction: column; align-items: center; }
-.tier-lbl { font-size: clamp(11px, .85vw, 13px); letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); font-weight: 600; margin-bottom: clamp(8px, 1.2vh, 14px); }
-.org .row { position: relative; display: flex; justify-content: center; gap: clamp(22px, 3.4vw, 64px); width: 100%; }
+.tier-lbl { font-size: clamp(11px, calc(.85 * var(--vw)), 13px); letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); font-weight: 600; margin-bottom: clamp(8px, calc(1.2 * var(--vh)), 14px); }
+.org .row { position: relative; display: flex; justify-content: center; gap: clamp(22px, calc(3.4 * var(--vw)), 64px); width: 100%; }
 .org .t1 .row::before, .org .t2 .row::before { content: ''; position: absolute; left: 18%; right: 18%; top: var(--cy, 50px); height: 1px; background: var(--line-2); z-index: 0; }
-.org .t1 .row { --cy: calc(clamp(96px, 14vh, 150px) / 2); }
-.org .t2 .row { --cy: calc(clamp(72px, 10vh, 104px) / 2); }
-.org-link { width: 1px; height: clamp(14px, 2.6vh, 28px); margin: clamp(6px, 1vh, 12px) auto; background: linear-gradient(180deg, var(--line-2), transparent); }
-.person { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; width: clamp(150px, 15vw, 240px); color: var(--text); }
+.org .t1 .row { --cy: calc(clamp(96px, calc(14 * var(--vh)), 150px) / 2); }
+.org .t2 .row { --cy: calc(clamp(72px, calc(10 * var(--vh)), 104px) / 2); }
+.org-link { width: 1px; height: clamp(14px, calc(2.6 * var(--vh)), 28px); margin: clamp(6px, calc(1 * var(--vh)), 12px) auto; background: linear-gradient(180deg, var(--line-2), transparent); }
+.person { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; width: clamp(150px, calc(15 * var(--vw)), 240px); color: var(--text); }
 .person .avatar { position: relative; display: flex; align-items: center; justify-content: center; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 35% 30%, #27333f, #0d131c 70%); box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px rgba(191, 211, 230, .45), 0 18px 40px rgba(0, 0, 0, .5); transition: transform .3s var(--ease), box-shadow .3s; }
-.person.xl .avatar { width: clamp(96px, 14vh, 150px); height: clamp(96px, 14vh, 150px); }
-.person.md .avatar { width: clamp(72px, 10vh, 104px); height: clamp(72px, 10vh, 104px); }
-.person .avatar .ini { font-size: clamp(26px, 4.2vh, 44px); font-weight: 650; font-stretch: 112%; letter-spacing: .02em; color: rgba(191, 211, 230, .55); }
-.person.md .avatar .ini { font-size: clamp(20px, 3vh, 30px); }
+.person.xl .avatar { width: clamp(96px, calc(14 * var(--vh)), 150px); height: clamp(96px, calc(14 * var(--vh)), 150px); }
+.person.md .avatar { width: clamp(72px, calc(10 * var(--vh)), 104px); height: clamp(72px, calc(10 * var(--vh)), 104px); }
+.person .avatar .ini { font-size: clamp(26px, calc(4.2 * var(--vh)), 44px); font-weight: 650; font-stretch: 112%; letter-spacing: .02em; color: rgba(191, 211, 230, .55); }
+.person.md .avatar .ini { font-size: clamp(20px, calc(3 * var(--vh)), 30px); }
 .person .avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 .person .avatar.has .ini { display: none; }
 .person .avatar.icon { color: var(--plat); background: radial-gradient(circle at 35% 30%, #1d2733, #0b1017 70%); box-shadow: 0 0 0 3px var(--bg), 0 0 0 4px var(--line-2); }
@@ -476,17 +503,17 @@ body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
 button.person:active .avatar { transform: scale(.96); }
 button.person .avatar::after { content: ''; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 0 rgba(191, 211, 230, 0); transition: box-shadow .3s; }
 button.person:hover .avatar { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--plat), 0 18px 40px rgba(0, 0, 0, .5); }
-.person .nm { font-weight: 600; font-size: clamp(14px, 1.15vw, 19px); line-height: 1.15; margin-top: 4px; }
-.person.md .nm { font-size: clamp(13px, 1vw, 16px); }
-.person .rl { color: var(--text-3); font-size: clamp(11px, .85vw, 13px); line-height: 1.3; letter-spacing: .02em; }
+.person .nm { font-weight: 600; font-size: clamp(14px, calc(1.15 * var(--vw)), 19px); line-height: 1.15; margin-top: 4px; }
+.person.md .nm { font-size: clamp(13px, calc(1 * var(--vw)), 16px); }
+.person .rl { color: var(--text-3); font-size: clamp(11px, calc(.85 * var(--vw)), 13px); line-height: 1.3; letter-spacing: .02em; }
 .org .base { flex: 1; min-height: 0; }
-.base-card { width: 100%; flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(260px, .9fr) 1.4fr; gap: clamp(18px, 2.4vw, 40px); align-items: center; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(180deg, rgba(16, 22, 31, .9), rgba(16, 22, 31, .45)); padding: clamp(12px, 1.4vw, 22px); max-height: clamp(170px, 27vh, 300px); }
-.base-card .team-photos { height: 100%; max-height: clamp(140px, 23vh, 256px); aspect-ratio: 16 / 10; width: auto; max-width: 100%; }
-.base-text h3 { font-size: clamp(20px, 1.9vw, 32px); line-height: 1.1; }
-.base-text p { color: var(--text-2); font-size: clamp(13px, 1.02vw, 16px); margin-top: 8px; max-width: 70ch; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.base-text .team-stats { display: flex; gap: clamp(18px, 2.6vw, 48px); margin-top: clamp(10px, 1.6vh, 18px); }
-.tstat .v { font-size: clamp(24px, 2.4vw, 40px); font-weight: 650; font-stretch: 110%; line-height: 1; letter-spacing: -.01em; color: var(--plat-2); font-variant-numeric: tabular-nums; }
-.tstat .k { color: var(--text-2); margin-top: 6px; font-size: clamp(12px, .95vw, 15px); line-height: 1.3; max-width: 20ch; }
+.base-card { width: 100%; flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(260px, .9fr) 1.4fr; gap: clamp(18px, calc(2.4 * var(--vw)), 40px); align-items: center; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(180deg, rgba(16, 22, 31, .9), rgba(16, 22, 31, .45)); padding: clamp(12px, calc(1.4 * var(--vw)), 22px); max-height: clamp(170px, calc(27 * var(--vh)), 300px); }
+.base-card .team-photos { height: 100%; max-height: clamp(140px, calc(23 * var(--vh)), 256px); aspect-ratio: 16 / 10; width: auto; max-width: 100%; }
+.base-text h3 { font-size: clamp(20px, calc(1.9 * var(--vw)), 32px); line-height: 1.1; }
+.base-text p { color: var(--text-2); font-size: clamp(13px, calc(1.02 * var(--vw)), 16px); margin-top: 8px; max-width: 70ch; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.base-text .team-stats { display: flex; gap: clamp(18px, calc(2.6 * var(--vw)), 48px); margin-top: clamp(10px, calc(1.6 * var(--vh)), 18px); }
+.tstat .v { font-size: clamp(24px, calc(2.4 * var(--vw)), 40px); font-weight: 650; font-stretch: 110%; line-height: 1; letter-spacing: -.01em; color: var(--plat-2); font-variant-numeric: tabular-nums; }
+.tstat .k { color: var(--text-2); margin-top: 6px; font-size: clamp(12px, calc(.95 * var(--vw)), 15px); line-height: 1.3; max-width: 20ch; }
 .tstat .pflag { display: block; font-style: normal; color: var(--glow); font-size: 11px; margin-top: 3px; }
 .team-photos { position: relative; border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: 0 18px 50px rgba(0, 0, 0, .45); isolation: isolate; }
 .team-photos .ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.08); transition: opacity 1.4s var(--ease); }
@@ -499,44 +526,44 @@ button.person:hover .avatar { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--p
 .profile { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(5, 7, 11, .62); backdrop-filter: blur(6px); opacity: 0; transition: opacity .3s var(--ease); pointer-events: auto; }
 .profile.on { opacity: 1; }
 .profile[hidden] { display: none; }
-.pcard { position: relative; width: min(960px, 92vw); max-height: 88vh; overflow: auto; border: 1px solid var(--line-2); border-radius: 20px; background: linear-gradient(180deg, #121a25, #0c1119); box-shadow: 0 40px 120px rgba(0, 0, 0, .6); transform: translateY(14px); transition: transform .35s var(--ease); }
+.pcard { position: relative; width: min(960px, calc(92 * var(--vw))); max-height: calc(88 * var(--vh)); overflow: auto; border: 1px solid var(--line-2); border-radius: 20px; background: linear-gradient(180deg, #121a25, #0c1119); box-shadow: 0 40px 120px rgba(0, 0, 0, .6); transform: translateY(14px); transition: transform .35s var(--ease); }
 .profile.on .pcard { transform: none; }
 .pclose { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-2); display: flex; align-items: center; justify-content: center; color: var(--text); background: rgba(11, 16, 23, .8); z-index: 2; }
-.pbody { display: grid; grid-template-columns: minmax(220px, .8fr) 1.4fr; gap: clamp(18px, 2.6vw, 40px); padding: clamp(18px, 2.4vw, 36px); }
+.pbody { display: grid; grid-template-columns: minmax(220px, .8fr) 1.4fr; gap: clamp(18px, calc(2.6 * var(--vw)), 40px); padding: clamp(18px, calc(2.4 * var(--vw)), 36px); }
 .pphoto { position: relative; aspect-ratio: 4 / 5; border-radius: 16px; overflow: hidden; background: linear-gradient(160deg, #1a2330, #0d131c); display: flex; align-items: center; justify-content: center; }
 .pphoto .avatar { width: 100%; height: 100%; border-radius: 16px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-.pphoto .avatar .ini { font-size: clamp(56px, 7vw, 110px); font-weight: 650; font-stretch: 112%; color: rgba(191, 211, 230, .3); }
+.pphoto .avatar .ini { font-size: clamp(56px, calc(7 * var(--vw)), 110px); font-weight: 650; font-stretch: 112%; color: rgba(191, 211, 230, .3); }
 .pphoto .avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 .pphoto .avatar.has .ini { display: none; }
 .pphoto .ph-hint { position: absolute; right: 12px; bottom: 10px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); border: 1px dashed var(--line-2); border-radius: 999px; padding: 3px 9px; }
 .pphoto:has(.avatar.has) .ph-hint { display: none; }
 .ptext { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding-right: 40px; }
-.ptext h3 { font-size: clamp(26px, 2.6vw, 42px); line-height: 1.05; letter-spacing: -.01em; }
-.lrole { color: var(--plat); font-size: clamp(13px, 1vw, 16px); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
-.ptext blockquote { margin: 8px 0 0; padding: 0 0 0 16px; border-left: 2px solid var(--plat); color: var(--text); font-size: clamp(16px, 1.3vw, 22px); line-height: 1.4; font-style: italic; }
+.ptext h3 { font-size: clamp(26px, calc(2.6 * var(--vw)), 42px); line-height: 1.05; letter-spacing: -.01em; }
+.lrole { color: var(--plat); font-size: clamp(13px, calc(1 * var(--vw)), 16px); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+.ptext blockquote { margin: 8px 0 0; padding: 0 0 0 16px; border-left: 2px solid var(--plat); color: var(--text); font-size: clamp(16px, calc(1.3 * var(--vw)), 22px); line-height: 1.4; font-style: italic; }
 .ptext blockquote .pflag { display: block; font-style: normal; color: var(--glow); font-size: 11px; margin-top: 4px; }
-.lbio { color: var(--text-2); font-size: clamp(14px, 1.1vw, 18px); line-height: 1.5; margin-top: 4px; }
-.lmeta { display: flex; flex-direction: column; gap: 2px; padding-top: 10px; margin-top: 6px; border-top: 1px solid var(--line); font-size: clamp(14px, 1.05vw, 17px); color: var(--text); }
-.lmeta .k { color: var(--text-3); font-size: clamp(11px, .85vw, 13px); letter-spacing: .08em; text-transform: uppercase; }
+.lbio { color: var(--text-2); font-size: clamp(14px, calc(1.1 * var(--vw)), 18px); line-height: 1.5; margin-top: 4px; }
+.lmeta { display: flex; flex-direction: column; gap: 2px; padding-top: 10px; margin-top: 6px; border-top: 1px solid var(--line); font-size: clamp(14px, calc(1.05 * var(--vw)), 17px); color: var(--text); }
+.lmeta .k { color: var(--text-3); font-size: clamp(11px, calc(.85 * var(--vw)), 13px); letter-spacing: .08em; text-transform: uppercase; }
 .brand-rep { display: inline-flex; align-items: center; gap: 14px; margin-top: 16px; padding: 10px 16px 10px 10px; border-radius: 12px; background: #fff; color: #1d2430; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
-.brand-rep img { height: clamp(34px, 3.4vh, 46px); width: auto; display: block; }
+.brand-rep img { height: clamp(34px, calc(3.4 * var(--vh)), 46px); width: auto; display: block; }
 .brand-rep b { font-weight: 700; font-size: 18px; letter-spacing: .04em; }
-.brand-rep span { display: flex; flex-direction: column; font-size: clamp(13px, 1vw, 16px); font-weight: 600; line-height: 1.2; }
+.brand-rep span { display: flex; flex-direction: column; font-size: clamp(13px, calc(1 * var(--vw)), 16px); font-weight: 600; line-height: 1.2; }
 .brand-rep span small { font-weight: 500; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #5b6573; }
 
 /* ---------- ambiental (BI de energia) ---------- */
 :root { --leaf: #7FD4A6; --leaf-2: #B9F0CF; --sun: #FFD27A; }
-#s-env .content { padding-top: 1.6vh; }
-.env-head .lead { max-width: 78ch; margin-top: 6px; font-size: clamp(14px, 1.15vw, 19px); }
-.env-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(300px, 1.05fr) minmax(0, 1.6fr) minmax(260px, .9fr); grid-template-rows: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(12px, 1.3vw, 22px); margin-top: clamp(12px, 2vh, 22px); }
-.card { border: 1px solid var(--line); background: linear-gradient(180deg, rgba(16, 22, 31, .92), rgba(16, 22, 31, .55)); border-radius: var(--radius); padding: clamp(12px, 1.3vw, 20px); min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-.ch-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: clamp(13px, 1.05vw, 17px); color: var(--text); }
+#s-env .content { padding-top: calc(1.6 * var(--vh)); }
+.env-head .lead { max-width: 78ch; margin-top: 6px; font-size: clamp(14px, calc(1.15 * var(--vw)), 19px); }
+.env-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(300px, 1.05fr) minmax(0, 1.6fr) minmax(260px, .9fr); grid-template-rows: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(12px, calc(1.3 * var(--vw)), 22px); margin-top: clamp(12px, calc(2 * var(--vh)), 22px); }
+.card { border: 1px solid var(--line); background: linear-gradient(180deg, rgba(16, 22, 31, .92), rgba(16, 22, 31, .55)); border-radius: var(--radius); padding: clamp(12px, calc(1.3 * var(--vw)), 20px); min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.ch-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: clamp(13px, calc(1.05 * var(--vw)), 17px); color: var(--text); }
 .ch-head b { font-weight: 600; }
-.ch-head .legend { display: flex; align-items: center; gap: 8px; color: var(--text-3); font-size: clamp(11px, .85vw, 13px); }
+.ch-head .legend { display: flex; align-items: center; gap: 8px; color: var(--text-3); font-size: clamp(11px, calc(.85 * var(--vw)), 13px); }
 .ch-head .legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
 .ch-head .legend i.pv { background: var(--sun); }
 .ch-head .legend i.ld { background: var(--plat); }
-.live { font-size: clamp(11px, .85vw, 13px); color: var(--text-3); border: 1px solid var(--line-2); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+.live { font-size: clamp(11px, calc(.85 * var(--vw)), 13px); color: var(--text-3); border: 1px solid var(--line-2); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
 .live.on { color: var(--leaf); border-color: rgba(127, 212, 166, .5); }
 .live.on::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--leaf); margin-right: 7px; box-shadow: 0 0 10px var(--leaf); animation: tapPulse 1.6s ease-in-out infinite; }
 .env-flowcard { grid-column: 1; grid-row: 1; }
@@ -555,14 +582,14 @@ button.person:hover .avatar { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--p
 .flow .lbl { fill: var(--text-3); font-size: 12px; text-anchor: middle; font-family: var(--font); letter-spacing: .04em; text-transform: uppercase; }
 .flow .val { fill: var(--text); font-size: 15px; font-weight: 600; text-anchor: middle; font-family: var(--font); }
 .flow .val.big { font-size: 13px; fill: var(--plat-2); }
-.flow-note { color: var(--text-2); font-size: clamp(12px, .95vw, 15px); margin-top: 6px; min-height: 2.6em; }
-.env-kpis { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(0, 1fr); gap: clamp(10px, 1vw, 16px); min-height: 0; }
-.tile { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(16, 22, 31, .7); padding: clamp(10px, 1.1vw, 18px); display: flex; flex-direction: column; justify-content: center; min-height: 0; overflow: hidden; }
-.tile .k { color: var(--text-3); font-size: clamp(11px, .9vw, 14px); letter-spacing: .02em; }
+.flow-note { color: var(--text-2); font-size: clamp(12px, calc(.95 * var(--vw)), 15px); margin-top: 6px; min-height: 2.6em; }
+.env-kpis { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(0, 1fr); gap: clamp(10px, calc(1 * var(--vw)), 16px); min-height: 0; }
+.tile { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(16, 22, 31, .7); padding: clamp(10px, calc(1.1 * var(--vw)), 18px); display: flex; flex-direction: column; justify-content: center; min-height: 0; overflow: hidden; }
+.tile .k { color: var(--text-3); font-size: clamp(11px, calc(.9 * var(--vw)), 14px); letter-spacing: .02em; }
 .tile .v { display: flex; align-items: baseline; gap: 6px; margin-top: 4px; font-variant-numeric: tabular-nums; }
-.tile .v .n { font-size: clamp(26px, 2.6vw, 44px); font-weight: 650; font-stretch: 108%; line-height: 1; letter-spacing: -.01em; color: var(--plat-2); }
-.tile .v small { color: var(--text-2); font-size: clamp(12px, 1vw, 16px); font-weight: 500; }
-.tile .s { color: var(--text-3); font-size: clamp(11px, .85vw, 13px); margin-top: 6px; line-height: 1.3; }
+.tile .v .n { font-size: clamp(26px, calc(2.6 * var(--vw)), 44px); font-weight: 650; font-stretch: 108%; line-height: 1; letter-spacing: -.01em; color: var(--plat-2); }
+.tile .v small { color: var(--text-2); font-size: clamp(12px, calc(1 * var(--vw)), 16px); font-weight: 500; }
+.tile .s { color: var(--text-3); font-size: clamp(11px, calc(.85 * var(--vw)), 13px); margin-top: 6px; line-height: 1.3; }
 #tile-pvnow .v .n { color: var(--sun); }
 #tile-co2 .v .n, #tile-self .v .n { color: var(--leaf-2); }
 .env-chartcard { grid-column: 1 / 3; grid-row: 2; }
@@ -570,31 +597,31 @@ button.person:hover .avatar { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--p
 .env-green { grid-column: 3; grid-row: 1 / 3; position: relative; align-items: flex-start; justify-content: flex-end; background: linear-gradient(180deg, rgba(10, 30, 22, .55), rgba(16, 22, 31, .9)), url(env/seedlings.webp) center / cover no-repeat; border-color: rgba(127, 212, 166, .32); }
 .env-green::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 7, 11, .15), rgba(5, 7, 11, .82) 70%); pointer-events: none; }
 .env-green > * { position: relative; }
-.env-green .leaf { width: clamp(44px, 4vw, 64px); height: clamp(44px, 4vw, 64px); color: var(--leaf); filter: drop-shadow(0 0 18px rgba(127, 212, 166, .55)); margin-bottom: auto; }
+.env-green .leaf { width: clamp(44px, calc(4 * var(--vw)), 64px); height: clamp(44px, calc(4 * var(--vw)), 64px); color: var(--leaf); filter: drop-shadow(0 0 18px rgba(127, 212, 166, .55)); margin-bottom: auto; }
 .env-green .leaf svg { width: 100%; height: 100%; }
-.env-green .pct { font-size: clamp(56px, 6.2vw, 104px); font-weight: 650; font-stretch: 112%; line-height: .95; letter-spacing: -.02em; color: var(--leaf-2); font-variant-numeric: tabular-nums; }
+.env-green .pct { font-size: clamp(56px, calc(6.2 * var(--vw)), 104px); font-weight: 650; font-stretch: 112%; line-height: .95; letter-spacing: -.02em; color: var(--leaf-2); font-variant-numeric: tabular-nums; }
 .env-green .pct small { font-size: .42em; font-weight: 600; margin-left: 2px; color: var(--leaf); }
-.env-green .ttl { font-size: clamp(16px, 1.4vw, 24px); font-weight: 600; color: var(--text); margin-top: 4px; }
-.env-green .sub { color: var(--text-2); font-size: clamp(12px, 1vw, 16px); margin-top: 10px; max-width: 30ch; }
+.env-green .ttl { font-size: clamp(16px, calc(1.4 * var(--vw)), 24px); font-weight: 600; color: var(--text); margin-top: 4px; }
+.env-green .sub { color: var(--text-2); font-size: clamp(12px, calc(1 * var(--vw)), 16px); margin-top: 10px; max-width: 30ch; }
 .env-green .bar { width: 100%; height: 8px; border-radius: 4px; background: rgba(191, 211, 230, .22); margin-top: 14px; overflow: hidden; }
 .env-green .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--sun), var(--leaf)); border-radius: 4px; transition: width 1.2s var(--ease); }
-.env-green .bar-lbl { display: flex; justify-content: space-between; width: 100%; font-size: clamp(11px, .85vw, 13px); color: var(--text-3); margin-top: 6px; }
-.env-green .trees { margin-top: clamp(14px, 2vh, 24px); padding-top: 12px; border-top: 1px solid rgba(127, 212, 166, .3); font-size: clamp(12px, 1vw, 16px); color: var(--text-2); line-height: 1.4; }
-.env-green .trees b { font-size: clamp(22px, 2.1vw, 36px); color: var(--leaf-2); font-weight: 650; font-variant-numeric: tabular-nums; margin-right: 6px; }
-.env-green .trees span { color: var(--text-3); font-size: clamp(11px, .9vw, 14px); }
-.env-foot { margin-top: 10px; color: var(--text-3); font-size: clamp(11px, .85vw, 13px); }
+.env-green .bar-lbl { display: flex; justify-content: space-between; width: 100%; font-size: clamp(11px, calc(.85 * var(--vw)), 13px); color: var(--text-3); margin-top: 6px; }
+.env-green .trees { margin-top: clamp(14px, calc(2 * var(--vh)), 24px); padding-top: 12px; border-top: 1px solid rgba(127, 212, 166, .3); font-size: clamp(12px, calc(1 * var(--vw)), 16px); color: var(--text-2); line-height: 1.4; }
+.env-green .trees b { font-size: clamp(22px, calc(2.1 * var(--vw)), 36px); color: var(--leaf-2); font-weight: 650; font-variant-numeric: tabular-nums; margin-right: 6px; }
+.env-green .trees span { color: var(--text-3); font-size: clamp(11px, calc(.9 * var(--vw)), 14px); }
+.env-foot { margin-top: 10px; color: var(--text-3); font-size: clamp(11px, calc(.85 * var(--vw)), 13px); }
 
 /* ---------- QR code (tela inicial e início) ---------- */
-.qr { position: absolute; right: var(--pad); bottom: clamp(60px, 10vh, 120px); display: flex; align-items: center; gap: 16px; padding: 12px 18px 12px 12px; border-radius: 18px; background: rgba(11, 16, 23, .7); border: 1px solid var(--line-2); backdrop-filter: blur(8px); max-width: 360px; }
-.qr-img { flex: none; width: clamp(84px, 8.6vh, 120px); height: clamp(84px, 8.6vh, 120px); padding: 8px; border-radius: 12px; background: #fff; }
+.qr { position: absolute; right: var(--pad); bottom: clamp(60px, calc(10 * var(--vh)), 120px); display: flex; align-items: center; gap: 16px; padding: 12px 18px 12px 12px; border-radius: 18px; background: rgba(11, 16, 23, .7); border: 1px solid var(--line-2); backdrop-filter: blur(8px); max-width: 360px; }
+.qr-img { flex: none; width: clamp(84px, calc(8.6 * var(--vh)), 120px); height: clamp(84px, calc(8.6 * var(--vh)), 120px); padding: 8px; border-radius: 12px; background: #fff; }
 .qr-img svg { display: block; width: 100%; height: 100%; }
 .qr-txt { display: flex; flex-direction: column; gap: 4px; }
-.qr-txt b { font-size: clamp(14px, 1.15vw, 19px); font-weight: 600; }
-.qr-txt span { color: var(--text-2); font-size: clamp(12px, .95vw, 15px); line-height: 1.35; }
-.qr.small { bottom: 3vh; padding: 10px 14px 10px 10px; max-width: 300px; }
-#s-home .qr.small { right: auto; left: calc(var(--pad) + var(--rail-w) + clamp(24px, 3vw, 56px)); }
-.qr.small .qr-img { width: clamp(64px, 7vh, 92px); height: clamp(64px, 7vh, 92px); padding: 6px; }
-body.welcome-on #s-attract .qr { bottom: clamp(22px, 4vh, 44px); } /* com as boas-vindas, o cartão desce para não disputar a base com o texto */
+.qr-txt b { font-size: clamp(14px, calc(1.15 * var(--vw)), 19px); font-weight: 600; }
+.qr-txt span { color: var(--text-2); font-size: clamp(12px, calc(.95 * var(--vw)), 15px); line-height: 1.35; }
+.qr.small { bottom: calc(3 * var(--vh)); padding: 10px 14px 10px 10px; max-width: 300px; }
+#s-home .qr.small { right: auto; left: calc(var(--pad) + var(--rail-w) + clamp(24px, calc(3 * var(--vw)), 56px)); }
+.qr.small .qr-img { width: clamp(64px, calc(7 * var(--vh)), 92px); height: clamp(64px, calc(7 * var(--vh)), 92px); padding: 6px; }
+body.welcome-on #s-attract .qr { bottom: clamp(22px, calc(4 * var(--vh)), 44px); } /* com as boas-vindas, o cartão desce para não disputar a base com o texto */
 
 /* ============================================================
    Celular (body.mobile — decidido no JS por tamanho de tela):
@@ -608,12 +635,12 @@ body.mobile { --logo-h: 42px; --top-h: 62px; --pad: 16px; --rail-w: 0px; --radiu
 html:has(body.mobile) { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
 body.mobile #globe-canvas { touch-action: pan-y; }           /* arrastar na horizontal gira; na vertical rola a página */
 body.mobile #viewer-canvas { touch-action: none; }
-body.mobile #app { position: relative; inset: auto; min-height: 100vh; min-height: 100dvh; }
-body.mobile #stage { position: relative; inset: auto; min-height: 100vh; min-height: 100dvh; }
+body.mobile #app { position: relative; inset: auto; min-height: calc(100 * var(--vh)); min-height: 100dvh; }
+body.mobile #stage { position: relative; inset: auto; min-height: calc(100 * var(--vh)); min-height: 100dvh; }
 body.mobile .screen { position: absolute; inset: 0; }
 body.mobile .screen:not(.active) { height: 0; overflow: hidden; bottom: auto; } /* tela inativa não estende a rolagem da página */
-body.mobile .screen.active { position: relative; inset: auto; min-height: 100vh; min-height: 100dvh; }
-body.mobile .screen .content { position: relative; inset: auto; display: block; min-height: 100vh; min-height: 100dvh;
+body.mobile .screen.active { position: relative; inset: auto; min-height: calc(100 * var(--vh)); min-height: 100dvh; }
+body.mobile .screen .content { position: relative; inset: auto; display: block; min-height: calc(100 * var(--vh)); min-height: 100dvh;
   padding: calc(var(--top-h) + var(--rail-h) + 8px) 16px calc(28px + env(safe-area-inset-bottom)); overflow: visible; pointer-events: none; }
 body.mobile .screen .content > * { pointer-events: auto; }
 body.mobile #top { position: fixed; padding: 0 14px; background: rgba(5, 7, 11, .96); }
@@ -629,7 +656,7 @@ body.mobile #rail .sep { display: none; }
 body.mobile .screen h2 { font-size: 28px; }
 body.mobile .screen .lead { font-size: 16px; }
 /* início: globo no alto, texto embaixo */
-body.mobile #s-home .content { padding-top: 46vh; }
+body.mobile #s-home .content { padding-top: calc(46 * var(--vh)); }
 body.mobile #s-home .intro { max-width: none; }
 body.mobile #s-home .intro h2 { font-size: 30px; }
 body.mobile .hero-hint { margin-top: 14px; font-size: 13px; }
@@ -649,7 +676,7 @@ body.mobile .tl-card h3 { font-size: 22px; }
 body.mobile .tl-card p { font-size: 16px; }
 /* nosso time */
 /* presença global: globo no alto, lista por continente embaixo */
-body.mobile #s-world .content { padding-top: 40vh; }
+body.mobile #s-world .content { padding-top: calc(40 * var(--vh)); }
 body.mobile #s-world .side { width: auto; flex: none; flex-direction: row; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 body.mobile #s-world .side .big { font-size: 56px; }
 body.mobile #s-world .side .cap { max-width: none; font-size: 15px; margin-top: 0; }
@@ -667,7 +694,7 @@ body.mobile .picker button { flex: none; min-height: 42px; padding: 6px 14px 6px
 body.mobile .picker button .i { width: 20px; height: 20px; }
 body.mobile .picker button .k { display: none; }
 body.mobile .detail { border-left: 0; padding-left: 0; overflow: visible; flex: none; }
-body.mobile .detail .photo { height: 46vw; min-height: 160px; max-height: 260px; }
+body.mobile .detail .photo { height: calc(46 * var(--vw)); min-height: 160px; max-height: 260px; }
 body.mobile .detail h3 { font-size: 24px; }
 body.mobile .detail .sum { font-size: 16px; }
 body.mobile .detail li { font-size: 15px; }
@@ -684,7 +711,7 @@ body.mobile .compliance { margin-top: 14px; }
 /* ambiental */
 body.mobile .env-head .lead { font-size: 14px; }
 body.mobile .env-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; flex: none; }
-body.mobile .env-flowcard .flow { height: 62vw; max-height: 300px; flex: none; }
+body.mobile .env-flowcard .flow { height: calc(62 * var(--vw)); max-height: 300px; flex: none; }
 body.mobile .env-kpis { grid-template-columns: 1fr 1fr; grid-auto-rows: auto; gap: 10px; }
 body.mobile .tile { padding: 12px; min-height: 92px; }
 body.mobile .tile .v .n { font-size: 28px; }
@@ -693,7 +720,7 @@ body.mobile .env-green { min-height: 360px; }
 body.mobile .env-green .pct { font-size: 64px; }
 body.mobile .env-foot { font-size: 11px; margin: 10px 0 0; }
 /* visualizador 3D: tela fixa (sem rolagem), controles como folha inferior */
-body.mobile #s-viewer.active { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; }
+body.mobile #s-viewer.active { height: calc(100 * var(--vh)); height: 100dvh; min-height: 0; overflow: hidden; }
 body.mobile #s-viewer .content { position: absolute; inset: 0; min-height: 0; padding: calc(var(--top-h) + 6px) 12px 0; overflow: visible; pointer-events: none; }
 body.mobile #s-viewer .vtop { gap: 10px; }
 body.mobile #s-viewer .vtop h2 { font-size: 17px; line-height: 1.15; }
@@ -702,7 +729,7 @@ body.mobile .back { padding: 8px 12px 8px 10px; min-height: 40px; font-size: 14p
 body.mobile .modes { left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); transform: none; overflow-x: auto; justify-content: flex-start; gap: 4px; padding: 5px; scrollbar-width: none; touch-action: pan-x; }
 body.mobile .modes::-webkit-scrollbar { display: none; }
 body.mobile .modes button { padding: 10px 14px; min-height: 42px; font-size: 14px; }
-body.mobile .vpanel { left: 10px; right: 10px; top: auto; bottom: calc(66px + env(safe-area-inset-bottom)); width: auto; max-height: 34vh; overflow-y: auto; padding: 12px 14px; transform: translateY(12px); touch-action: pan-y; }
+body.mobile .vpanel { left: 10px; right: 10px; top: auto; bottom: calc(66px + env(safe-area-inset-bottom)); width: auto; max-height: calc(34 * var(--vh)); overflow-y: auto; padding: 12px 14px; transform: translateY(12px); touch-action: pan-y; }
 body.mobile .vpanel h4 { font-size: 15px; }
 body.mobile .readout .t { font-size: 34px; }
 body.mobile #rt-chart { height: 90px; }
@@ -726,7 +753,7 @@ body.mobile .base-card .team-photos { width: 100%; height: auto; max-height: non
 body.mobile .base-text p { -webkit-line-clamp: 6; }
 body.mobile .base-text .team-stats { flex-wrap: wrap; gap: 12px 20px; }
 body.mobile .pbody { grid-template-columns: 1fr; padding: 16px; gap: 14px; }
-body.mobile .pphoto { aspect-ratio: 4 / 3; max-height: 40vh; }
+body.mobile .pphoto { aspect-ratio: 4 / 3; max-height: calc(40 * var(--vh)); }
 body.mobile .ptext { padding-right: 0; }
 body.mobile .ptext h3 { font-size: 24px; }
 body.mobile.hero-on .lbl3d { display: none; }
@@ -734,21 +761,21 @@ body.mobile .tl .years span:not(.on) { visibility: hidden; }
 body.mobile .brand-rep { margin-top: 12px; }
 
 /* ---- Quem somos: missão, visão e valores ---- */
-#s-about .content { padding-top: 1.6vh; }
-.about-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: clamp(18px, 2.4vw, 40px); margin-top: clamp(14px, 2.2vh, 26px); align-items: stretch; min-height: 0; }
-.about-col { display: flex; flex-direction: column; gap: clamp(14px, 2vh, 24px); min-height: 0; }
-.about-card { display: grid; grid-template-columns: clamp(150px, 15vw, 240px) 1fr; gap: clamp(14px, 1.6vw, 26px); border: 1px solid var(--line); border-radius: var(--radius); background: rgba(16, 22, 31, .66); overflow: hidden; flex: 1; min-height: 0; }
+#s-about .content { padding-top: calc(1.6 * var(--vh)); }
+.about-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: clamp(18px, calc(2.4 * var(--vw)), 40px); margin-top: clamp(14px, calc(2.2 * var(--vh)), 26px); align-items: stretch; min-height: 0; }
+.about-col { display: flex; flex-direction: column; gap: clamp(14px, calc(2 * var(--vh)), 24px); min-height: 0; }
+.about-card { display: grid; grid-template-columns: clamp(150px, calc(15 * var(--vw)), 240px) 1fr; gap: clamp(14px, calc(1.6 * var(--vw)), 26px); border: 1px solid var(--line); border-radius: var(--radius); background: rgba(16, 22, 31, .66); overflow: hidden; flex: 1; min-height: 0; }
 .about-ph { background: var(--surface) center / cover no-repeat; min-height: 150px; }
 .about-ph[hidden] { display: none; }
-.about-txt { padding: clamp(14px, 1.8vh, 24px) clamp(14px, 1.6vw, 26px) clamp(14px, 1.8vh, 24px) 0; display: flex; flex-direction: column; justify-content: center; }
-.about-txt h3 { font-size: clamp(18px, 1.6vw, 26px); margin-bottom: 8px; }
-.about-txt p { color: var(--text-2); font-size: clamp(13px, 1.05vw, 17px); line-height: 1.5; margin: 0; }
-.mvv { display: flex; flex-direction: column; gap: clamp(12px, 1.8vh, 20px); min-height: 0; }
-.mvv-item { flex: 1; border: 1px solid rgba(191, 211, 230, .22); border-radius: var(--radius); background: linear-gradient(135deg, rgba(191, 211, 230, .10), rgba(16, 22, 31, .72) 60%); padding: clamp(14px, 1.8vh, 24px) clamp(16px, 1.6vw, 28px); display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 16px; align-items: center; }
-.mvv-item .mi { grid-row: 1 / 3; width: clamp(40px, 3.6vw, 60px); height: clamp(40px, 3.6vw, 60px); color: var(--plat); display: inline-flex; }
+.about-txt { padding: clamp(14px, calc(1.8 * var(--vh)), 24px) clamp(14px, calc(1.6 * var(--vw)), 26px) clamp(14px, calc(1.8 * var(--vh)), 24px) 0; display: flex; flex-direction: column; justify-content: center; }
+.about-txt h3 { font-size: clamp(18px, calc(1.6 * var(--vw)), 26px); margin-bottom: 8px; }
+.about-txt p { color: var(--text-2); font-size: clamp(13px, calc(1.05 * var(--vw)), 17px); line-height: 1.5; margin: 0; }
+.mvv { display: flex; flex-direction: column; gap: clamp(12px, calc(1.8 * var(--vh)), 20px); min-height: 0; }
+.mvv-item { flex: 1; border: 1px solid rgba(191, 211, 230, .22); border-radius: var(--radius); background: linear-gradient(135deg, rgba(191, 211, 230, .10), rgba(16, 22, 31, .72) 60%); padding: clamp(14px, calc(1.8 * var(--vh)), 24px) clamp(16px, calc(1.6 * var(--vw)), 28px); display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 16px; align-items: center; }
+.mvv-item .mi { grid-row: 1 / 3; width: clamp(40px, calc(3.6 * var(--vw)), 60px); height: clamp(40px, calc(3.6 * var(--vw)), 60px); color: var(--plat); display: inline-flex; }
 .mvv-item .mi svg { width: 100%; height: 100%; }
-.mvv-item h4 { font-size: clamp(12px, 1vw, 15px); letter-spacing: .14em; text-transform: uppercase; color: var(--plat-2); font-weight: 600; margin: 0 0 4px; }
-.mvv-item p { color: var(--text); font-size: clamp(14px, 1.15vw, 19px); line-height: 1.4; margin: 0; }
+.mvv-item h4 { font-size: clamp(12px, calc(1 * var(--vw)), 15px); letter-spacing: .14em; text-transform: uppercase; color: var(--plat-2); font-weight: 600; margin: 0 0 4px; }
+.mvv-item p { color: var(--text); font-size: clamp(14px, calc(1.15 * var(--vw)), 19px); line-height: 1.4; margin: 0; }
 body.mobile .about-grid { display: flex; flex-direction: column; gap: 14px; }
 body.mobile .about-card { grid-template-columns: 1fr; }
 body.mobile .about-ph { height: 150px; }
@@ -764,20 +791,20 @@ body.mobile .detail .photo.prod.tall .ph { transform: rotate(90deg) scale(1.6); 
 body.mobile #s-env .content, body.mobile #s-about .content { padding-top: calc(var(--top-h) + var(--rail-h) + 8px); }
 
 /* ---- Apresentação guiada ---- */
-.tour-start { margin-top: clamp(16px, 2.4vh, 28px); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; pointer-events: auto; }
+.tour-start { margin-top: clamp(16px, calc(2.4 * var(--vh)), 28px); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; pointer-events: auto; }
 .tour-start .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.tour-start .btn.primary { display: inline-flex; align-items: center; gap: 10px; padding: 12px 24px; font-size: clamp(15px, 1.2vw, 19px); box-shadow: 0 12px 34px rgba(191, 211, 230, .22); }
+.tour-start .btn.primary { display: inline-flex; align-items: center; gap: 10px; padding: 12px 24px; font-size: clamp(15px, calc(1.2 * var(--vw)), 19px); box-shadow: 0 12px 34px rgba(191, 211, 230, .22); }
 .tour-start .btn.primary svg { flex: none; }
 .tour-langs { display: flex; gap: 6px; }
-.tour-langs button { border: 1px solid var(--line-2); border-radius: 999px; padding: 8px 14px; min-height: 40px; font-size: clamp(13px, 1vw, 15px); color: var(--text-2); font-family: 'Noto Sans JP', var(--font); }
+.tour-langs button { border: 1px solid var(--line-2); border-radius: 999px; padding: 8px 14px; min-height: 40px; font-size: clamp(13px, calc(1 * var(--vw)), 15px); color: var(--text-2); font-family: 'Noto Sans JP', var(--font); }
 .tour-langs button:active, .tour-langs button.on { color: var(--text); border-color: var(--plat); background: rgba(191, 211, 230, .14); }
-.tour-start small { color: var(--text-3); font-size: clamp(12px, .95vw, 14px); }
+.tour-start small { color: var(--text-3); font-size: clamp(12px, calc(.95 * var(--vw)), 14px); }
 .tour-start[hidden] { display: none; }
 
-.tour { position: fixed; left: 50%; bottom: clamp(14px, 2.4vh, 28px); transform: translateX(-50%); width: min(1180px, 94vw); z-index: 40; pointer-events: none; }
+.tour { position: fixed; left: 50%; bottom: clamp(10px, calc(1.6 * var(--vh)), 18px); transform: translateX(-50%); width: min(1400px, calc(94 * var(--vw))); z-index: 40; pointer-events: none; }
 .tour[hidden] { display: none; }
-.tbar { display: grid; grid-template-columns: auto 1fr; gap: clamp(10px, 1.2vw, 18px); align-items: stretch; pointer-events: auto;
-  background: rgba(9, 13, 20, .82); border: 1px solid var(--line-2); border-radius: 20px; padding: clamp(10px, 1.2vh, 14px) clamp(14px, 1.4vw, 20px);
+.tbar { display: grid; grid-template-columns: auto 1fr; gap: clamp(10px, calc(1.2 * var(--vw)), 18px); align-items: stretch; pointer-events: auto;
+  background: rgba(9, 13, 20, .82); border: 1px solid var(--line-2); border-radius: 20px; padding: clamp(10px, calc(1.2 * var(--vh)), 14px) clamp(14px, calc(1.4 * var(--vw)), 20px);
   box-shadow: 0 24px 70px rgba(0, 0, 0, .6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); animation: tourIn .5s var(--ease) both; }
 @keyframes tourIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 .tctl { display: flex; align-items: center; gap: 8px; }
@@ -792,11 +819,11 @@ body.mobile #s-env .content, body.mobile #s-about .content { padding-top: calc(v
 .tctl button.play.playing .ic-play { display: none; }
 .tmain { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .thead { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.thead .tstep { font-variant-numeric: tabular-nums; color: var(--text-3); font-size: clamp(12px, .95vw, 14px); flex: none; }
-.thead .ttitle { font-weight: 600; font-size: clamp(14px, 1.15vw, 18px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Noto Sans JP', var(--font); }
-.thead .tstate { color: var(--glow); font-size: clamp(12px, .95vw, 14px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Noto Sans JP', var(--font); }
+.thead .tstep { font-variant-numeric: tabular-nums; color: var(--text-3); font-size: clamp(12px, calc(.95 * var(--vw)), 14px); flex: none; }
+.thead .ttitle { font-weight: 600; font-size: clamp(14px, calc(1.15 * var(--vw)), 18px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Noto Sans JP', var(--font); }
+.thead .tstate { color: var(--glow); font-size: clamp(12px, calc(.95 * var(--vw)), 14px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Noto Sans JP', var(--font); }
 .thead .tlangs { margin-left: auto; display: flex; gap: 4px; flex: none; }
-.thead .tlangs button { border: 1px solid transparent; border-radius: 999px; padding: 4px 10px; min-height: 30px; font-size: clamp(12px, .95vw, 14px); color: var(--text-3); font-family: 'Noto Sans JP', var(--font); }
+.thead .tlangs button { border: 1px solid transparent; border-radius: 999px; padding: 4px 10px; min-height: 30px; font-size: clamp(12px, calc(.95 * var(--vw)), 14px); color: var(--text-3); font-family: 'Noto Sans JP', var(--font); }
 .thead .tlangs button.on { color: var(--text); border-color: var(--line-2); background: rgba(191, 211, 230, .12); }
 .thead .tclose { width: 34px; height: 34px; border-radius: 50%; color: var(--text-2); display: inline-flex; align-items: center; justify-content: center; flex: none; }
 .thead .tclose svg { width: 16px; height: 16px; }
@@ -806,21 +833,36 @@ body.mobile #s-env .content, body.mobile #s-about .content { padding-top: calc(v
 .ttimeline .seg i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--plat-2); border-radius: 4px; transition: width .25s linear; }
 .ttimeline .seg.cur { background: rgba(191, 211, 230, .26); box-shadow: 0 0 0 1px rgba(191, 211, 230, .35); }
 .ttimeline .seg.done i { background: rgba(191, 211, 230, .55); }
-.tcap { color: var(--text-2); font-size: clamp(13px, 1.05vw, 16px); line-height: 1.45; max-height: 3em; overflow: auto; font-family: 'Noto Sans JP', var(--font); scrollbar-width: thin; }
+.tcap { color: var(--text-2); font-size: clamp(13px, calc(1.08 * var(--vw)), 17px); line-height: 1.45; height: 5.8em; overflow: auto; font-family: 'Noto Sans JP', var(--font); scrollbar-width: thin; scroll-behavior: auto; }
 .tour.paused .tcap { color: var(--text); }
 body.tour-on #s-home .qr.small, body.tour-on #s-home .hero-hint { opacity: 0; pointer-events: none; transition: opacity .3s; }
-body.tour-on .tl-nav { margin-bottom: 96px; }
-body.tour-on #s-products .split, body.tour-on #s-markets .split { padding-bottom: 92px; }
-body.tour-on #s-env .content { padding-bottom: 110px; }
-body.tour-on #s-clients .logo-wall, body.tour-on #s-certs .content, body.tour-on #s-about .content, body.tour-on #s-world .content { padding-bottom: 100px; }
-body.tour-on .vpanel { max-height: calc(100vh - var(--top-h) - 150px); }
+body.tour-on .vpanel { max-height: calc(calc(100 * var(--vh)) - var(--top-h) - var(--reserve) - 24px); }
+/* com a barra ligada a área útil encolhe ~200 px: cabeçalhos e cartões do painel de energia ficam mais compactos */
+body.tour-on #s-env .screen-h2, body.tour-on #s-env h2 { font-size: clamp(26px, calc(2.6 * var(--vw)), 42px); }
+body.tour-on .env-head .lead { font-size: clamp(13px, calc(1 * var(--vw)), 16px); max-width: 90ch; margin-top: 4px; }
+body.tour-on .env-grid { margin-top: 10px; gap: clamp(10px, calc(1 * var(--vw)), 14px); }
+body.tour-on .tile { padding: 8px 12px; }
+body.tour-on .tile .k { font-size: clamp(11px, calc(.8 * var(--vw)), 12.5px); }
+body.tour-on .tile .v { margin-top: 2px; }
+body.tour-on .tile .v .n { font-size: clamp(22px, calc(2 * var(--vw)), 34px); }
+body.tour-on .tile .v small { font-size: clamp(11px, calc(.85 * var(--vw)), 13px); }
+body.tour-on .tile .s { font-size: clamp(10px, calc(.75 * var(--vw)), 11.5px); margin-top: 3px; }
+body.tour-on .env-green .pct { font-size: clamp(44px, calc(5 * var(--vw)), 84px); }
+body.tour-on .env-foot { margin-top: 6px; }
+body.tour-on #s-about h2 { font-size: clamp(26px, calc(2.6 * var(--vw)), 42px); }
+body.tour-on .about-txt p { font-size: clamp(12px, calc(.95 * var(--vw)), 14px); }
+body.tour-on .mvv-item p { font-size: clamp(12px, calc(1 * var(--vw)), 15px); }
+body.tour-on .modes { bottom: calc(var(--reserve) + calc(2 * var(--vh))); } /* .modes e .vpanel ficam fora de .content */
+/* vídeo dentro da apresentação: o filme ocupa a área acima da barra (nada fica atrás dela) */
+body.tour-on .video-layer video { height: calc(100% - var(--reserve)); object-fit: contain; }
+body.tour-on .video-hint { bottom: calc(var(--reserve) + 10px); }
 body.mobile .tour { left: 0; right: 0; bottom: 0; transform: none; width: auto; }
 body.mobile .tbar { border-radius: 18px 18px 0 0; grid-template-columns: 1fr; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); }
 body.mobile .tctl { order: 2; justify-content: center; }
 body.mobile .tctl button { width: 42px; height: 42px; }
 body.mobile .tctl button.play { width: 52px; height: 52px; }
 body.mobile .thead .tstate { display: none; }
-body.mobile .tcap { font-size: 13px; max-height: 2.9em; }
+body.mobile .tcap { font-size: 13px; height: auto; max-height: 2.9em; }
 body.mobile.tour-on .screen .content { padding-bottom: 190px; }
 body.mobile .tour-start .btn.primary { padding: 12px 18px; }
 
@@ -846,15 +888,16 @@ body.mobile .tour-start .btn.primary { padding: 12px 18px; }
 @media (min-height: 940px) { .about-grid { align-items: stretch; } .about-col .about-card { flex: 1; } }
 
 /* ---- orelhinha da apresentação guiada (todas as telas, exceto atração e 3D) ---- */
-.tour-tab { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); z-index: 39; display: inline-flex; align-items: center; gap: 8px;
+.tour-tab { position: fixed; left: var(--pad); bottom: 0; max-width: var(--rail-w); z-index: 39; display: inline-flex; align-items: center; gap: 8px;
   padding: 6px 16px 8px; border-radius: 14px 14px 0 0; border: 1px solid var(--line-2); border-bottom: 0;
-  background: rgba(9, 13, 20, .55); color: var(--text-2); font-size: clamp(12px, .95vw, 14px); font-weight: 500;
+  background: rgba(9, 13, 20, .55); color: var(--text-2); font-size: clamp(12px, calc(.95 * var(--vw)), 14px); font-weight: 500;
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); opacity: .8; transition: opacity .25s, transform .25s, background .25s; }
 .tour-tab svg { width: 16px; height: 16px; }
 .tour-tab .pl { width: 14px; height: 14px; color: var(--plat-2); }
-.tour-tab:active { opacity: 1; background: rgba(191, 211, 230, .16); transform: translateX(-50%) translateY(-2px); }
+.tour-tab:active { opacity: 1; background: rgba(191, 211, 230, .16); transform: translateY(-2px); }
 .tour-tab[hidden], body.tour-on .tour-tab, body.video-on .tour-tab { display: none; }
-body.mobile .tour-tab { bottom: env(safe-area-inset-bottom); font-size: 12px; padding: 5px 14px 7px; }
+body.mobile .tour-tab { left: 50%; transform: translateX(-50%); max-width: none; bottom: env(safe-area-inset-bottom); font-size: 12px; padding: 5px 14px 7px; }
+body.mobile .tour-tab:active { transform: translateX(-50%) translateY(-2px); }
 
 </style>
 </head>
@@ -1131,7 +1174,7 @@ body.mobile .tour-tab { bottom: env(safe-area-inset-bottom); font-size: 12px; pa
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-1407</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-1452</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -5519,7 +5562,7 @@ const SENSOR_DATA = {
   clientsPlaceholders: 12,
 
   markets: [
-    { id: 'hvac', photos: [], icon: 'hvac', // foto removida a pedido (10/11) — aguardando a foto certa
+    { id: 'hvac', photos: ['markets/hvac-chiller.webp', 'markets/hvac-datacenter.webp'], icon: 'hvac', // chiller/central de água gelada e data center (fotos de 10/11)
       name: { pt: 'HVAC e refrigeração', en: 'HVAC and refrigeration' },
       summary: { pt: 'Controle fino de temperatura em sistemas de climatização e frio industrial, onde estabilidade ao longo de anos vale mais que velocidade.',
                  en: 'Fine temperature control in air-conditioning and industrial cooling, where stability over years matters more than speed.' },
@@ -5554,7 +5597,7 @@ const SENSOR_DATA = {
       apps: { pt: ['Transformadores e subestações', 'Usinas solares e eólicas', 'Geração térmica', 'Armazenamento em baterias'],
               en: ['Transformers and substations', 'Solar and wind plants', 'Thermal generation', 'Battery storage'] },
       products: ['cww', 'assemblies'] },
-    { id: 'food', photos: [], icon: 'food', // foto removida a pedido (10/11) — aguardando a foto certa
+    { id: 'food', photos: ['markets/food-uht.webp'], icon: 'food', // esterilizador UHT (foto de 10/11)
       name: { pt: 'Alimentos e bebidas', en: 'Food and beverage' },
       summary: { pt: 'Temperatura é segurança alimentar: processos térmicos documentados do cozimento ao frio.',
                  en: 'Temperature is food safety: documented thermal processes from cooking to chilling.' },
@@ -5785,7 +5828,7 @@ const SENSOR_DATA = {
 };
 
 </script>
-<script>window.TOUR = {"langs":["en","ja","de"],"default":"en","steps":[{"id":"intro","screen":"home","title":{"en":"Welcome","ja":"ようこそ","de":"Willkommen","pt":"Boas-vindas"},"text":{"en":"Welcome to Sensor Technology. This guided presentation takes you through who we are, what we make, and where our sensors go. You can pause at any time to read or explore on your own, and resume whenever you like. Let's begin.","ja":"センサー・テクノロジーへようこそ。このガイド付きプレゼンテーションでは、私たちが何者で、何を作り、製品がどこへ届いているのかをご紹介します。いつでも一時停止して、ご自身のペースでご覧いただけます。それでは始めましょう。","de":"Willkommen bei Sensor Technology. Diese geführte Präsentation zeigt Ihnen, wer wir sind, was wir herstellen und wohin unsere Sensoren gehen. Sie können jederzeit pausieren, um in Ruhe zu lesen oder selbst zu erkunden, und danach fortfahren. Beginnen wir."},"dur":{"de":15.55,"ja":21.58,"en":12.38}},{"id":"hero","screen":"home","title":{"en":"Precision in platinum","ja":"白金の精度","de":"Präzision aus Platin","pt":"Precisão em platina"},"text":{"en":"Precision is born in the platinum wire. On screen are our two signature elements: the CWW — a ceramic wire-wound platinum element — and the EW micro-heater. Since 1989 we have produced more than fifteen million sensors in Diadema, Brazil, shipped to fifty-seven countries, with a team of about one hundred people.","ja":"精度は、白金線から生まれます。画面には当社を代表する二つの素子、セラミック巻線型白金素子のCWWと、マイクロヒーターのEWがあります。1989年以来、ブラジル・ジアデマの工場で1500万個以上のセンサーを製造し、57か国へ出荷してきました。従業員は約100名です。","de":"Präzision entsteht im Platindraht. Auf dem Bildschirm sehen Sie unsere beiden charakteristischen Elemente: das CWW, ein keramisches drahtgewickeltes Platinelement, und den EW-Mikroheizer. Seit 1989 haben wir in Diadema, Brasilien, mehr als fünfzehn Millionen Sensoren gefertigt und in siebenundfünfzig Länder geliefert, mit einem Team von rund hundert Mitarbeitenden."},"tts":{"en":"Precision is born in the platinum wire. On screen are our two signature elements: the C W W — a ceramic wirewound platinum element — and the E W micro-heater. Since nineteen eighty-nine we have produced more than fifteen million sensors in Diadema, Brazil, shipped to fifty-seven countries, with a team of about one hundred people.","ja":"精度は、白金線から生まれます。画面には当社を代表する二つの素子、セラミック巻線型白金素子のシーダブリューダブリューと、マイクロヒーターのイーダブリューがあります。1989年以来、ブラジル・ジアデマの工場で千五百万個以上のセンサーを製造し、57か国へ出荷してきました。従業員は約100名です。","de":"Präzision entsteht im Platindraht. Auf dem Bildschirm sehen Sie unsere beiden charakteristischen Elemente: das Ce-We-We, ein keramisches drahtgewickeltes Platinelement, und den E-We-Mikroheizer. Seit neunzehnhundertneunundachtzig haben wir in Diadema, Brasilien, mehr als fünfzehn Millionen Sensoren gefertigt und in siebenundfünfzig Länder geliefert, mit einem Team von rund hundert Mitarbeitenden."},"dur":{"de":24.38,"ja":29.16,"en":19.68}},{"id":"history1","screen":"history","history":0,"title":{"en":"Our history · 1989","ja":"歩み · 1989年","de":"Geschichte · 1989","pt":"História · 1989"},"text":{"en":"Our story begins in 1989, as the RTD division of Heraeus Electro-Nite in Brazil: the manufacture of CWW platinum elements in Diadema, inheriting more than a century of the group's platinum expertise. ISO 9001 certification followed in 1993, and the calibration laboratory in 2004.","ja":"私たちの歩みは1989年、ブラジルのヘレウス・エレクトロナイト社のRTD部門として始まりました。グループが一世紀以上にわたり培った白金の技術を受け継ぎ、ジアデマでCWW白金素子の製造を開始したのです。1993年にはISO 9001を取得し、2004年には校正ラボラトリーを設立しました。","de":"Unsere Geschichte beginnt 1989 als RTD-Abteilung von Heraeus Electro-Nite in Brasilien: die Fertigung von CWW-Platinelementen in Diadema, mit dem Platin-Know-how aus über einem Jahrhundert Konzerngeschichte. 1993 folgte die Zertifizierung nach ISO 9001, 2004 das Kalibrierlabor."},"tts":{"en":"Our story begins in nineteen eighty-nine, as the R T D division of Heraeus Electro-Nite in Brazil: the manufacture of C W W platinum elements in Diadema, inheriting more than a century of the group's platinum expertise. I S O nine thousand one certification followed in nineteen ninety-three, and the calibration laboratory in two thousand four.","ja":"私たちの歩みは1989年、ブラジルのヘレウス・エレクトロナイト社のアールティーディー部門として始まりました。グループが一世紀以上にわたり培った白金の技術を受け継ぎ、ジアデマでシーダブリューダブリュー白金素子の製造を開始したのです。1993年にはアイエスオー・キューセンイチを取得し、2004年には校正ラボラトリーを設立しました。","de":"Unsere Geschichte beginnt neunzehnhundertneunundachtzig als Er-Te-De-Abteilung von Heraeus Electro-Nite in Brasilien: die Fertigung von Ce-We-We-Platinelementen in Diadema, mit dem Platin-Know-how aus über einem Jahrhundert Konzerngeschichte. Neunzehnhundertdreiundneunzig folgte die Zertifizierung nach I-S-O neuntausendeins, zweitausendvier das Kalibrierlabor."},"dur":{"de":23.4,"ja":30.22,"en":21.1}},{"id":"history2","screen":"history","history":6,"title":{"en":"Independence · 2011","ja":"独立 · 2011年","de":"Unabhängigkeit · 2011","pt":"Independência · 2011"},"text":{"en":"In 2011, a management buyout made us independent. Rui Pereira and Luis Bombonatti took over the company, which became Sensor Technology Ltda. — with the same team, the same processes and all the accumulated know-how. Slot sensors and the EW element followed in 2018, noble-metal thermocouple wires in 2019, and ISO 14001 in 2022.","ja":"2011年、マネジメント・バイアウトにより独立。ルイ・ペレイラとルイス・ボンボナッチが会社を引き継ぎ、センサー・テクノロジー社が誕生しました。同じチーム、同じ工程、そして蓄積されたノウハウはそのままに。2018年にはスロットセンサーとEW素子、2019年には貴金属熱電対線の供給、2022年にはISO 14001の認証が続きました。","de":"2011 wurden wir durch ein Management-Buy-out unabhängig. Rui Pereira und Luis Bombonatti übernahmen das Unternehmen, das zu Sensor Technology Ltda. wurde – mit demselben Team, denselben Prozessen und dem gesamten gesammelten Know-how. 2018 folgten Nutsensoren und das EW-Element, 2019 Edelmetall-Thermoelementdrähte und 2022 die ISO 14001."},"tts":{"en":"In two thousand eleven, a management buyout made us independent. Rui Pereira and Luis Bombonatti took over the company, which became Sensor Technology Limitada — with the same team, the same processes and all the accumulated know-how. Slot sensors and the E W element followed in two thousand eighteen, noble-metal thermocouple wires in two thousand nineteen, and I S O fourteen thousand one in two thousand twenty-two.","ja":"2011年、マネジメント・バイアウトにより独立。ルイ・ペレイラとルイス・ボンボナッチが会社を引き継ぎ、センサー・テクノロジー社が誕生しました。同じチーム、同じ工程、そして蓄積されたノウハウはそのままに。2018年にはスロットセンサーとイーダブリュー素子、2019年には貴金属熱電対線の供給、2022年にはアイエスオー・イチマンヨンセンイチの認証が続きました。","de":"Zweitausendelf wurden wir durch ein Management-Buy-out unabhängig. Rui Pereira und Luis Bombonatti übernahmen das Unternehmen, das zu Sensor Technology Limitada wurde – mit demselben Team, denselben Prozessen und dem gesamten gesammelten Know-how. Zweitausendachtzehn folgten Nutsensoren und das E-We-Element, zweitausendneunzehn Edelmetall-Thermoelementdrähte und zweitausendzweiundzwanzig die I-S-O vierzehntausendeins."},"dur":{"de":28.92,"ja":32.9,"en":23.81}},{"id":"today","screen":"history","history":-1,"title":{"en":"Today","ja":"現在","de":"Heute","pt":"Hoje"},"text":{"en":"Today we make about five hundred thousand sensors a year, with around one hundred people, our own solar power on the factory roof, and exports to fifty-seven countries across five continents.","ja":"現在は年間約50万個のセンサーを製造し、約100名の従業員、工場屋上の自家太陽光発電、そして五大陸57か国への輸出を行っています。","de":"Heute fertigen wir rund fünfhunderttausend Sensoren pro Jahr, mit etwa hundert Mitarbeitenden, eigener Solarstromerzeugung auf dem Fabrikdach und Exporten in siebenundfünfzig Länder auf fünf Kontinenten."},"dur":{"de":12.36,"ja":14.52,"en":10.51}},{"id":"about","screen":"about","title":{"en":"Mission, vision and values","ja":"ミッション・ビジョン・価値観","de":"Mission, Vision und Werte","pt":"Missão, visão e valores"},"text":{"en":"Our mission is to stand out in the global technology market by integrating innovative solutions for our customers. Our vision is to be recognised as the best option for innovation, product quality, technological solutions and services. And our values: ethical conduct, transparency, social responsibility, and respect for customers, suppliers, people and the environment.","ja":"私たちのミッションは、お客様のために革新的なソリューションを統合し、世界の技術市場で際立つ存在になることです。ビジョンは、革新性、製品品質、技術ソリューション、サービスにおいて最良の選択肢として認められること。そして価値観は、倫理的な行動、透明性、社会的責任、そしてお客様、取引先、人々、環境への敬意です。","de":"Unsere Mission: uns im globalen Technologiemarkt hervorzuheben, indem wir innovative Lösungen für unsere Kunden integrieren. Unsere Vision: als beste Wahl für Innovation, Produktqualität, technologische Lösungen und Service anerkannt zu werden. Und unsere Werte: ethisches Handeln, Transparenz, soziale Verantwortung und Respekt gegenüber Kunden, Lieferanten, Menschen und Umwelt."},"dur":{"de":25.8,"ja":31.06,"en":21.77}},{"id":"world","screen":"world","title":{"en":"Global presence","ja":"グローバルな展開","de":"Weltweite Präsenz","pt":"Presença global"},"text":{"en":"Our sensors are at work in fifty-seven countries. Each arc on the globe links Diadema to a destination: the Americas, Europe, Asia, Africa and Oceania. Tap any country in the list to fly there.","ja":"当社のセンサーは57か国で活躍しています。地球儀の弧の一本一本が、ジアデマと届け先を結んでいます。南北アメリカ、ヨーロッパ、アジア、アフリカ、オセアニア。リストの国をタップすると、その国へ飛びます。","de":"Unsere Sensoren arbeiten in siebenundfünfzig Ländern. Jeder Bogen auf dem Globus verbindet Diadema mit einem Zielland: Amerika, Europa, Asien, Afrika und Ozeanien. Tippen Sie auf ein Land in der Liste, um dorthin zu fliegen."},"dur":{"de":14.86,"ja":19.73,"en":11.42}},{"id":"markets","screen":"markets","market":"hvac","cues":[{"at":0.18,"market":"auto"},{"at":0.34,"market":"industry"},{"at":0.5,"market":"energy"},{"at":0.68,"market":"aero"},{"at":0.84,"market":"lab"}],"title":{"en":"Markets and applications","ja":"市場と用途","de":"Märkte und Anwendungen","pt":"Mercados e aplicações"},"text":{"en":"Wherever temperature must be measured reliably, there is a place for a CWW element: HVAC and refrigeration; automotive and mobility; chemical and petrochemical plants; power generation — hydro, wind and solar; aerospace and defence; and health, laboratory and metrology.","ja":"温度を確実に測る必要があるところには、必ずCWW素子の出番があります。空調と冷凍、自動車とモビリティ、化学・石油化学プラント、水力・風力・太陽光の発電、航空宇宙と防衛、そして医療、研究室、計量です。","de":"Überall, wo Temperatur zuverlässig gemessen werden muss, hat ein CWW-Element seinen Platz: Klima- und Kältetechnik, Automobil und Mobilität, Chemie- und Petrochemieanlagen, Energieerzeugung aus Wasser, Wind und Sonne, Luft- und Raumfahrt und Verteidigung sowie Medizin, Labor und Messtechnik."},"tts":{"en":"Wherever temperature must be measured reliably, there is a place for a C W W element: H V A C and refrigeration; automotive and mobility; chemical and petrochemical plants; power generation — hydro, wind and solar; aerospace and defence; and health, laboratory and metrology.","ja":"温度を確実に測る必要があるところには、必ずシーダブリューダブリュー素子の出番があります。空調と冷凍、自動車とモビリティ、化学・石油化学プラント、水力・風力・太陽光の発電、航空宇宙と防衛、そして医療、研究室、計量です。","de":"Überall, wo Temperatur zuverlässig gemessen werden muss, hat ein Ce-We-We-Element seinen Platz: Klima- und Kältetechnik, Automobil und Mobilität, Chemie- und Petrochemieanlagen, Energieerzeugung aus Wasser, Wind und Sonne, Luft- und Raumfahrt und Verteidigung sowie Medizin, Labor und Messtechnik."},"dur":{"de":18.12,"ja":21.26,"en":17.06}},{"id":"clients","screen":"clients","title":{"en":"Key clients","ja":"主なお客様","de":"Wichtige Kunden","pt":"Principais clientes"},"text":{"en":"For decades, leading manufacturers have trusted our elements inside their own instruments: makers of generators and motors, process instrumentation, flow meters and temperature probes, in Europe, the Americas and Asia.","ja":"何十年にもわたり、一流メーカーの皆様が、ご自身の計器の内部に当社の素子をご採用くださっています。発電機やモーター、プロセス計装、流量計、温度プローブのメーカーが、ヨーロッパ、南北アメリカ、アジアに広がっています。","de":"Seit Jahrzehnten vertrauen führende Hersteller auf unsere Elemente im Inneren ihrer eigenen Geräte: Hersteller von Generatoren und Motoren, Prozessinstrumentierung, Durchflussmessern und Temperaturfühlern in Europa, Amerika und Asien."},"dur":{"de":14.88,"ja":20.06,"en":12.6}},{"id":"certs","screen":"certs","title":{"en":"Certifications","ja":"認証","de":"Zertifizierungen","pt":"Certificações"},"text":{"en":"Quality you can audit. ISO 9001 since 1993, ISO 14001 since 2022, and a calibration laboratory accredited to ISO/IEC 17025 since 2008 — with traceability recognised internationally. Our products comply with RoHS and REACH.","ja":"監査に耐える品質。1993年からISO 9001、2022年からISO 14001、そして2008年からISO/IEC 17025の認定を受けた校正ラボラトリー。国際的に認められたトレーサビリティを備えています。製品はRoHSとREACHに適合しています。","de":"Qualität, die man auditieren kann. ISO 9001 seit 1993, ISO 14001 seit 2022 und ein nach ISO/IEC 17025 akkreditiertes Kalibrierlabor seit 2008 – mit international anerkannter Rückführbarkeit. Unsere Produkte entsprechen RoHS und REACH."},"tts":{"en":"Quality you can audit. I S O nine thousand one since nineteen ninety-three, I S O fourteen thousand one since two thousand twenty-two, and a calibration laboratory accredited to I S O, I E C seventeen thousand twenty-five since two thousand eight — with traceability recognised internationally. Our products comply with RoHS and REACH.","ja":"監査に耐える品質。1993年からアイエスオー・キューセンイチ、2022年からアイエスオー・イチマンヨンセンイチ、そして2008年からアイエスオー・アイイーシー・イチマンナナセンニジュウゴの認定を受けた校正ラボラトリー。国際的に認められたトレーサビリティを備えています。製品はローズとリーチに適合しています。","de":"Qualität, die man auditieren kann. I-S-O neuntausendeins seit neunzehnhundertdreiundneunzig, I-S-O vierzehntausendeins seit zweitausendzweiundzwanzig und ein nach I-S-O I-E-C siebzehntausendfünfundzwanzig akkreditiertes Kalibrierlabor seit zweitausendacht – mit international anerkannter Rückführbarkeit. Unsere Produkte entsprechen Rohs und Ritsch."},"dur":{"de":23.47,"ja":27.29,"en":19.82}},{"id":"env","screen":"env","title":{"en":"Clean energy","ja":"クリーンエネルギー","de":"Saubere Energie","pt":"Energia limpa"},"text":{"en":"Clean energy, measured in real time. The factory roof carries a 115 kilowatt-peak solar plant. More than seventy percent of our consumption is generated on site, and the rest comes from the Brazilian grid, which is predominantly hydroelectric — so our energy is one hundred percent renewable. The panel shows generation, consumption and the CO₂ avoided.","ja":"クリーンエネルギーをリアルタイムで計測。工場の屋上には115キロワットピークの太陽光発電設備があります。消費電力の70パーセント以上を自家発電でまかない、残りは水力が中心のブラジルの電力網から。つまり、当社の電力は100パーセント再生可能エネルギーです。パネルには発電量、消費量、そして削減されたCO₂が表示されます。","de":"Saubere Energie, in Echtzeit gemessen. Auf dem Fabrikdach arbeitet eine Photovoltaikanlage mit 115 Kilowatt-Peak. Mehr als siebzig Prozent unseres Verbrauchs erzeugen wir selbst; der Rest kommt aus dem brasilianischen Netz, das überwiegend aus Wasserkraft gespeist wird – unsere Energie ist damit zu hundert Prozent erneuerbar. Die Anzeige zeigt Erzeugung, Verbrauch und das vermiedene CO₂."},"tts":{"en":"Clean energy, measured in real time. The factory roof carries a one hundred and fifteen kilowatt-peak solar plant. More than seventy percent of our consumption is generated on site, and the rest comes from the Brazilian grid, which is predominantly hydroelectric — so our energy is one hundred percent renewable. The panel shows generation, consumption and the C O two avoided.","ja":"クリーンエネルギーをリアルタイムで計測。工場の屋上には115キロワットピークの太陽光発電設備があります。消費電力の70パーセント以上を自家発電でまかない、残りは水力が中心のブラジルの電力網から。つまり、当社の電力は100パーセント再生可能エネルギーです。パネルには発電量、消費量、そして削減された二酸化炭素が表示されます。","de":"Saubere Energie, in Echtzeit gemessen. Auf dem Fabrikdach arbeitet eine Photovoltaikanlage mit hundertfünfzehn Kilowatt-Peak. Mehr als siebzig Prozent unseres Verbrauchs erzeugen wir selbst; der Rest kommt aus dem brasilianischen Netz, das überwiegend aus Wasserkraft gespeist wird – unsere Energie ist damit zu hundert Prozent erneuerbar. Die Anzeige zeigt Erzeugung, Verbrauch und das vermiedene Ce-O-zwei."},"dur":{"de":24.48,"ja":33.46,"en":21.17}},{"id":"cww","screen":"products","product":"cww","title":{"en":"CWW platinum element","ja":"CWW白金素子","de":"CWW-Platinelement","pt":"Elemento CWW"},"text":{"en":"The CWW platinum element: a free platinum coil inside a high-purity alumina body, sealed with glass-ceramic at both ends. One hundred ohms at zero degrees as standard — other values on demand — from minus 196 to plus 850 degrees Celsius, diameters from 0.4 to 4.5 millimetres, and tolerance classes to IEC 60751 and JIS, down to special classes.","ja":"CWW白金素子。高純度アルミナの本体の中に白金コイルを自由な状態で収め、両端をガラスセラミックで封止しています。標準は0℃で100オーム、その他の抵抗値にも対応。測定範囲はマイナス196℃からプラス850℃、直径は0.4ミリから4.5ミリ、許容差はIEC 60751およびJIS規格、さらに特別クラスまで対応します。","de":"Das CWW-Platinelement: eine frei liegende Platinwendel in einem Körper aus hochreinem Aluminiumoxid, an beiden Enden mit Glaskeramik versiegelt. Standard sind hundert Ohm bei null Grad – andere Werte auf Anfrage –, von minus 196 bis plus 850 Grad Celsius, Durchmesser von 0,4 bis 4,5 Millimeter und Toleranzklassen nach IEC 60751 und JIS, bis hin zu Sonderklassen."},"tts":{"en":"The C W W platinum element: a free platinum coil inside a high-purity alumina body, sealed with glass ceramic at both ends. One hundred ohms at zero degrees as standard — other values on demand — from minus one hundred ninety-six to plus eight hundred fifty degrees Celsius, diameters from zero point four to four point five millimetres, and tolerance classes to I E C six zero seven five one and JIS, down to special classes.","ja":"シーダブリューダブリュー白金素子。高純度アルミナの本体の中に白金コイルを自由な状態で収め、両端をガラスセラミックで封止しています。標準はゼロ度で100オーム、その他の抵抗値にも対応。測定範囲はマイナス196度からプラス850度、直径は0.4ミリから4.5ミリ、許容差はアイイーシー60751およびジス規格、さらに特別クラスまで対応します。","de":"Das Ce-We-We-Platinelement: eine frei liegende Platinwendel in einem Körper aus hochreinem Aluminiumoxid, an beiden Enden mit Glaskeramik versiegelt. Standard sind hundert Ohm bei null Grad – andere Werte auf Anfrage –, von minus hundertsechsundneunzig bis plus achthundertfünfzig Grad Celsius, Durchmesser von null Komma vier bis vier Komma fünf Millimeter und Toleranzklassen nach I-E-C sechs null sieben fünf eins und Jis, bis hin zu Sonderklassen."},"dur":{"de":27.36,"ja":35.23,"en":25.97}},{"id":"viewer","screen":"viewer","product":"cww","mode":"rotate","cues":[{"at":0.14,"mode":"cut"},{"at":0.46,"mode":"explode"},{"at":0.72,"mode":"temp","temp":700}],"title":{"en":"Inside the element","ja":"素子の内部","de":"Blick ins Element","pt":"Por dentro do elemento"},"text":{"en":"Let's look inside. In X-ray view you can see the two platinum coils resting freely in the capillaries of the ceramic body. The exploded view separates the glaze seals, the coils, the body and the lead wires. And as temperature rises, the resistance follows the Callendar–Van Dusen curve — repeatable, cycle after cycle.","ja":"内部を見てみましょう。X線表示では、セラミック本体の細孔の中に二本の白金コイルが自由な状態で収まっているのが分かります。分解表示では、釉薬の封止部、コイル、本体、リード線が分かれます。そして温度が上がると、抵抗はキャレンダー・ヴァン・デューゼンの式に沿って変化します。何度繰り返しても、再現性は変わりません。","de":"Schauen wir hinein. In der Röntgenansicht sehen Sie die beiden Platinwendeln, die frei in den Kapillaren des Keramikkörpers liegen. Die Explosionsansicht trennt die Glasurabdichtungen, die Wendeln, den Körper und die Anschlussdrähte. Und mit steigender Temperatur folgt der Widerstand der Callendar-Van-Dusen-Gleichung – reproduzierbar, Zyklus für Zyklus."},"tts":{"en":"Let's look inside. In X-ray view you can see the two platinum coils resting freely in the capillaries of the ceramic body. The exploded view separates the glaze seals, the coils, the body and the lead wires. And as temperature rises, the resistance follows the Callendar Van Dusen curve — repeatable, cycle after cycle.","ja":"内部を見てみましょう。エックス線表示では、セラミック本体の細孔の中に二本の白金コイルが自由な状態で収まっているのが分かります。分解表示では、釉薬の封止部、コイル、本体、リード線が分かれます。そして温度が上がると、抵抗はキャレンダー・ヴァン・デューゼンの式に沿って変化します。何度繰り返しても、再現性は変わりません。","de":"Schauen wir hinein. In der Röntgenansicht sehen Sie die beiden Platinwendeln, die frei in den Kapillaren des Keramikkörpers liegen. Die Explosionsansicht trennt die Glasurabdichtungen, die Wendeln, den Körper und die Anschlussdrähte. Und mit steigender Temperatur folgt der Widerstand der Kalendar-Van-Dusen-Gleichung – reproduzierbar, Zyklus für Zyklus."},"dur":{"de":21.22,"ja":30.67,"en":18.43}},{"id":"ew","screen":"products","product":"heaters","title":{"en":"EW micro-heater","ja":"EWマイクロヒーター","de":"EW-Mikroheizer","pt":"Micro-aquecedor EW"},"text":{"en":"The EW micro-heater: a platinum coil wound externally around an alumina core and glass-coated. The same element heats and measures, which makes it the heart of thermal mass flow meters — with very low hysteresis, tailored resistance values and high dimensional flexibility.","ja":"EWマイクロヒーター。アルミナのコアの外側に白金コイルを巻き、ガラスでコーティングしています。一つの素子で加熱と測定を同時に行うため、熱式質量流量計の心臓部となります。ヒステリシスは極めて小さく、抵抗値は仕様に合わせて設計でき、寸法の自由度も高い製品です。","de":"Der EW-Mikroheizer: eine außen auf einen Aluminiumoxidkern gewickelte, glasbeschichtete Platinwendel. Dasselbe Element heizt und misst – das macht es zum Herzstück thermischer Massendurchflussmesser, mit sehr geringer Hysterese, maßgeschneiderten Widerstandswerten und hoher Flexibilität in den Abmessungen."},"tts":{"en":"The E W micro-heater: a platinum coil wound externally around an alumina core and glass-coated. The same element heats and measures, which makes it the heart of thermal mass flow meters — with very low hysteresis, tailored resistance values and high dimensional flexibility.","ja":"イーダブリューマイクロヒーター。アルミナのコアの外側に白金コイルを巻き、ガラスでコーティングしています。一つの素子で加熱と測定を同時に行うため、熱式質量流量計の心臓部となります。ヒステリシスは極めて小さく、抵抗値は仕様に合わせて設計でき、寸法の自由度も高い製品です。","de":"Der E-We-Mikroheizer: eine außen auf einen Aluminiumoxidkern gewickelte, glasbeschichtete Platinwendel. Dasselbe Element heizt und misst – das macht es zum Herzstück thermischer Massendurchflussmesser, mit sehr geringer Hysterese, maßgeschneiderten Widerstandswerten und hoher Flexibilität in den Abmessungen."},"dur":{"de":18.36,"ja":26.95,"en":15.98}},{"id":"range","screen":"products","product":"slot","cues":[{"at":0.22,"product":"sp01"},{"at":0.42,"product":"assemblies"},{"at":0.6,"product":"calibration"},{"at":0.8,"product":"tcwire"}],"title":{"en":"The complete range","ja":"製品ラインナップ","de":"Das komplette Programm","pt":"A linha completa"},"text":{"en":"Around the element, a complete range. Slot sensors up to three metres long for the stators of generators and motors. The SP-01 reference thermometer for laboratories. Assemblies and probes from a single prototype to volume production. Accredited calibration of sensors, thermocouples and instruments. And noble-metal thermocouple wires, representing Safina.","ja":"素子を中心に、幅広い製品群をそろえています。発電機やモーターの固定子向けに最長3メートルのスロットセンサー。研究室向けの基準温度計SP-01。試作一個から量産までのアセンブリとプローブ。センサー、熱電対、計器の認定校正。そしてサフィナ社の代理店として供給する貴金属熱電対線です。","de":"Rund um das Element ein komplettes Programm. Nutsensoren bis drei Meter Länge für die Statoren von Generatoren und Motoren. Das Referenzthermometer SP-01 für Laboratorien. Baugruppen und Fühler vom einzelnen Prototyp bis zur Serienfertigung. Akkreditierte Kalibrierung von Sensoren, Thermoelementen und Messgeräten. Und Edelmetall-Thermoelementdrähte als Vertretung von Safina."},"tts":{"en":"Around the element, a complete range. Slot sensors up to three metres long for the stators of generators and motors. The S P zero one reference thermometer for laboratories. Assemblies and probes from a single prototype to volume production. Accredited calibration of sensors, thermocouples and instruments. And noble-metal thermocouple wires, representing Safina.","ja":"素子を中心に、幅広い製品群をそろえています。発電機やモーターの固定子向けに最長3メートルのスロットセンサー。研究室向けの基準温度計エスピーゼロワン。試作一個から量産までのアセンブリとプローブ。センサー、熱電対、計器の認定校正。そしてサフィナ社の代理店として供給する貴金属熱電対線です。","de":"Rund um das Element ein komplettes Programm. Nutsensoren bis drei Meter Länge für die Statoren von Generatoren und Motoren. Das Referenzthermometer Es-Pe null eins für Laboratorien. Baugruppen und Fühler vom einzelnen Prototyp bis zur Serienfertigung. Akkreditierte Kalibrierung von Sensoren, Thermoelementen und Messgeräten. Und Edelmetall-Thermoelementdrähte als Vertretung von Safina."},"dur":{"de":25.08,"ja":30.05,"en":20.83}},{"id":"partner","screen":"products","product":"design","cues":[{"at":0.45,"product":"partner"}],"title":{"en":"Engineering and partnership","ja":"エンジニアリングとパートナーシップ","de":"Engineering und Partnerschaft","pt":"Engenharia e parceria"},"text":{"en":"Our Product Engineering and Applications team develops custom elements, micro-heaters, slot sensors and semi-assembled components together with each customer. Four reasons to partner with us: enduring trust, tailored solutions, market leadership in CWW technology, and comprehensive support from first design to full-scale production.","ja":"製品エンジニアリング・アプリケーションチームは、お客様一社一社と共に、特注の素子、マイクロヒーター、スロットセンサー、半組立部品を開発しています。私たちをパートナーに選ぶ四つの理由。長年の信頼、オーダーメイドのソリューション、CWW技術における市場のリーダーシップ、そして初期設計から量産までの一貫したサポートです。","de":"Unser Team für Produktentwicklung und Anwendungstechnik entwickelt gemeinsam mit jedem Kunden kundenspezifische Elemente, Mikroheizer, Nutsensoren und vormontierte Komponenten. Vier Gründe für eine Partnerschaft mit uns: langjähriges Vertrauen, maßgeschneiderte Lösungen, Marktführerschaft in der CWW-Technologie und umfassende Unterstützung vom ersten Entwurf bis zur Serienproduktion."},"tts":{"en":"Our Product Engineering and Applications team develops custom elements, micro-heaters, slot sensors and semi-assembled components together with each customer. Four reasons to partner with us: enduring trust, tailored solutions, market leadership in C W W technology, and comprehensive support from first design to full-scale production.","ja":"製品エンジニアリング・アプリケーションチームは、お客様一社一社と共に、特注の素子、マイクロヒーター、スロットセンサー、半組立部品を開発しています。私たちをパートナーに選ぶ四つの理由。長年の信頼、オーダーメイドのソリューション、シーダブリューダブリュー技術における市場のリーダーシップ、そして初期設計から量産までの一貫したサポートです。","de":"Unser Team für Produktentwicklung und Anwendungstechnik entwickelt gemeinsam mit jedem Kunden kundenspezifische Elemente, Mikroheizer, Nutsensoren und vormontierte Komponenten. Vier Gründe für eine Partnerschaft mit uns: langjähriges Vertrauen, maßgeschneiderte Lösungen, Marktführerschaft in der Ce-We-We-Technologie und umfassende Unterstützung vom ersten Entwurf bis zur Serienproduktion."},"dur":{"de":24.19,"ja":30.36,"en":19.9}},{"id":"closing","screen":"home","title":{"en":"Thank you","ja":"ありがとうございました","de":"Vielen Dank","pt":"Obrigado"},"text":{"en":"Thank you for your visit. Feel free to explore each section on your own — tap the element to open the 3D model, or scan the QR code to take this presentation with you. Sensor Technology: precision born in the platinum wire, since 1989.","ja":"ご来訪ありがとうございました。各セクションをご自由にご覧ください。素子をタップすると3Dモデルが開き、QRコードを読み取ればこのプレゼンテーションをお持ち帰りいただけます。センサー・テクノロジー。1989年から、白金線に生まれる精度を。","de":"Vielen Dank für Ihren Besuch. Erkunden Sie gern jeden Bereich selbst – tippen Sie auf das Element, um das 3D-Modell zu öffnen, oder scannen Sie den QR-Code, um diese Präsentation mitzunehmen. Sensor Technology: Präzision aus dem Platindraht, seit 1989."},"tts":{"en":"Thank you for your visit. Feel free to explore each section on your own — tap the element to open the three D model, or scan the Q R code to take this presentation with you. Sensor Technology: precision born in the platinum wire, since nineteen eighty-nine.","ja":"ご来訪ありがとうございました。各セクションをご自由にご覧ください。素子をタップするとスリーディーモデルが開き、キューアールコードを読み取ればこのプレゼンテーションをお持ち帰りいただけます。センサー・テクノロジー。1989年から、白金線に生まれる精度を。","de":"Vielen Dank für Ihren Besuch. Erkunden Sie gern jeden Bereich selbst – tippen Sie auf das Element, um das drei-De-Modell zu öffnen, oder scannen Sie den Ku-Er-Code, um diese Präsentation mitzunehmen. Sensor Technology: Präzision aus dem Platindraht, seit neunzehnhundertneunundachtzig."},"dur":{"de":19.1,"ja":24.43,"en":13.85}}]};</script>
+<script>window.TOUR = {"langs":["en","ja","de"],"default":"en","steps":[{"id":"intro","screen":"home","title":{"en":"Welcome","ja":"ようこそ","de":"Willkommen","pt":"Boas-vindas"},"text":{"en":"Welcome to Sensor Technology. This guided presentation takes you through who we are, what we make, and where our sensors go. You can pause at any time to read or explore on your own, and resume whenever you like. Let's begin.","ja":"センサー・テクノロジーへようこそ。このガイド付きプレゼンテーションでは、私たちが何者で、何を作り、製品がどこへ届いているのかをご紹介します。いつでも一時停止して、ご自身のペースでご覧いただけます。それでは始めましょう。","de":"Willkommen bei Sensor Technology. Diese geführte Präsentation zeigt Ihnen, wer wir sind, was wir herstellen und wohin unsere Sensoren gehen. Sie können jederzeit pausieren, um in Ruhe zu lesen oder selbst zu erkunden, und danach fortfahren. Beginnen wir."},"dur":{"de":15.55,"ja":21.58,"en":12.38}},{"id":"hero","screen":"home","title":{"en":"Precision in platinum","ja":"白金の精度","de":"Präzision aus Platin","pt":"Precisão em platina"},"text":{"en":"Precision is born in the platinum wire. On screen are our two signature elements: the CWW — a ceramic wire-wound platinum element — and the EW micro-heater. Since 1989 we have produced more than fifteen million sensors in Diadema, Brazil, shipped to fifty-seven countries, with a team of about one hundred people.","ja":"精度は、白金線から生まれます。画面には当社を代表する二つの素子、セラミック巻線型白金素子のCWWと、マイクロヒーターのEWがあります。1989年以来、ブラジル・ジアデマの工場で1500万個以上のセンサーを製造し、57か国へ出荷してきました。従業員は約100名です。","de":"Präzision entsteht im Platindraht. Auf dem Bildschirm sehen Sie unsere beiden charakteristischen Elemente: das CWW, ein keramisches drahtgewickeltes Platinelement, und den EW-Mikroheizer. Seit 1989 haben wir in Diadema, Brasilien, mehr als fünfzehn Millionen Sensoren gefertigt und in siebenundfünfzig Länder geliefert, mit einem Team von rund hundert Mitarbeitenden."},"tts":{"en":"Precision is born in the platinum wire. On screen are our two signature elements: the C W W — a ceramic wirewound platinum element — and the E W micro-heater. Since nineteen eighty-nine we have produced more than fifteen million sensors in Diadema, Brazil, shipped to fifty-seven countries, with a team of about one hundred people.","ja":"精度は、白金線から生まれます。画面には当社を代表する二つの素子、セラミック巻線型白金素子のシーダブリューダブリューと、マイクロヒーターのイーダブリューがあります。1989年以来、ブラジル・ジアデマの工場で千五百万個以上のセンサーを製造し、57か国へ出荷してきました。従業員は約100名です。","de":"Präzision entsteht im Platindraht. Auf dem Bildschirm sehen Sie unsere beiden charakteristischen Elemente: das Ce-We-We, ein keramisches drahtgewickeltes Platinelement, und den E-We-Mikroheizer. Seit neunzehnhundertneunundachtzig haben wir in Diadema, Brasilien, mehr als fünfzehn Millionen Sensoren gefertigt und in siebenundfünfzig Länder geliefert, mit einem Team von rund hundert Mitarbeitenden."},"dur":{"de":24.38,"ja":29.16,"en":19.68}},{"id":"history1","screen":"history","history":0,"title":{"en":"Our history · 1989","ja":"歩み · 1989年","de":"Geschichte · 1989","pt":"História · 1989"},"text":{"en":"Our story begins in 1989, as the RTD division of Heraeus Electro-Nite in Brazil: the manufacture of CWW platinum elements in Diadema, inheriting more than a century of the group's platinum expertise. ISO 9001 certification followed in 1993, and the calibration laboratory in 2004.","ja":"私たちの歩みは1989年、ブラジルのヘレウス・エレクトロナイト社のRTD部門として始まりました。グループが一世紀以上にわたり培った白金の技術を受け継ぎ、ジアデマでCWW白金素子の製造を開始したのです。1993年にはISO 9001を取得し、2004年には校正ラボラトリーを設立しました。","de":"Unsere Geschichte beginnt 1989 als RTD-Abteilung von Heraeus Electro-Nite in Brasilien: die Fertigung von CWW-Platinelementen in Diadema, mit dem Platin-Know-how aus über einem Jahrhundert Konzerngeschichte. 1993 folgte die Zertifizierung nach ISO 9001, 2004 das Kalibrierlabor."},"tts":{"en":"Our story begins in nineteen eighty-nine, as the R T D division of Heraeus Electro-Nite in Brazil: the manufacture of C W W platinum elements in Diadema, inheriting more than a century of the group's platinum expertise. I S O nine thousand one certification followed in nineteen ninety-three, and the calibration laboratory in two thousand four.","ja":"私たちの歩みは1989年、ブラジルのヘレウス・エレクトロナイト社のアールティーディー部門として始まりました。グループが一世紀以上にわたり培った白金の技術を受け継ぎ、ジアデマでシーダブリューダブリュー白金素子の製造を開始したのです。1993年にはアイエスオー・キューセンイチを取得し、2004年には校正ラボラトリーを設立しました。","de":"Unsere Geschichte beginnt neunzehnhundertneunundachtzig als Er-Te-De-Abteilung von Heraeus Electro-Nite in Brasilien: die Fertigung von Ce-We-We-Platinelementen in Diadema, mit dem Platin-Know-how aus über einem Jahrhundert Konzerngeschichte. Neunzehnhundertdreiundneunzig folgte die Zertifizierung nach I-S-O neuntausendeins, zweitausendvier das Kalibrierlabor."},"dur":{"de":23.4,"ja":30.22,"en":21.1}},{"id":"history2","screen":"history","history":6,"title":{"en":"Independence · 2011","ja":"独立 · 2011年","de":"Unabhängigkeit · 2011","pt":"Independência · 2011"},"text":{"en":"In 2011, a management buyout made us independent. Rui Pereira and Luis Bombonatti took over the company, which became Sensor Technology Ltda. — with the same team, the same processes and all the accumulated know-how. Slot sensors and the EW element followed in 2018, noble-metal thermocouple wires in 2019, and ISO 14001 in 2022.","ja":"2011年、マネジメント・バイアウトにより独立。ルイ・ペレイラとルイス・ボンボナッチが会社を引き継ぎ、センサー・テクノロジー社が誕生しました。同じチーム、同じ工程、そして蓄積されたノウハウはそのままに。2018年にはスロットセンサーとEW素子、2019年には貴金属熱電対線の供給、2022年にはISO 14001の認証が続きました。","de":"2011 wurden wir durch ein Management-Buy-out unabhängig. Rui Pereira und Luis Bombonatti übernahmen das Unternehmen, das zu Sensor Technology Ltda. wurde – mit demselben Team, denselben Prozessen und dem gesamten gesammelten Know-how. 2018 folgten Nutsensoren und das EW-Element, 2019 Edelmetall-Thermoelementdrähte und 2022 die ISO 14001."},"tts":{"en":"In two thousand eleven, a management buyout made us independent. Rui Pereira and Luis Bombonatti took over the company, which became Sensor Technology Limitada — with the same team, the same processes and all the accumulated know-how. Slot sensors and the E W element followed in two thousand eighteen, noble-metal thermocouple wires in two thousand nineteen, and I S O fourteen thousand one in two thousand twenty-two.","ja":"2011年、マネジメント・バイアウトにより独立。ルイ・ペレイラとルイス・ボンボナッチが会社を引き継ぎ、センサー・テクノロジー社が誕生しました。同じチーム、同じ工程、そして蓄積されたノウハウはそのままに。2018年にはスロットセンサーとイーダブリュー素子、2019年には貴金属熱電対線の供給、2022年にはアイエスオー・イチマンヨンセンイチの認証が続きました。","de":"Zweitausendelf wurden wir durch ein Management-Buy-out unabhängig. Rui Pereira und Luis Bombonatti übernahmen das Unternehmen, das zu Sensor Technology Limitada wurde – mit demselben Team, denselben Prozessen und dem gesamten gesammelten Know-how. Zweitausendachtzehn folgten Nutsensoren und das E-We-Element, zweitausendneunzehn Edelmetall-Thermoelementdrähte und zweitausendzweiundzwanzig die I-S-O vierzehntausendeins."},"dur":{"de":28.92,"ja":32.9,"en":23.81}},{"id":"today","screen":"history","history":-1,"title":{"en":"Today","ja":"現在","de":"Heute","pt":"Hoje"},"text":{"en":"Today we make about five hundred thousand sensors a year, with around one hundred people, our own solar power on the factory roof, and exports to fifty-seven countries across five continents.","ja":"現在は年間約50万個のセンサーを製造し、約100名の従業員、工場屋上の自家太陽光発電、そして五大陸57か国への輸出を行っています。","de":"Heute fertigen wir rund fünfhunderttausend Sensoren pro Jahr, mit etwa hundert Mitarbeitenden, eigener Solarstromerzeugung auf dem Fabrikdach und Exporten in siebenundfünfzig Länder auf fünf Kontinenten."},"dur":{"de":12.36,"ja":14.52,"en":10.51}},{"id":"video_inst","screen":"history","media":"institutional","title":{"en":"Company film","ja":"会社紹介フィルム","de":"Unternehmensfilm","pt":"Vídeo institucional"},"text":{"en":"Before we go on, here is a short film about Sensor Technology, recorded at our plant in Diadema in 2022: our people, our processes and our production lines, in about three minutes. You can pause or skip it with the bar below.","ja":"次に進む前に、2022年にジアデマ工場で撮影したセンサー・テクノロジーの短いフィルムをご覧ください。私たちの社員、工程、生産ラインを約3分でご紹介します。下のバーで一時停止やスキップができます。","de":"Bevor wir weitergehen, sehen Sie einen kurzen Film über Sensor Technology, aufgenommen 2022 in unserem Werk in Diadema: unsere Mitarbeitenden, unsere Prozesse und unsere Fertigungslinien, in etwa drei Minuten. Mit der Leiste unten können Sie pausieren oder überspringen."},"tts":{"en":"Before we go on, here is a short film about Sensor Technology, recorded at our plant in Diadema in twenty twenty-two: our people, our processes and our production lines, in about three minutes. You can pause or skip it with the bar below.","ja":"次に進む前に、2022年にジアデマ工場で撮影したセンサー・テクノロジーの短いフィルムをご覧ください。私たちの社員、工程、生産ラインを約3分でご紹介します。下のバーで一時停止やスキップができます。","de":"Bevor wir weitergehen, sehen Sie einen kurzen Film über Sensor Technology, aufgenommen zweitausendzweiundzwanzig in unserem Werk in Diadema: unsere Mitarbeitenden, unsere Prozesse und unsere Fertigungslinien, in etwa drei Minuten. Mit der Leiste unten können Sie pausieren oder überspringen."},"dur":{"en":13.22,"ja":20.16,"de":18.46}},{"id":"about","screen":"about","title":{"en":"Mission, vision and values","ja":"ミッション・ビジョン・価値観","de":"Mission, Vision und Werte","pt":"Missão, visão e valores"},"text":{"en":"Our mission is to stand out in the global technology market by integrating innovative solutions for our customers. Our vision is to be recognised as the best option for innovation, product quality, technological solutions and services. And our values: ethical conduct, transparency, social responsibility, and respect for customers, suppliers, people and the environment.","ja":"私たちのミッションは、お客様のために革新的なソリューションを統合し、世界の技術市場で際立つ存在になることです。ビジョンは、革新性、製品品質、技術ソリューション、サービスにおいて最良の選択肢として認められること。そして価値観は、倫理的な行動、透明性、社会的責任、そしてお客様、取引先、人々、環境への敬意です。","de":"Unsere Mission: uns im globalen Technologiemarkt hervorzuheben, indem wir innovative Lösungen für unsere Kunden integrieren. Unsere Vision: als beste Wahl für Innovation, Produktqualität, technologische Lösungen und Service anerkannt zu werden. Und unsere Werte: ethisches Handeln, Transparenz, soziale Verantwortung und Respekt gegenüber Kunden, Lieferanten, Menschen und Umwelt."},"dur":{"de":25.8,"ja":31.06,"en":21.77}},{"id":"world","screen":"world","title":{"en":"Global presence","ja":"グローバルな展開","de":"Weltweite Präsenz","pt":"Presença global"},"text":{"en":"Our sensors are at work in fifty-seven countries. Each arc on the globe links Diadema to a destination: the Americas, Europe, Asia, Africa and Oceania. Tap any country in the list to fly there.","ja":"当社のセンサーは57か国で活躍しています。地球儀の弧の一本一本が、ジアデマと届け先を結んでいます。南北アメリカ、ヨーロッパ、アジア、アフリカ、オセアニア。リストの国をタップすると、その国へ飛びます。","de":"Unsere Sensoren arbeiten in siebenundfünfzig Ländern. Jeder Bogen auf dem Globus verbindet Diadema mit einem Zielland: Amerika, Europa, Asien, Afrika und Ozeanien. Tippen Sie auf ein Land in der Liste, um dorthin zu fliegen."},"dur":{"de":14.86,"ja":19.73,"en":11.42}},{"id":"markets","screen":"markets","market":"hvac","cues":[{"at":0.18,"market":"auto"},{"at":0.34,"market":"industry"},{"at":0.5,"market":"energy"},{"at":0.68,"market":"aero"},{"at":0.84,"market":"lab"}],"title":{"en":"Markets and applications","ja":"市場と用途","de":"Märkte und Anwendungen","pt":"Mercados e aplicações"},"text":{"en":"Wherever temperature must be measured reliably, there is a place for a CWW element: HVAC and refrigeration; automotive and mobility; chemical and petrochemical plants; power generation — hydro, wind and solar; aerospace and defence; and health, laboratory and metrology.","ja":"温度を確実に測る必要があるところには、必ずCWW素子の出番があります。空調と冷凍、自動車とモビリティ、化学・石油化学プラント、水力・風力・太陽光の発電、航空宇宙と防衛、そして医療、研究室、計量です。","de":"Überall, wo Temperatur zuverlässig gemessen werden muss, hat ein CWW-Element seinen Platz: Klima- und Kältetechnik, Automobil und Mobilität, Chemie- und Petrochemieanlagen, Energieerzeugung aus Wasser, Wind und Sonne, Luft- und Raumfahrt und Verteidigung sowie Medizin, Labor und Messtechnik."},"tts":{"en":"Wherever temperature must be measured reliably, there is a place for a C W W element: H V A C and refrigeration; automotive and mobility; chemical and petrochemical plants; power generation — hydro, wind and solar; aerospace and defence; and health, laboratory and metrology.","ja":"温度を確実に測る必要があるところには、必ずシーダブリューダブリュー素子の出番があります。空調と冷凍、自動車とモビリティ、化学・石油化学プラント、水力・風力・太陽光の発電、航空宇宙と防衛、そして医療、研究室、計量です。","de":"Überall, wo Temperatur zuverlässig gemessen werden muss, hat ein Ce-We-We-Element seinen Platz: Klima- und Kältetechnik, Automobil und Mobilität, Chemie- und Petrochemieanlagen, Energieerzeugung aus Wasser, Wind und Sonne, Luft- und Raumfahrt und Verteidigung sowie Medizin, Labor und Messtechnik."},"dur":{"de":18.12,"ja":21.26,"en":17.06}},{"id":"clients","screen":"clients","title":{"en":"Key clients","ja":"主なお客様","de":"Wichtige Kunden","pt":"Principais clientes"},"text":{"en":"For decades, leading manufacturers have trusted our elements inside their own instruments: makers of generators and motors, process instrumentation, flow meters and temperature probes, in Europe, the Americas and Asia.","ja":"何十年にもわたり、一流メーカーの皆様が、ご自身の計器の内部に当社の素子をご採用くださっています。発電機やモーター、プロセス計装、流量計、温度プローブのメーカーが、ヨーロッパ、南北アメリカ、アジアに広がっています。","de":"Seit Jahrzehnten vertrauen führende Hersteller auf unsere Elemente im Inneren ihrer eigenen Geräte: Hersteller von Generatoren und Motoren, Prozessinstrumentierung, Durchflussmessern und Temperaturfühlern in Europa, Amerika und Asien."},"dur":{"de":14.88,"ja":20.06,"en":12.6}},{"id":"certs","screen":"certs","title":{"en":"Certifications","ja":"認証","de":"Zertifizierungen","pt":"Certificações"},"text":{"en":"Quality you can audit. ISO 9001 since 1993, ISO 14001 since 2022, and a calibration laboratory accredited to ISO/IEC 17025 since 2008 — with traceability recognised internationally. Our products comply with RoHS and REACH.","ja":"監査に耐える品質。1993年からISO 9001、2022年からISO 14001、そして2008年からISO/IEC 17025の認定を受けた校正ラボラトリー。国際的に認められたトレーサビリティを備えています。製品はRoHSとREACHに適合しています。","de":"Qualität, die man auditieren kann. ISO 9001 seit 1993, ISO 14001 seit 2022 und ein nach ISO/IEC 17025 akkreditiertes Kalibrierlabor seit 2008 – mit international anerkannter Rückführbarkeit. Unsere Produkte entsprechen RoHS und REACH."},"tts":{"en":"Quality you can audit. I S O nine thousand one since nineteen ninety-three, I S O fourteen thousand one since two thousand twenty-two, and a calibration laboratory accredited to I S O, I E C seventeen thousand twenty-five since two thousand eight — with traceability recognised internationally. Our products comply with RoHS and REACH.","ja":"監査に耐える品質。1993年からアイエスオー・キューセンイチ、2022年からアイエスオー・イチマンヨンセンイチ、そして2008年からアイエスオー・アイイーシー・イチマンナナセンニジュウゴの認定を受けた校正ラボラトリー。国際的に認められたトレーサビリティを備えています。製品はローズとリーチに適合しています。","de":"Qualität, die man auditieren kann. I-S-O neuntausendeins seit neunzehnhundertdreiundneunzig, I-S-O vierzehntausendeins seit zweitausendzweiundzwanzig und ein nach I-S-O I-E-C siebzehntausendfünfundzwanzig akkreditiertes Kalibrierlabor seit zweitausendacht – mit international anerkannter Rückführbarkeit. Unsere Produkte entsprechen Rohs und Ritsch."},"dur":{"de":23.47,"ja":27.29,"en":19.82}},{"id":"env","screen":"env","title":{"en":"Clean energy","ja":"クリーンエネルギー","de":"Saubere Energie","pt":"Energia limpa"},"text":{"en":"Clean energy, measured in real time. The factory roof carries a 115 kilowatt-peak solar plant. More than seventy percent of our consumption is generated on site, and the rest comes from the Brazilian grid, which is predominantly hydroelectric — so our energy is one hundred percent renewable. The panel shows generation, consumption and the CO₂ avoided.","ja":"クリーンエネルギーをリアルタイムで計測。工場の屋上には115キロワットピークの太陽光発電設備があります。消費電力の70パーセント以上を自家発電でまかない、残りは水力が中心のブラジルの電力網から。つまり、当社の電力は100パーセント再生可能エネルギーです。パネルには発電量、消費量、そして削減されたCO₂が表示されます。","de":"Saubere Energie, in Echtzeit gemessen. Auf dem Fabrikdach arbeitet eine Photovoltaikanlage mit 115 Kilowatt-Peak. Mehr als siebzig Prozent unseres Verbrauchs erzeugen wir selbst; der Rest kommt aus dem brasilianischen Netz, das überwiegend aus Wasserkraft gespeist wird – unsere Energie ist damit zu hundert Prozent erneuerbar. Die Anzeige zeigt Erzeugung, Verbrauch und das vermiedene CO₂."},"tts":{"en":"Clean energy, measured in real time. The factory roof carries a one hundred and fifteen kilowatt-peak solar plant. More than seventy percent of our consumption is generated on site, and the rest comes from the Brazilian grid, which is predominantly hydroelectric — so our energy is one hundred percent renewable. The panel shows generation, consumption and the C O two avoided.","ja":"クリーンエネルギーをリアルタイムで計測。工場の屋上には115キロワットピークの太陽光発電設備があります。消費電力の70パーセント以上を自家発電でまかない、残りは水力が中心のブラジルの電力網から。つまり、当社の電力は100パーセント再生可能エネルギーです。パネルには発電量、消費量、そして削減された二酸化炭素が表示されます。","de":"Saubere Energie, in Echtzeit gemessen. Auf dem Fabrikdach arbeitet eine Photovoltaikanlage mit hundertfünfzehn Kilowatt-Peak. Mehr als siebzig Prozent unseres Verbrauchs erzeugen wir selbst; der Rest kommt aus dem brasilianischen Netz, das überwiegend aus Wasserkraft gespeist wird – unsere Energie ist damit zu hundert Prozent erneuerbar. Die Anzeige zeigt Erzeugung, Verbrauch und das vermiedene Ce-O-zwei."},"dur":{"de":24.48,"ja":33.46,"en":21.17}},{"id":"video_solar","screen":"env","media":"solar","title":{"en":"The solar plant","ja":"太陽光発電所","de":"Die Solaranlage","pt":"A usina solar"},"text":{"en":"To close this chapter, a short video of the photovoltaic plant installed on our roof in 2025: 164 modules and 114.8 kilowatts-peak, generating most of the electricity the factory uses.","ja":"この章の締めくくりに、2025年に当社の屋上に設置した太陽光発電所の短い映像をご覧ください。164枚のモジュール、114.8キロワットピークで、工場が使う電力の大半を発電しています。","de":"Zum Abschluss dieses Kapitels ein kurzes Video der Photovoltaikanlage, die 2025 auf unserem Dach installiert wurde: 164 Module und 114,8 Kilowatt-Peak, die den größten Teil des Stroms liefern, den das Werk verbraucht."},"tts":{"en":"To close this chapter, a short video of the photovoltaic plant installed on our roof in twenty twenty-five: one hundred sixty-four modules and one hundred fourteen point eight kilowatts peak, generating most of the electricity the factory uses.","ja":"この章の締めくくりに、2025年に当社の屋上に設置した太陽光発電所の短い映像をご覧ください。164枚のモジュール、114.8キロワットピークで、工場が使う電力の大半を発電しています。","de":"Zum Abschluss dieses Kapitels ein kurzes Video der Photovoltaikanlage, die zweitausendfünfundzwanzig auf unserem Dach installiert wurde: hundertvierundsechzig Module und hundertvierzehn Komma acht Kilowatt-Peak, die den größten Teil des Stroms liefern, den das Werk verbraucht."},"dur":{"en":13.56,"ja":19.56,"de":17.11}},{"id":"cww","screen":"products","product":"cww","title":{"en":"CWW platinum element","ja":"CWW白金素子","de":"CWW-Platinelement","pt":"Elemento CWW"},"text":{"en":"The CWW platinum element: a free platinum coil inside a high-purity alumina body, sealed with glass-ceramic at both ends. One hundred ohms at zero degrees as standard — other values on demand — from minus 196 to plus 850 degrees Celsius, diameters from 0.4 to 4.5 millimetres, and tolerance classes to IEC 60751 and JIS, down to special classes.","ja":"CWW白金素子。高純度アルミナの本体の中に白金コイルを自由な状態で収め、両端をガラスセラミックで封止しています。標準は0℃で100オーム、その他の抵抗値にも対応。測定範囲はマイナス196℃からプラス850℃、直径は0.4ミリから4.5ミリ、許容差はIEC 60751およびJIS規格、さらに特別クラスまで対応します。","de":"Das CWW-Platinelement: eine frei liegende Platinwendel in einem Körper aus hochreinem Aluminiumoxid, an beiden Enden mit Glaskeramik versiegelt. Standard sind hundert Ohm bei null Grad – andere Werte auf Anfrage –, von minus 196 bis plus 850 Grad Celsius, Durchmesser von 0,4 bis 4,5 Millimeter und Toleranzklassen nach IEC 60751 und JIS, bis hin zu Sonderklassen."},"tts":{"en":"The C W W platinum element: a free platinum coil inside a high-purity alumina body, sealed with glass ceramic at both ends. One hundred ohms at zero degrees as standard — other values on demand — from minus one hundred ninety-six to plus eight hundred fifty degrees Celsius, diameters from zero point four to four point five millimetres, and tolerance classes to I E C six zero seven five one and JIS, down to special classes.","ja":"シーダブリューダブリュー白金素子。高純度アルミナの本体の中に白金コイルを自由な状態で収め、両端をガラスセラミックで封止しています。標準はゼロ度で100オーム、その他の抵抗値にも対応。測定範囲はマイナス196度からプラス850度、直径は0.4ミリから4.5ミリ、許容差はアイイーシー60751およびジス規格、さらに特別クラスまで対応します。","de":"Das Ce-We-We-Platinelement: eine frei liegende Platinwendel in einem Körper aus hochreinem Aluminiumoxid, an beiden Enden mit Glaskeramik versiegelt. Standard sind hundert Ohm bei null Grad – andere Werte auf Anfrage –, von minus hundertsechsundneunzig bis plus achthundertfünfzig Grad Celsius, Durchmesser von null Komma vier bis vier Komma fünf Millimeter und Toleranzklassen nach I-E-C sechs null sieben fünf eins und Jis, bis hin zu Sonderklassen."},"dur":{"de":27.36,"ja":35.23,"en":25.97}},{"id":"viewer","screen":"viewer","product":"cww","mode":"rotate","cues":[{"at":0.14,"mode":"cut"},{"at":0.46,"mode":"explode"},{"at":0.72,"mode":"temp","temp":700}],"title":{"en":"Inside the element","ja":"素子の内部","de":"Blick ins Element","pt":"Por dentro do elemento"},"text":{"en":"Let's look inside. In X-ray view you can see the two platinum coils resting freely in the capillaries of the ceramic body. The exploded view separates the glaze seals, the coils, the body and the lead wires. And as temperature rises, the resistance follows the Callendar–Van Dusen curve — repeatable, cycle after cycle.","ja":"内部を見てみましょう。X線表示では、セラミック本体の細孔の中に二本の白金コイルが自由な状態で収まっているのが分かります。分解表示では、釉薬の封止部、コイル、本体、リード線が分かれます。そして温度が上がると、抵抗はキャレンダー・ヴァン・デューゼンの式に沿って変化します。何度繰り返しても、再現性は変わりません。","de":"Schauen wir hinein. In der Röntgenansicht sehen Sie die beiden Platinwendeln, die frei in den Kapillaren des Keramikkörpers liegen. Die Explosionsansicht trennt die Glasurabdichtungen, die Wendeln, den Körper und die Anschlussdrähte. Und mit steigender Temperatur folgt der Widerstand der Callendar-Van-Dusen-Gleichung – reproduzierbar, Zyklus für Zyklus."},"tts":{"en":"Let's look inside. In X-ray view you can see the two platinum coils resting freely in the capillaries of the ceramic body. The exploded view separates the glaze seals, the coils, the body and the lead wires. And as temperature rises, the resistance follows the Callendar Van Dusen curve — repeatable, cycle after cycle.","ja":"内部を見てみましょう。エックス線表示では、セラミック本体の細孔の中に二本の白金コイルが自由な状態で収まっているのが分かります。分解表示では、釉薬の封止部、コイル、本体、リード線が分かれます。そして温度が上がると、抵抗はキャレンダー・ヴァン・デューゼンの式に沿って変化します。何度繰り返しても、再現性は変わりません。","de":"Schauen wir hinein. In der Röntgenansicht sehen Sie die beiden Platinwendeln, die frei in den Kapillaren des Keramikkörpers liegen. Die Explosionsansicht trennt die Glasurabdichtungen, die Wendeln, den Körper und die Anschlussdrähte. Und mit steigender Temperatur folgt der Widerstand der Kalendar-Van-Dusen-Gleichung – reproduzierbar, Zyklus für Zyklus."},"dur":{"de":21.22,"ja":30.67,"en":18.43}},{"id":"ew","screen":"products","product":"heaters","title":{"en":"EW micro-heater","ja":"EWマイクロヒーター","de":"EW-Mikroheizer","pt":"Micro-aquecedor EW"},"text":{"en":"The EW micro-heater: a platinum coil wound externally around an alumina core and glass-coated. The same element heats and measures, which makes it the heart of thermal mass flow meters — with very low hysteresis, tailored resistance values and high dimensional flexibility.","ja":"EWマイクロヒーター。アルミナのコアの外側に白金コイルを巻き、ガラスでコーティングしています。一つの素子で加熱と測定を同時に行うため、熱式質量流量計の心臓部となります。ヒステリシスは極めて小さく、抵抗値は仕様に合わせて設計でき、寸法の自由度も高い製品です。","de":"Der EW-Mikroheizer: eine außen auf einen Aluminiumoxidkern gewickelte, glasbeschichtete Platinwendel. Dasselbe Element heizt und misst – das macht es zum Herzstück thermischer Massendurchflussmesser, mit sehr geringer Hysterese, maßgeschneiderten Widerstandswerten und hoher Flexibilität in den Abmessungen."},"tts":{"en":"The E W micro-heater: a platinum coil wound externally around an alumina core and glass-coated. The same element heats and measures, which makes it the heart of thermal mass flow meters — with very low hysteresis, tailored resistance values and high dimensional flexibility.","ja":"イーダブリューマイクロヒーター。アルミナのコアの外側に白金コイルを巻き、ガラスでコーティングしています。一つの素子で加熱と測定を同時に行うため、熱式質量流量計の心臓部となります。ヒステリシスは極めて小さく、抵抗値は仕様に合わせて設計でき、寸法の自由度も高い製品です。","de":"Der E-We-Mikroheizer: eine außen auf einen Aluminiumoxidkern gewickelte, glasbeschichtete Platinwendel. Dasselbe Element heizt und misst – das macht es zum Herzstück thermischer Massendurchflussmesser, mit sehr geringer Hysterese, maßgeschneiderten Widerstandswerten und hoher Flexibilität in den Abmessungen."},"dur":{"de":18.36,"ja":26.95,"en":15.98}},{"id":"range","screen":"products","product":"slot","cues":[{"at":0.22,"product":"sp01"},{"at":0.42,"product":"assemblies"},{"at":0.6,"product":"calibration"},{"at":0.8,"product":"tcwire"}],"title":{"en":"The complete range","ja":"製品ラインナップ","de":"Das komplette Programm","pt":"A linha completa"},"text":{"en":"Around the element, a complete range. Slot sensors up to three metres long for the stators of generators and motors. The SP-01 reference thermometer for laboratories. Assemblies and probes from a single prototype to volume production. Accredited calibration of sensors, thermocouples and instruments. And noble-metal thermocouple wires, representing Safina.","ja":"素子を中心に、幅広い製品群をそろえています。発電機やモーターの固定子向けに最長3メートルのスロットセンサー。研究室向けの基準温度計SP-01。試作一個から量産までのアセンブリとプローブ。センサー、熱電対、計器の認定校正。そしてサフィナ社の代理店として供給する貴金属熱電対線です。","de":"Rund um das Element ein komplettes Programm. Nutsensoren bis drei Meter Länge für die Statoren von Generatoren und Motoren. Das Referenzthermometer SP-01 für Laboratorien. Baugruppen und Fühler vom einzelnen Prototyp bis zur Serienfertigung. Akkreditierte Kalibrierung von Sensoren, Thermoelementen und Messgeräten. Und Edelmetall-Thermoelementdrähte als Vertretung von Safina."},"tts":{"en":"Around the element, a complete range. Slot sensors up to three metres long for the stators of generators and motors. The S P zero one reference thermometer for laboratories. Assemblies and probes from a single prototype to volume production. Accredited calibration of sensors, thermocouples and instruments. And noble-metal thermocouple wires, representing Safina.","ja":"素子を中心に、幅広い製品群をそろえています。発電機やモーターの固定子向けに最長3メートルのスロットセンサー。研究室向けの基準温度計エスピーゼロワン。試作一個から量産までのアセンブリとプローブ。センサー、熱電対、計器の認定校正。そしてサフィナ社の代理店として供給する貴金属熱電対線です。","de":"Rund um das Element ein komplettes Programm. Nutsensoren bis drei Meter Länge für die Statoren von Generatoren und Motoren. Das Referenzthermometer Es-Pe null eins für Laboratorien. Baugruppen und Fühler vom einzelnen Prototyp bis zur Serienfertigung. Akkreditierte Kalibrierung von Sensoren, Thermoelementen und Messgeräten. Und Edelmetall-Thermoelementdrähte als Vertretung von Safina."},"dur":{"de":25.08,"ja":30.05,"en":20.83}},{"id":"partner","screen":"products","product":"design","cues":[{"at":0.45,"product":"partner"}],"title":{"en":"Engineering and partnership","ja":"エンジニアリングとパートナーシップ","de":"Engineering und Partnerschaft","pt":"Engenharia e parceria"},"text":{"en":"Our Product Engineering and Applications team develops custom elements, micro-heaters, slot sensors and semi-assembled components together with each customer. Four reasons to partner with us: enduring trust, tailored solutions, market leadership in CWW technology, and comprehensive support from first design to full-scale production.","ja":"製品エンジニアリング・アプリケーションチームは、お客様一社一社と共に、特注の素子、マイクロヒーター、スロットセンサー、半組立部品を開発しています。私たちをパートナーに選ぶ四つの理由。長年の信頼、オーダーメイドのソリューション、CWW技術における市場のリーダーシップ、そして初期設計から量産までの一貫したサポートです。","de":"Unser Team für Produktentwicklung und Anwendungstechnik entwickelt gemeinsam mit jedem Kunden kundenspezifische Elemente, Mikroheizer, Nutsensoren und vormontierte Komponenten. Vier Gründe für eine Partnerschaft mit uns: langjähriges Vertrauen, maßgeschneiderte Lösungen, Marktführerschaft in der CWW-Technologie und umfassende Unterstützung vom ersten Entwurf bis zur Serienproduktion."},"tts":{"en":"Our Product Engineering and Applications team develops custom elements, micro-heaters, slot sensors and semi-assembled components together with each customer. Four reasons to partner with us: enduring trust, tailored solutions, market leadership in C W W technology, and comprehensive support from first design to full-scale production.","ja":"製品エンジニアリング・アプリケーションチームは、お客様一社一社と共に、特注の素子、マイクロヒーター、スロットセンサー、半組立部品を開発しています。私たちをパートナーに選ぶ四つの理由。長年の信頼、オーダーメイドのソリューション、シーダブリューダブリュー技術における市場のリーダーシップ、そして初期設計から量産までの一貫したサポートです。","de":"Unser Team für Produktentwicklung und Anwendungstechnik entwickelt gemeinsam mit jedem Kunden kundenspezifische Elemente, Mikroheizer, Nutsensoren und vormontierte Komponenten. Vier Gründe für eine Partnerschaft mit uns: langjähriges Vertrauen, maßgeschneiderte Lösungen, Marktführerschaft in der Ce-We-We-Technologie und umfassende Unterstützung vom ersten Entwurf bis zur Serienproduktion."},"dur":{"de":24.19,"ja":30.36,"en":19.9}},{"id":"closing","screen":"home","title":{"en":"Thank you","ja":"ありがとうございました","de":"Vielen Dank","pt":"Obrigado"},"text":{"en":"Thank you for your visit. Feel free to explore each section on your own — tap the element to open the 3D model, or use the bar below to replay any chapter. Sensor Technology: precision born in the platinum wire, since 1989.","ja":"ご来訪ありがとうございました。各セクションをご自由にご覧ください。素子をタップすると3Dモデルが開き、下のバーからはどの章でももう一度ご覧いただけます。センサー・テクノロジー。1989年から、白金線に生まれる精度を。","de":"Vielen Dank für Ihren Besuch. Erkunden Sie gern jeden Bereich selbst – tippen Sie auf das Element, um das 3D-Modell zu öffnen, oder wiederholen Sie über die Leiste unten jedes Kapitel. Sensor Technology: Präzision aus dem Platindraht, seit 1989."},"tts":{"en":"Thank you for your visit. Feel free to explore each section on your own — tap the element to open the three D model, or use the bar below to replay any chapter. Sensor Technology: precision born in the platinum wire, since nineteen eighty-nine.","ja":"ご来訪ありがとうございました。各セクションをご自由にご覧ください。素子をタップするとスリーディーモデルが開き、下のバーからはどの章でももう一度ご覧いただけます。センサー・テクノロジー。1989年から、白金線に生まれる精度を。","de":"Vielen Dank für Ihren Besuch. Erkunden Sie gern jeden Bereich selbst – tippen Sie auf das Element, um das drei-De-Modell zu öffnen, oder wiederholen Sie über die Leiste unten jedes Kapitel. Sensor Technology: Präzision aus dem Platindraht, seit neunzehnhundertneunundachtzig."},"dur":{"de":18.38,"ja":23.21,"en":13.15}}]};</script>
 <script>
 /* ============================================================
    Sensor Technology · Showcase — código do app
@@ -5807,7 +5850,7 @@ const I18N = {
     navWelcome: 'Boas-vindas', navAbout: 'Quem somos',
     aboutTitle: 'Quem somos', whoWeAre: 'Quem somos', whatWeDo: 'O que fazemos', mission: 'Missão', vision: 'Visão', values: 'Valores',
     producedCap: 'sensores produzidos desde 1989 — e subindo', statSince: 'sensores desde 1989',
-    watchVideo: 'Assistir ao vídeo institucional', watchSolar: 'Ver o vídeo da usina solar', tapBack: 'Toque para voltar',
+    watchVideo: 'Assistir ao vídeo institucional', watchSolar: 'Ver o vídeo da usina solar', tapBack: 'Toque para voltar', tapPause: 'Toque para pausar · barra abaixo para avançar',
     tourStart: 'Apresentação guiada', tourSub: 'Narração em inglês, japonês ou alemão · pause, leia e retome quando quiser', tapToPlay: 'Toque em ▶ para ouvir a narração',
     sinceAt: 'Na Sensor desde {y}',
     teamTitle: 'Nosso time', teamMgmt: 'Direção', teamProd: 'Produção', teamAreas: 'Áreas', teamBase: 'A nossa base', orgSoon: 'equipe · em breve', teamMgmtLead: 'Quem conduz a Sensor Technology.', hobbies: 'Fora do trabalho', photoHint: 'foto', brandRep: 'Marca representada',
@@ -5858,7 +5901,7 @@ const I18N = {
     navWelcome: 'Welcome', navAbout: 'About us',
     aboutTitle: 'About us', whoWeAre: 'Who we are', whatWeDo: 'What we do', mission: 'Mission', vision: 'Vision', values: 'Values',
     producedCap: 'sensors made since 1989 — and counting', statSince: 'sensors since 1989',
-    watchVideo: 'Watch the corporate video', watchSolar: 'Watch the solar plant video', tapBack: 'Tap to return',
+    watchVideo: 'Watch the corporate video', watchSolar: 'Watch the solar plant video', tapBack: 'Tap to return', tapPause: 'Tap to pause · use the bar below to skip',
     tourStart: 'Guided presentation', tourSub: 'Narrated in English, Japanese or German · pause, read and resume at any time', tapToPlay: 'Tap ▶ to hear the narration',
     sinceAt: 'At Sensor since {y}',
     teamTitle: 'Our team', teamMgmt: 'Management', teamProd: 'Production', teamAreas: 'Areas', teamBase: 'Our base', orgSoon: 'team · coming soon', teamMgmtLead: 'The people who lead Sensor Technology.', hobbies: 'Outside work', photoHint: 'photo', brandRep: 'Represented brand',
@@ -5988,6 +6031,8 @@ let lastTouch = performance.now();
 // Decisão por tamanho físico de tela (não por media query aninhada, que navegadores antigos ignoram).
 // ?m=1 força o modo celular e ?m=0 força o modo quiosque, para diagnóstico.
 const FORCE_M = new URLSearchParams(location.search).get('m');
+// Telas grandes (BenQ 86" etc.): o <head> aplica zoom CSS na raiz; canvases usam ZOOM para manter a nitidez
+const ZOOM = Math.max(1, +window.UI_ZOOM || 1);
 const IS_MOBILE = FORCE_M === '1' ? true : FORCE_M === '0' ? false : (() => {
   // telefone (lado menor ≤ 600 px CSS, em qualquer orientação), janela estreita, ou qualquer tela em pé até 1100 px
   const sw = screen.width || window.innerWidth, sh = screen.height || window.innerHeight;
@@ -6015,7 +6060,7 @@ function go(name) {
   g.classList.toggle('dim', !['attract', 'home', 'world'].includes(name));
   Globe.setMode(name);
   if (prev === 'home' && name !== 'home') Viewer.hideHero();
-  if (name === 'viewer') { if (prev !== 'viewer') viewerFrom = prev === 'attract' ? 'home' : prev; Viewer.show(); } else if (prev === 'viewer') Viewer.hide();
+  if (name === 'viewer') { if (prev !== 'viewer') { viewerFrom = prev === 'attract' ? 'home' : prev; Sfx.play('ticks', 0.8); } Viewer.show(); } else if (prev === 'viewer') Viewer.hide();
   if (name === 'home') Viewer.showHero();
   if (name === 'attract') Attract.enter(); else if (prev === 'attract') Attract.leave();
   if (name === 'home') Home.enter();
@@ -6042,7 +6087,7 @@ function buildRail() {
     b.type = 'button';
     b.dataset.screen = s;
     b.innerHTML = `<span class="i">${ICONS[s === 'attract' ? 'welcome' : s]}</span><span data-i18n="${k}"></span>`;
-    b.addEventListener('click', () => (s === 'attract' ? goWelcome() : go(s)));
+    b.addEventListener('click', () => { if (s !== current) Sfx.play('tick', 0.7); s === 'attract' ? goWelcome() : go(s); });
     if (s === 'attract') b.classList.add('wchip');
     rail.appendChild(b);
     if (s === 'home') { const sep = document.createElement('div'); sep.className = 'sep'; rail.appendChild(sep); }
@@ -6068,7 +6113,7 @@ function applyI18n() {
   $('#viewer-sub').textContent = T('viewerSub');
   $('#admin-idle').textContent = D.kiosk.idleSeconds + ' ' + T('seconds');
   History.render(); About.render(); World.render(); Markets.render(); Clients.render(); Certs.render(); Products.render(); Viewer.renderPanels(); Team.render(); Energy.render();
-  const sb = $('#env-video'); if (sb) { sb.hidden = !(D.media && D.media.solar); $('span', sb).textContent = T('watchSolar'); sb.onclick = () => Videos.playManual(D.media.solar); }
+  const sb = $('#env-video'); if (sb) { sb.hidden = !(D.media && D.media.solar); $('span', sb).textContent = T('watchSolar'); sb.onclick = () => Videos.playManual(D.media.solar, 'solar'); }
 }
 
 let userChoseLang = false;
@@ -6087,7 +6132,7 @@ function kioskGuards() {
   ['pointerdown', 'pointermove', 'keydown', 'wheel'].forEach((ev) => document.addEventListener(ev, touch, { passive: true }));
   setInterval(() => {
     const idle = (performance.now() - lastTouch) / 1000;
-    if (!IS_MOBILE && idle > D.kiosk.idleSeconds && current !== 'attract' && !(Tour.on && Tour.playing)) { go('attract'); userChoseLang = false; const dl = RemoteConfig.cfg && RemoteConfig.cfg.defaultLang; if (dl && dl !== LANG) setLang(dl); }
+    if (!IS_MOBILE && idle > D.kiosk.idleSeconds && current !== 'attract' && !(Tour.on && Tour.playing) && !Videos.playing) { go('attract'); userChoseLang = false; const dl = RemoteConfig.cfg && RemoteConfig.cfg.defaultLang; if (dl && dl !== LANG) setLang(dl); }
   }, 1000);
   // Mantém a tela acesa
   let lock = null;
@@ -6118,7 +6163,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.10-1407';
+const BUILD = '2026.11.10-1452';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -6181,6 +6226,7 @@ const RemoteConfig = {
     Welcome.apply(cfg.welcome || {});
     Motion.apply(Welcome.cfg.voice || {});
     Videos.apply(cfg.videos || {});
+    Sfx.apply(cfg.sfx);
     const cf = Array.isArray(cfg.clientsFirst) ? cfg.clientsFirst : [];
     if (cf.join('|') !== (Clients.first || []).join('|')) { Clients.first = cf; Clients.render(); }
     if (Array.isArray(cfg.hidden)) { const nh = new Set(cfg.hidden); if ([...nh].join() !== [...HIDDEN].join()) { HIDDEN = nh; buildRail(); applyI18n(); if (HIDDEN.has(current)) go('home'); else go(current); } }
@@ -6310,6 +6356,9 @@ const Welcome = {
   },
   speak(auto) {
     if (Videos.playing) { if (!auto) { Videos.stop(true); } else return; } // nunca por cima do vídeo
+    // saudação automática (movimento / intervalo): um sinal sonoro curto chama a atenção antes da voz
+    if (auto && Sfx.on && !this.chimed) { this.chimed = true; Sfx.play('hit', 1.2); setTimeout(() => { Welcome.chimed = false; if (Welcome.active && current === 'attract') Welcome.speak(true); }, 1100); return; }
+    this.chimed = false;
     const voice = this.cfg.voice || {};
     const btn = $('#w-voice');
     const secs = Math.max(10, +voice.seconds || 45);                       // duração estimada (Fully toca fora do DOM)
@@ -6379,19 +6428,20 @@ const Videos = {
     if (idle < 15 || since < this.every) return;
     this.play(this.items[(this.idx = (this.idx + 1) % this.items.length)]);
   },
-  manual: false,
+  manual: false, tour: false, onEnd: null,
   play(item, opts) {
     const layer = $('#video-layer'), v = $('#video-el');
-    this.playing = true; this.manual = !!(opts && opts.manual); clearTimeout(this.hideT);
+    opts = opts || {};
+    this.playing = true; this.manual = !!opts.manual; this.tour = !!opts.tour; this.onEnd = opts.onEnd || null; clearTimeout(this.hideT);
     try { if (Welcome.audio && !Welcome.audio.paused) Welcome.audio.pause(); if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
     $('#video-layer .vcap').hidden = true; // sem logo/título sobre o vídeo
-    $('#video-hint').textContent = this.manual ? T('tapBack') : T('tap');
+    $('#video-hint').textContent = this.tour ? T('tapPause') : this.manual ? T('tapBack') : T('tap');
     v.muted = this.muted || item.muted === true; v.volume = item.volume == null ? this.volume : Math.min(1, Math.max(0, +item.volume || 0));
     v.loop = false; v.src = item.src;
     layer.hidden = false; layer.classList.remove('on'); void layer.offsetWidth; layer.classList.add('on');
     document.body.classList.add('video-on');
     $('#globe-canvas').classList.add('hidden'); // o 3D para enquanto o vídeo toca (laço principal pula o render)
-    const end = () => Videos.stop(true);
+    const end = () => Videos.stop(true, 'ended');
     v.onended = end; v.onerror = end;
     v.play().catch((err) => {
       if (!v.muted && err && err.name === 'NotAllowedError') { v.muted = true; v.play().catch(end); } // sem gesto ainda: mostra mudo
@@ -6399,17 +6449,23 @@ const Videos = {
     });
     clearTimeout(this.guard); this.guard = setTimeout(end, Math.max(30, +item.maxSeconds || 600) * 1000);
   },
-  stop(backToGlobe) {
+  stop(backToGlobe, why) {
     if (!this.playing) return;
-    const wasManual = this.manual; this.playing = false; this.manual = false; this.lastEnd = performance.now(); clearTimeout(this.guard);
+    const wasManual = this.manual, cb = this.onEnd; this.playing = false; this.manual = false; this.tour = false; this.onEnd = null; this.lastEnd = performance.now(); clearTimeout(this.guard);
     const layer = $('#video-layer'), v = $('#video-el');
     try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {}
     document.body.classList.remove('video-on');
     layer.classList.remove('on');
     clearTimeout(this.hideT); this.hideT = setTimeout(() => { if (!Videos.playing) layer.hidden = true; }, backToGlobe ? 700 : 0);
     if (backToGlobe || wasManual) $('#globe-canvas').classList.toggle('hidden', current === 'viewer' || current === 'home');
+    if (why === 'ended' && cb) { try { cb(); } catch (e) {} } // fim natural: a apresentação guiada segue
   },
-  playManual(media) { if (!media || !media.src) return; this.play({ src: media.src, title: media.title, maxSeconds: 900 }, { manual: true }); },
+  // botões "assistir ao vídeo": com a apresentação guiada ligada, o vídeo toca como passo dela (e ela continua depois)
+  playManual(media, key) {
+    if (!media || !media.src) return;
+    if (key && typeof Tour !== 'undefined' && Tour.on && Tour.playMedia(key)) return;
+    this.play({ src: media.src, title: media.title, maxSeconds: 900 }, { manual: true });
+  },
   async prefetch() {
     if (!this.enabled || location.protocol === 'file:' || !navigator.onLine) return;
     const all = [...this.items, ...Object.values(D.media || {})].filter((it) => it && it.src);
@@ -6418,6 +6474,24 @@ const Videos = {
       try { const r = await fetch(it.src, { cache: 'force-cache' }); if (r.body) { try { await r.body.cancel(); } catch (e) {} } this.prefetched.add(it.src); } catch (e) { /* tenta na próxima */ }
     }
   },
+};
+
+/* Efeitos sonoros curtos (recortes da trilha do vídeo Netsushin), em volume baixo, só no quiosque.
+   config.json → "sfx": false desliga; "sfx": { "volume": 0.5 } ajusta (padrão 0.35). */
+const Sfx = {
+  on: true, volume: 0.35, pool: {},
+  files: { sting: 'audio/sfx/sfx-sting.mp3', hit: 'audio/sfx/sfx-hit.mp3', ding: 'audio/sfx/sfx-ding.mp3', tick: 'audio/sfx/sfx-tick.mp3', ticks: 'audio/sfx/sfx-ticks.mp3' },
+  apply(cfg) {
+    if (cfg === false) { this.on = false; return; }
+    this.on = D.kiosk.sfx !== false;
+    if (cfg && typeof cfg === 'object') { if (cfg.enabled === false) this.on = false; if (cfg.volume != null) this.volume = clamp(+cfg.volume || 0, 0, 1); }
+  },
+  el(name) { let a = this.pool[name]; if (!a) { a = new Audio(this.files[name]); a.preload = 'auto'; this.pool[name] = a; } return a; },
+  play(name, gain) {
+    if (!this.on || IS_MOBILE || !this.files[name]) return;
+    try { const a = this.el(name); a.volume = clamp(this.volume * (gain == null ? 1 : gain), 0, 1); a.currentTime = 0; const p = a.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+  },
+  warm() { if (!this.on || IS_MOBILE) return; Object.keys(this.files).forEach((k) => this.el(k)); },
 };
 
 /* Movimento pela câmera frontal (getUserMedia): alguém passando na recepção dispara a saudação.
@@ -6518,7 +6592,7 @@ const History = {
       nodes.appendChild(n);
       const y = document.createElement('span'); y.textContent = h.year && !h.label ? h.year : L(h.label) || h.year; years.appendChild(y);
     });
-    const vb = $('#tl-video'); if (vb) { vb.hidden = !(D.media && D.media.institutional); vb.onclick = () => Videos.playManual(D.media.institutional); }
+    const vb = $('#tl-video'); if (vb) { vb.hidden = !(D.media && D.media.institutional); vb.onclick = () => Videos.playManual(D.media.institutional, 'institutional'); }
     $('#tl-prev').onclick = () => History.set((History.i - 1 + H.length) % H.length, true);
     $('#tl-next').onclick = () => History.set((History.i + 1) % H.length, true);
     this.set(this.i, false);
@@ -6590,7 +6664,7 @@ function renderPicker(pickerEl, detailEl, items, renderDetail, state) {
     const b = document.createElement('button'); b.type = 'button';
     b.innerHTML = `<span class="i">${ICONS[it.icon] || ''}</span><span>${L(it.name)}</span>`;
     b.classList.toggle('on', i === state.i);
-    b.addEventListener('click', () => { state.i = i; $$('button', pickerEl).forEach((x, k) => x.classList.toggle('on', k === i)); renderDetail(it, detailEl); if (pickerEl.id === 'products-picker' && typeof Tour !== 'undefined') Tour.onUserNav('products', { product: it.id }); });
+    b.addEventListener('click', () => { if (i !== state.i) Sfx.play('tick', 0.7); state.i = i; $$('button', pickerEl).forEach((x, k) => x.classList.toggle('on', k === i)); renderDetail(it, detailEl); if (pickerEl.id === 'products-picker' && typeof Tour !== 'undefined') Tour.onUserNav('products', { product: it.id }); });
     pickerEl.appendChild(b);
   });
   renderDetail(items[state.i], detailEl);
@@ -6884,7 +6958,7 @@ const Energy = (function () {
     if (force || performance.now() - chartAt > 60000) { drawChart(s); chartAt = performance.now(); }
   }
   function drawChart(s) {
-    const c = $('#env-chart'); const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const c = $('#env-chart'); const dpr = Math.min(3, (window.devicePixelRatio || 1) * ZOOM);
     const W = c.clientWidth, H = c.clientHeight; if (!W || !H) return;
     c.width = W * dpr; c.height = H * dpr; const g = c.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
     const padL = 34, padR = 12, padT = 18, padB = 24; const maxV = Math.max(10, ...s.curve.map((p) => Math.max(p.pvF || 0, p.load || 0, p.pv || 0))) * 1.12;
@@ -6922,7 +6996,7 @@ const Energy = (function () {
 const Globe = (function () {
   const canvas = $('#globe-canvas');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min((window.devicePixelRatio || 1) * ZOOM, 2));
   renderer.setClearColor(0x000000, 0);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
@@ -7620,7 +7694,7 @@ const Viewer = (function () {
 
   function init() {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
+    renderer.setPixelRatio(Math.min((window.devicePixelRatio || 1) * ZOOM, ZOOM > 1 ? 2 : 1.25));
     renderer.setClearColor(0x000000, 0);
     renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
     scene = new THREE.Scene();
@@ -7692,7 +7766,7 @@ const Viewer = (function () {
     drawChart();
   }
   function drawChart() {
-    const c = $('#rt-chart'); const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const c = $('#rt-chart'); const dpr = Math.min(3, (window.devicePixelRatio || 1) * ZOOM);
     const W = c.clientWidth, H = c.clientHeight; if (!W || !H) return;
     c.width = W * dpr; c.height = H * dpr; const g = c.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
     const [t0, t1] = D.cww.tRange; const r0 = rOf(t0, chip), r1 = rOf(t1, chip);
@@ -7851,37 +7925,51 @@ const TOUR_LANG_NAMES = { en: 'English', ja: '日本語', de: 'Deutsch' };
 const TOUR_BCP = { en: 'en-US', ja: 'ja-JP', de: 'de-DE' };
 
 const Tour = {
-  on: false, lang: 'en', i: 0, playing: false, navigating: false, ended: false, gen: 0,
+  on: false, lang: 'en', i: 0, playing: false, navigating: false, ended: false, gen: 0, videoDone: false,
   audio: null, mode: 'audio', fired: new Set(), synthT0: 0, synthDur: 0, raf: 0, segs: [],
   steps() { return (window.TOUR && TOUR.steps) || []; },
   ui() { return TOUR_UI[this.lang] || TOUR_UI.en; },
-  dur(step) { return (step.dur && step.dur[this.lang]) || Math.max(8, ((step.tts && step.tts[this.lang]) || step.text[this.lang] || '').length / (this.lang === 'ja' ? 7 : 15)); },
+  narr(step) { return (step.dur && step.dur[this.lang]) || Math.max(8, ((step.tts && step.tts[this.lang]) || step.text[this.lang] || '').length / (this.lang === 'ja' ? 7 : 15)); },
+  dur(step) { return this.narr(step) + (this.isVideo(step) ? 50 : 0); }, // peso do trecho na barra (vídeo conta como 50 s)
   available() { return !!(window.TOUR && TOUR.steps && TOUR.steps.length); },
+  // passo de vídeo: narração curta e depois o filme inteiro (a barra pausa / avança o filme)
+  isVideo(step) { return !!(step && step.media && D.media && D.media[step.media] && D.media[step.media].src); },
 
   start(lang) {
     if (!this.available()) return;
     this.lang = TOUR_LANG_NAMES[lang] ? lang : (TOUR.default || 'en');
     this.on = true; this.ended = false; document.body.classList.add('tour-on');
     if (Videos.playing) Videos.stop(false);
-    Welcome.stopVoice();
+    Welcome.stopVoice(); Sfx.warm(); Sfx.play('hit');
     $('#tour').hidden = false; this.buildBar();
     this.goStep(0, true);
   },
   stop() {
     this.on = false; this.playing = false; document.body.classList.remove('tour-on');
     this.stopAudio(); cancelAnimationFrame(this.raf);
-    $('#tour').hidden = true;
+    $('#tour').hidden = true; this.layout();
     if (current === 'viewer') Viewer.setMode('rotate');
   },
   setLang(lang) {
     if (!TOUR_LANG_NAMES[lang] || lang === this.lang) return;
-    const wasPlaying = this.playing; this.lang = lang; this.buildBar();
+    this.lang = lang;
+    if (this.mode === 'video') { this.buildBar(); return; } // no meio do filme: só troca os textos da barra
+    const wasPlaying = this.playing; this.buildBar();
     this.goStep(this.i, wasPlaying || !this.ended);
+  },
+  // faixa reservada embaixo: o conteúdo das telas termina acima da barra (nada fica escondido atrás dela)
+  layout() {
+    const root = document.documentElement;
+    if (!this.on || IS_MOBILE) { root.style.setProperty('--reserve', '0px'); return; }
+    const bar = $('#tour .tbar'), wrap = $('#tour');
+    const h = bar ? bar.offsetHeight : 0, gap = parseFloat(getComputedStyle(wrap).bottom) || 20;
+    root.style.setProperty('--reserve', Math.round(h + gap + 10) + 'px');
   },
 
   // ---- o visitante navegou por conta própria: a apresentação acompanha ----
   stepFor(screen, extra) {
     const S = this.steps(); extra = extra || {};
+    if (screen === 'video') return S.findIndex((s) => s.media === extra.media);
     if (screen === 'products' && extra.product) {
       const k = S.findIndex((s) => s.screen === 'products' && s.product === extra.product); if (k >= 0) return k;
       for (let j = 0; j < S.length; j++) { const ci = (S[j].cues || []).findIndex((c) => c.product === extra.product); if (ci >= 0) { extra.cue = ci; return j; } }
@@ -7914,7 +8002,7 @@ const Tour = {
   // orelhinha: abre a barra no passo da tela atual, pausada, esperando o play
   open() {
     if (!this.available()) return;
-    if (!this.on) { this.lang = TOUR_LANG_NAMES[this.lang] ? this.lang : (TOUR.default || 'en'); this.on = true; this.ended = false; document.body.classList.add('tour-on'); $('#tour').hidden = false; this.buildBar(); }
+    if (!this.on) { this.lang = TOUR_LANG_NAMES[this.lang] ? this.lang : (TOUR.default || 'en'); this.on = true; this.ended = false; document.body.classList.add('tour-on'); $('#tour').hidden = false; Sfx.warm(); Sfx.play('ding'); this.buildBar(); }
     const k = Math.max(0, this.stepFor(current, { product: current === 'products' ? (D.products[Products.st.i] || {}).id : undefined }));
     this.goStep(k, false);
   },
@@ -7940,18 +8028,30 @@ const Tour = {
   },
   goStep(i, autoplay) {
     const S = this.steps(); if (!S.length) return;
-    this.i = clamp(i, 0, S.length - 1); this.ended = false; this.fired = new Set(); this.gen++; this.startAt = 0;
+    this.i = clamp(i, 0, S.length - 1); this.ended = false; this.fired = new Set(); this.gen++; this.startAt = 0; this.videoDone = false;
     const step = S[this.i];
     this.stopAudio();
     this.apply(step);
     this.renderBar();
     if (autoplay) this.play(); else { this.playing = false; this.renderControls(); }
   },
-  next() { if (this.i < this.steps().length - 1) this.goStep(this.i + 1, true); else this.finish(); },
-  prev() { this.goStep(Math.max(0, this.i - 1), true); },
+  next() { Sfx.play('tick'); if (this.i < this.steps().length - 1) this.goStep(this.i + 1, true); else this.finish(); },
+  prev() { Sfx.play('tick'); this.goStep(Math.max(0, this.i - 1), true); },
   finish() {
-    this.playing = false; this.ended = true; this.stopAudio(); this.renderControls();
+    this.playing = false; this.ended = true; this.stopAudio(); this.renderControls(); Sfx.play('ding');
     $('#tour-cap').textContent = this.ui().end;
+  },
+  // ---- vídeos dentro da apresentação ----
+  playVideo(step) {
+    const m = D.media[step.media]; if (!m) { this.afterStep(); return; }
+    const g = ++this.gen; this.mode = 'video'; this.playing = true; this.renderControls();
+    Videos.play({ src: m.src, title: m.title, maxSeconds: 1200 }, { manual: true, tour: true, onEnd: () => { if (Tour.on && Tour.gen === g && Tour.mode === 'video') { Tour.mode = 'audio'; Tour.videoDone = true; Tour.afterStep(); } } });
+    this.tick();
+  },
+  // botão "assistir ao vídeo" com a apresentação ligada: pula para o passo do vídeo e toca o filme direto
+  playMedia(key) {
+    const k = this.stepFor('video', { media: key }); if (k < 0) return false;
+    this.goStep(k, false); this.playVideo(this.steps()[k]); return true;
   },
 
   // ---- reprodução ----
@@ -7960,6 +8060,7 @@ const Tour = {
     const step = this.steps()[this.i];
     if (this.ended) { this.goStep(0, true); return; }
     this.playing = true; this.renderControls();
+    if (this.mode === 'video') { if (Videos.playing && Videos.tour) { try { const p = $('#video-el').play(); if (p && p.catch) p.catch(() => {}); } catch (e) {} this.tick(); } else { this.mode = 'audio'; this.playVideo(step); } return; }
     if (this.mode === 'synth' && this.synthPaused) { this.synthResume(); return; }
     const a = this.audio || (this.audio = $('#tour-audio'));
     const src = this.src(step);
@@ -7977,6 +8078,7 @@ const Tour = {
   },
   pause() {
     this.playing = false;
+    if (this.mode === 'video') { try { $('#video-el').pause(); } catch (e) {} }
     if (this.mode === 'audio' && this.audio) { try { this.audio.pause(); } catch (e) {} }
     if (this.mode === 'synth') { try { speechSynthesis.pause(); } catch (e) {} this.synthPaused = true; this.synthPausedAt = performance.now(); }
     cancelAnimationFrame(this.raf); this.renderControls();
@@ -7988,9 +8090,19 @@ const Tour = {
     this.play();
   },
   toggle() { if (this.playing) this.pause(); else this.resume(); },
-  afterStep() { const g = this.gen; this.playing = false; cancelAnimationFrame(this.raf); this.setProgress(1); this.renderControls(); setTimeout(() => { if (Tour.on && Tour.gen === g && !Tour.playing && !Tour.ended) Tour.next(); }, 900); },
+  afterStep() {
+    const g = this.gen, step = this.steps()[this.i];
+    if (this.isVideo(step) && this.mode !== 'video' && !this.videoDone) { // narração do passo de vídeo acabou: entra o filme
+      this.playing = false; cancelAnimationFrame(this.raf); this.setProgress(0.08);
+      setTimeout(() => { if (Tour.on && Tour.gen === g && !Tour.ended) Tour.playVideo(step); }, 500);
+      return;
+    }
+    this.playing = false; cancelAnimationFrame(this.raf); this.setProgress(1); this.renderControls();
+    setTimeout(() => { if (Tour.on && Tour.gen === g && !Tour.playing && !Tour.ended) Tour.next(); }, 900);
+  },
   stopAudio() {
     cancelAnimationFrame(this.raf); clearTimeout(this.synthTimer); this.mode = 'audio';
+    if (Videos.playing && Videos.tour) Videos.stop(false);
     if (this.audio) { try { this.audio.onended = null; this.audio.onerror = null; this.audio.pause(); this.audio.removeAttribute('src'); this.audio.load(); } catch (e) {} }
     try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
     this.synthPaused = false; this.mode = 'audio';
@@ -8015,17 +8127,23 @@ const Tour = {
   },
   synthResume() { try { speechSynthesis.resume(); } catch (e) {} this.synthT0 += performance.now() - this.synthPausedAt; this.synthPaused = false; this.tick(); },
   progress() {
-    if (this.mode === 'audio' && this.audio && this.audio.duration) return clamp(this.audio.currentTime / this.audio.duration, 0, 1);
-    if (this.mode === 'synth') return clamp((performance.now() - this.synthT0) / this.synthDur, 0, 1);
-    return 0;
+    const step = this.steps()[this.i], vid = this.isVideo(step);
+    if (this.mode === 'video') { const v = $('#video-el'); return v && v.duration ? 0.08 + 0.92 * clamp(v.currentTime / v.duration, 0, 1) : 0.08; }
+    let p = 0;
+    if (this.mode === 'audio' && this.audio && this.audio.duration) p = clamp(this.audio.currentTime / this.audio.duration, 0, 1);
+    else if (this.mode === 'synth') p = clamp((performance.now() - this.synthT0) / this.synthDur, 0, 1);
+    return vid ? p * 0.08 : p; // no passo de vídeo a narração é só o começo do trecho
   },
   tick() {
     cancelAnimationFrame(this.raf);
+    const cap = $('#tour-cap');
     const loop = () => {
       if (!this.on || !this.playing) return;
       const p = this.progress(); this.setProgress(p);
       const step = this.steps()[this.i];
       (step.cues || []).forEach((c, k) => { if (!this.fired.has(k) && p >= c.at) { this.fired.add(k); this.apply(step, c); } });
+      // legenda acompanha a voz: rola devagar quando o texto não cabe na caixa
+      if (this.mode !== 'video' && cap && cap.scrollHeight > cap.clientHeight + 2) { const q = clamp((p - 0.12) / 0.76, 0, 1); cap.scrollTop = q * (cap.scrollHeight - cap.clientHeight); }
       this.raf = requestAnimationFrame(loop);
     };
     this.raf = requestAnimationFrame(loop);
@@ -8039,13 +8157,13 @@ const Tour = {
     S.forEach((s, k) => {
       const seg = document.createElement('button'); seg.type = 'button'; seg.className = 'seg'; seg.style.flexGrow = (this.dur(s) / total * 100).toFixed(2);
       seg.title = s.title[this.lang] || s.title.en; seg.innerHTML = '<i></i>';
-      seg.addEventListener('click', () => Tour.goStep(k, true));
+      seg.addEventListener('click', () => { Sfx.play('tick'); Tour.goStep(k, true); });
       tl.appendChild(seg); this.segs.push(seg);
     });
     const langs = $('#tour-langs'); langs.innerHTML = '';
     (TOUR.langs || ['en', 'ja', 'de']).forEach((l) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = TOUR_LANG_NAMES[l]; b.lang = TOUR_BCP[l]; b.classList.toggle('on', l === this.lang); b.addEventListener('click', () => Tour.setLang(l)); langs.appendChild(b); });
     $('#tour-prev').title = ui.prev; $('#tour-next').title = ui.next; $('#tour-close').title = ui.close;
-    this.renderBar();
+    this.renderBar(); this.layout();
   },
   renderBar() {
     const S = this.steps(), step = S[this.i]; if (!step) return;
@@ -8085,7 +8203,15 @@ go(IS_MOBILE ? 'home' : 'attract');
 if (IS_MOBILE && new URLSearchParams(location.search).get('qr')) setTimeout(() => toast(T('qrHello')), 1200);
 if (DESKTOP_SITE_ON_PHONE) setTimeout(() => toast(T('desktopHint'), 8000), 2600);
 requestAnimationFrame(loop);
-$('#video-layer').addEventListener('pointerup', () => { const manual = Videos.manual; Videos.stop(false); if (!manual) go('home'); });
+$('#video-layer').addEventListener('pointerup', () => { if (Videos.tour) { Tour.toggle(); return; } const manual = Videos.manual; Videos.stop(false); if (!manual) go('home'); });
+window.addEventListener('resize', () => { if (Tour.on) Tour.layout(); });
+document.addEventListener('pointerdown', () => Sfx.warm(), { once: true, passive: true });
+// ?diag=1 → mostra medidas da tela (para ajustar o layout em um aparelho novo, ex.: painel BenQ 86")
+if (new URLSearchParams(location.search).get('diag')) {
+  const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:8px;top:8px;z-index:999;background:rgba(0,0,0,.8);color:#fff;font:13px/1.5 monospace;padding:8px 10px;border-radius:8px;pointer-events:none;white-space:pre';
+  const upd = () => { d.textContent = `viewport ${window.innerWidth}×${window.innerHeight} · screen ${screen.width}×${screen.height} · dpr ${(window.devicePixelRatio || 1).toFixed(2)}\nzoom ${ZOOM} · viewportMeta ${window.UI_VIEWPORT || '-'} · mobile ${IS_MOBILE} · ${BUILD.version || ''}\n${navigator.userAgent}`; };
+  upd(); window.addEventListener('resize', upd); document.body.appendChild(d);
+}
 $('#ribbon').addEventListener('click', goWelcome);
 // Apresentação guiada
 (() => {

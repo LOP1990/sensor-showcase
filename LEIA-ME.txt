@@ -95,7 +95,36 @@ Agenda das boas-vindas (config.json → welcome.schedule)
   11 a 13/11 Dr. Lützen + Japão (ja/de/en, áudio welcome.mp3). Fora desses dias vale o bloco geral.
 
 Apresentação guiada — orelhinha e navegação
-  Em todas as telas (menos atração e 3D) há uma aba discreta no pé da tela: toque para abrir a barra
-  no passo da tela atual, já pausada, e dê o play. Durante a narração, tocar em outra seção, em um
-  produto ou em um marco da história leva a apresentação junto (e, nos produtos narrados no meio de
-  um passo, a voz começa direto naquele trecho). Pausado, a navegação acompanha mas não fala.
+  Em todas as telas (menos atração e 3D) há uma aba discreta no canto inferior esquerdo (coluna do
+  trilho, fora do conteúdo): toque para abrir a barra no passo da tela atual, já pausada, e dê o play.
+  Durante a narração, tocar em outra seção, em um produto ou em um marco da história leva a
+  apresentação junto (e, nos produtos narrados no meio de um passo, a voz começa direto naquele
+  trecho). Pausado, a navegação acompanha mas não fala.
+  A barra ocupa uma faixa própria no pé da tela: com ela aberta, o conteúdo das telas termina acima
+  dela (nada fica escondido) e a legenda, maior, rola sozinha acompanhando a voz quando o texto não cabe.
+
+Vídeos dentro da apresentação (10/11)
+  Dois passos de vídeo: o institucional (depois de "Hoje", na história) e o da usina solar (depois de
+  "Energia limpa"). Em cada um, uma narração curta apresenta o filme e ele toca inteiro, ajustado à
+  área acima da barra; a barra pausa/retoma e avança (▶▶ pula o filme), tocar no filme pausa/retoma,
+  e ao terminar a apresentação segue sozinha. Os botões "Assistir ao vídeo" das telas, com a
+  apresentação ligada, pulam direto para o passo do vídeo (sem a narração) e depois ela continua;
+  sem a apresentação, o vídeo toca e volta para a mesma tela. O quiosque nunca volta à atração
+  enquanto um vídeo toca (era isso que mandava a tela para o início no meio do filme).
+
+Efeitos sonoros (10/11)
+  Cinco recortes da trilha do vídeo Netsushin, em volume baixo, só no quiosque (não no celular):
+  "hit" ao iniciar a apresentação e antes da saudação automática por movimento (chama a atenção antes
+  da voz), "tick" ao trocar de passo/seção/produto, "ding" ao abrir a orelhinha e no fim, "ticks" ao
+  abrir o 3D. Arquivos: audio/sfx/sfx-*.mp3 (trocáveis por outros com o mesmo nome).
+  config.json → "sfx": false desliga; "sfx": { "volume": 0.5 } ajusta (padrão 0.35). data.js →
+  kiosk.sfx: false também desliga.
+
+Telas grandes — painel BenQ 86" e similares (10/11)
+  Quando o navegador informa uma tela com mais de 1300 px CSS no lado menor (ex.: 4K sem escala, ou
+  2560×1440), o app passa a usar o layout de 1920×1080 ampliado: no Android, pela meta viewport
+  (width=1920, nítido e com a mesma proporção); em PC/OPS, por zoom CSS na raiz. Para conferir o que o
+  aparelho informa, abra a URL com ?diag=1 (mostra viewport, tela, DPR e zoom aplicado no canto).
+  ?z=0 desliga a ampliação; ?z=1.5 força um fator. Se o painel usar um PC com Windows, o mais simples
+  é a escala do Windows em 200% (4K → 1920×1080) — aí o app nem precisa ampliar.
+  Fotos novas em Mercados: HVAC (chiller/central de água gelada e data center) e Alimentos (UHT).
