@@ -104,7 +104,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .lbl3d .leader { position: absolute; left: 50%; top: 100%; width: 1px; height: 26px; background: var(--line-2); }
 
 #app { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
-#app button, #app input, #rail, .picker, .detail, .tl, .tl-nav, .logo-wall, .certs, .compliance, .vpanel, .modes, .lang, .admin, .vtop, .stats { pointer-events: auto; }
+#app button, #app input, #rail, .picker, .detail, .tl, .tl-nav, .logo-wall, .certs, .compliance, .vpanel, .modes, .lang, .admin, .vtop, .stats, .env-grid, .team, .qr { pointer-events: auto; }
 
 /* ---------- topo ---------- */
 #top {
@@ -234,17 +234,18 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 #s-world .side { width: clamp(280px, 26vw, 420px); display: flex; flex-direction: column; flex: 1; min-height: 0; }
 #s-world .side .big { font-size: clamp(64px, 8vw, 140px); font-weight: 650; font-stretch: 114%; line-height: .9; letter-spacing: -.02em; color: var(--plat-2); font-variant-numeric: tabular-nums; }
 #s-world .side .cap { color: var(--text-2); font-size: clamp(16px, 1.3vw, 22px); margin-top: 10px; max-width: 24ch; }
-#s-world .regions { margin-top: clamp(18px, 3vh, 36px); display: grid; gap: 8px; }
-.region { display: flex; align-items: baseline; gap: 14px; }
-.region .n { font-size: clamp(20px, 1.9vw, 30px); font-weight: 600; font-variant-numeric: tabular-nums; width: 2ch; color: var(--text); }
-.region .r { color: var(--text-2); font-size: clamp(14px, 1.1vw, 18px); }
-.region .bar { flex: 1; height: 2px; background: var(--line); position: relative; }
-.region .bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--plat); width: 0; transition: width .8s var(--ease); }
-#s-world .list { columns: 5; column-gap: clamp(14px, 1.6vw, 28px); font-size: clamp(12px, .95vw, 15px); color: var(--text-2); line-height: 1.6; margin-top: 14px; padding: 14px 18px; border-radius: var(--radius); background: rgba(5, 7, 11, .62); border: 1px solid var(--line); backdrop-filter: blur(8px); }
-#s-world .list span { display: flex; align-items: center; gap: 9px; break-inside: avoid; transition: color .3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 1px 0; }
-#s-world .list span .flag { width: clamp(18px, 1.35vw, 24px); height: auto; aspect-ratio: 4 / 3; border-radius: 2px; flex: none; box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); object-fit: cover; opacity: .92; }
-#s-world .list span.on { color: var(--plat-2); }
-#s-world .list span.on .flag { opacity: 1; box-shadow: 0 0 0 1px rgba(255, 210, 122, .8), 0 0 10px rgba(255, 210, 122, .35); }
+#s-world .side .hint { margin-top: clamp(14px, 2.4vh, 28px); color: var(--text-3); font-size: clamp(13px, 1vw, 16px); }
+#s-world .list { display: flex; gap: clamp(14px, 1.6vw, 28px); font-size: clamp(12px, .95vw, 15px); color: var(--text-2); line-height: 1.6; margin-top: 14px; padding: 12px 18px 10px; border-radius: var(--radius); background: rgba(5, 7, 11, .62); border: 1px solid var(--line); backdrop-filter: blur(8px); }
+#s-world .grp { flex: var(--cols, 1); min-width: 0; }
+#s-world .grp-stack { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+#s-world .grp h5 { margin: 0 0 6px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 4px 5px; border-bottom: 1px solid var(--line-2); font-size: clamp(11px, .85vw, 13px); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+#s-world .grp h5 b { font-size: clamp(15px, 1.25vw, 21px); line-height: 1; color: var(--plat-2); font-weight: 650; font-variant-numeric: tabular-nums; }
+#s-world .grp .items { columns: var(--cols, 1); column-gap: 12px; }
+#s-world .list button { display: flex; align-items: center; gap: 9px; width: 100%; break-inside: avoid; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 1px 4px; border-radius: 6px; color: var(--text-2); transition: color .3s, background .3s; }
+#s-world .list button:active { background: rgba(191, 211, 230, .14); }
+#s-world .list button .flag { width: clamp(18px, 1.35vw, 24px); height: auto; aspect-ratio: 4 / 3; border-radius: 2px; flex: none; box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); object-fit: cover; opacity: .92; }
+#s-world .list button.on { color: var(--plat-2); background: rgba(255, 210, 122, .08); }
+#s-world .list button.on .flag { opacity: 1; box-shadow: 0 0 0 1px rgba(255, 210, 122, .8), 0 0 10px rgba(255, 210, 122, .35); }
 
 /* ---------- mercados / produtos (seletor + detalhe) ---------- */
 .split { display: grid; grid-template-columns: minmax(260px, 1fr) 1.6fr; gap: clamp(24px, 3vw, 64px); flex: 1; min-height: 0; margin-top: clamp(16px, 2.5vh, 32px); }
@@ -358,7 +359,6 @@ input[type=range]::-moz-range-thumb { width: 30px; height: 30px; border-radius: 
 
 /* ---------- avisos ---------- */
 #rotate-hint { position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center; text-align: center; padding: 40px; background: var(--bg); font-size: 20px; color: var(--text-2); }
-@media (orientation: portrait) and (max-width: 900px) { #rotate-hint { display: flex; } }
 .admin { position: absolute; right: var(--pad); top: calc(var(--top-h) + 8px); z-index: 30; width: 340px; border-radius: var(--radius); background: rgba(11, 16, 23, .95); border: 1px solid var(--line-2); padding: 20px; }
 .admin[hidden] { display: none; }
 .admin h4 { margin: 0 0 12px; }
@@ -419,6 +419,209 @@ body.viewer-on .vpanel { background: rgba(11, 16, 23, .9); }
 body.viewer-on .modes { background: rgba(11, 16, 23, .88); }
 body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
 
+/* ---------- nosso time ---------- */
+#s-team .content { justify-content: center; }
+.team { display: grid; grid-template-columns: minmax(320px, 1fr) minmax(0, 1.15fr); gap: clamp(28px, 3.6vw, 72px); align-items: center; }
+.eyebrow { font-size: clamp(12px, .95vw, 15px); letter-spacing: .14em; text-transform: uppercase; color: var(--plat); font-weight: 600; margin-bottom: 14px; }
+.team-text h2 { font-size: clamp(32px, 3.6vw, 58px); }
+.team-text .lead { max-width: 52ch; }
+.team-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 1.6vw, 28px); margin-top: clamp(22px, 3.2vh, 40px); }
+.tstat .v { font-size: clamp(32px, 3.2vw, 54px); font-weight: 650; font-stretch: 110%; line-height: 1; letter-spacing: -.01em; color: var(--plat-2); font-variant-numeric: tabular-nums; }
+.tstat .k { color: var(--text-2); margin-top: 8px; font-size: clamp(13px, 1vw, 16px); line-height: 1.35; }
+.tstat .pflag { display: block; font-style: normal; color: var(--glow); font-size: 12px; margin-top: 4px; }
+.team-pillars { display: flex; flex-wrap: wrap; gap: 8px; margin-top: clamp(18px, 2.6vh, 30px); }
+.team-pillars .pill { border: 1px solid var(--line-2); border-radius: 999px; padding: 8px 14px; font-size: clamp(13px, 1vw, 16px); color: var(--text-2); }
+.team-photos { position: relative; aspect-ratio: 16 / 10; width: 100%; max-height: 66vh; border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: 0 24px 70px rgba(0, 0, 0, .5); isolation: isolate; }
+.team-photos .ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.08); transition: opacity 1.4s var(--ease); }
+.team-photos .ph.on { opacity: 1; animation: kenburns 7s linear forwards; }
+.team-photos::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 7, 11, 0) 60%, rgba(5, 7, 11, .5) 100%); pointer-events: none; }
+.team-photos .dots { position: absolute; right: 16px; bottom: 16px; display: flex; gap: 6px; z-index: 1; }
+.team-photos .dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .35); transition: background .4s, transform .4s; }
+.team-photos .dots i.on { background: var(--plat-2); transform: scale(1.3); }
+
+/* ---------- ambiental (BI de energia) ---------- */
+:root { --leaf: #7FD4A6; --leaf-2: #B9F0CF; --sun: #FFD27A; }
+#s-env .content { padding-top: 1.6vh; }
+.env-head .lead { max-width: 78ch; margin-top: 6px; font-size: clamp(14px, 1.15vw, 19px); }
+.env-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(300px, 1.05fr) minmax(0, 1.6fr) minmax(260px, .9fr); grid-template-rows: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(12px, 1.3vw, 22px); margin-top: clamp(12px, 2vh, 22px); }
+.card { border: 1px solid var(--line); background: linear-gradient(180deg, rgba(16, 22, 31, .92), rgba(16, 22, 31, .55)); border-radius: var(--radius); padding: clamp(12px, 1.3vw, 20px); min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.ch-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: clamp(13px, 1.05vw, 17px); color: var(--text); }
+.ch-head b { font-weight: 600; }
+.ch-head .legend { display: flex; align-items: center; gap: 8px; color: var(--text-3); font-size: clamp(11px, .85vw, 13px); }
+.ch-head .legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.ch-head .legend i.pv { background: var(--sun); }
+.ch-head .legend i.ld { background: var(--plat); }
+.live { font-size: clamp(11px, .85vw, 13px); color: var(--text-3); border: 1px solid var(--line-2); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+.live.on { color: var(--leaf); border-color: rgba(127, 212, 166, .5); }
+.live.on::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--leaf); margin-right: 7px; box-shadow: 0 0 10px var(--leaf); animation: tapPulse 1.6s ease-in-out infinite; }
+.env-flowcard { grid-column: 1; grid-row: 1; }
+.env-flowcard .flow { flex: 1; min-height: 0; width: 100%; }
+.flow .track { fill: none; stroke: rgba(191, 211, 230, .16); stroke-width: 3; }
+.flow .run { fill: none; stroke-width: 3.5; stroke-linecap: round; stroke-dasharray: 10 14; animation: flowDash 1.2s linear infinite; transition: opacity .6s; }
+.flow .run.pv { stroke: url(#gpv); }
+.flow .run.grid { stroke: var(--plat); }
+.flow .run.exp { stroke: var(--leaf); }
+@keyframes flowDash { to { stroke-dashoffset: -48; } }
+.flow .node circle { fill: rgba(11, 16, 23, .9); stroke: var(--line-2); stroke-width: 1.5; }
+.flow .node.fac circle { stroke: var(--plat); }
+.flow .ic { fill: none; stroke: var(--plat-2); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.flow .ic.sun { stroke: var(--sun); }
+.flow .ic.bolt { stroke: var(--plat); fill: rgba(191, 211, 230, .15); }
+.flow .lbl { fill: var(--text-3); font-size: 12px; text-anchor: middle; font-family: var(--font); letter-spacing: .04em; text-transform: uppercase; }
+.flow .val { fill: var(--text); font-size: 15px; font-weight: 600; text-anchor: middle; font-family: var(--font); }
+.flow .val.big { font-size: 13px; fill: var(--plat-2); }
+.flow-note { color: var(--text-2); font-size: clamp(12px, .95vw, 15px); margin-top: 6px; min-height: 2.6em; }
+.env-kpis { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(0, 1fr); gap: clamp(10px, 1vw, 16px); min-height: 0; }
+.tile { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(16, 22, 31, .7); padding: clamp(10px, 1.1vw, 18px); display: flex; flex-direction: column; justify-content: center; min-height: 0; overflow: hidden; }
+.tile .k { color: var(--text-3); font-size: clamp(11px, .9vw, 14px); letter-spacing: .02em; }
+.tile .v { display: flex; align-items: baseline; gap: 6px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.tile .v .n { font-size: clamp(26px, 2.6vw, 44px); font-weight: 650; font-stretch: 108%; line-height: 1; letter-spacing: -.01em; color: var(--plat-2); }
+.tile .v small { color: var(--text-2); font-size: clamp(12px, 1vw, 16px); font-weight: 500; }
+.tile .s { color: var(--text-3); font-size: clamp(11px, .85vw, 13px); margin-top: 6px; line-height: 1.3; }
+#tile-pvnow .v .n { color: var(--sun); }
+#tile-co2 .v .n, #tile-self .v .n { color: var(--leaf-2); }
+.env-chartcard { grid-column: 1 / 3; grid-row: 2; }
+#env-chart { flex: 1; min-height: 0; width: 100%; display: block; margin-top: 8px; }
+.env-green { grid-column: 3; grid-row: 1 / 3; position: relative; align-items: flex-start; justify-content: flex-end; background: linear-gradient(180deg, rgba(10, 30, 22, .55), rgba(16, 22, 31, .9)), url(env/seedlings.webp) center / cover no-repeat; border-color: rgba(127, 212, 166, .32); }
+.env-green::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 7, 11, .15), rgba(5, 7, 11, .82) 70%); pointer-events: none; }
+.env-green > * { position: relative; }
+.env-green .leaf { width: clamp(44px, 4vw, 64px); height: clamp(44px, 4vw, 64px); color: var(--leaf); filter: drop-shadow(0 0 18px rgba(127, 212, 166, .55)); margin-bottom: auto; }
+.env-green .leaf svg { width: 100%; height: 100%; }
+.env-green .pct { font-size: clamp(56px, 6.2vw, 104px); font-weight: 650; font-stretch: 112%; line-height: .95; letter-spacing: -.02em; color: var(--leaf-2); font-variant-numeric: tabular-nums; }
+.env-green .pct small { font-size: .42em; font-weight: 600; margin-left: 2px; color: var(--leaf); }
+.env-green .ttl { font-size: clamp(16px, 1.4vw, 24px); font-weight: 600; color: var(--text); margin-top: 4px; }
+.env-green .sub { color: var(--text-2); font-size: clamp(12px, 1vw, 16px); margin-top: 10px; max-width: 30ch; }
+.env-green .bar { width: 100%; height: 8px; border-radius: 4px; background: rgba(191, 211, 230, .22); margin-top: 14px; overflow: hidden; }
+.env-green .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--sun), var(--leaf)); border-radius: 4px; transition: width 1.2s var(--ease); }
+.env-green .bar-lbl { display: flex; justify-content: space-between; width: 100%; font-size: clamp(11px, .85vw, 13px); color: var(--text-3); margin-top: 6px; }
+.env-green .trees { margin-top: clamp(14px, 2vh, 24px); padding-top: 12px; border-top: 1px solid rgba(127, 212, 166, .3); font-size: clamp(12px, 1vw, 16px); color: var(--text-2); line-height: 1.4; }
+.env-green .trees b { font-size: clamp(22px, 2.1vw, 36px); color: var(--leaf-2); font-weight: 650; font-variant-numeric: tabular-nums; margin-right: 6px; }
+.env-green .trees span { color: var(--text-3); font-size: clamp(11px, .9vw, 14px); }
+.env-foot { margin-top: 10px; color: var(--text-3); font-size: clamp(11px, .85vw, 13px); }
+
+/* ---------- QR code (tela inicial e início) ---------- */
+.qr { position: absolute; right: var(--pad); bottom: clamp(60px, 10vh, 120px); display: flex; align-items: center; gap: 16px; padding: 12px 18px 12px 12px; border-radius: 18px; background: rgba(11, 16, 23, .7); border: 1px solid var(--line-2); backdrop-filter: blur(8px); max-width: 360px; }
+.qr-img { flex: none; width: clamp(84px, 8.6vh, 120px); height: clamp(84px, 8.6vh, 120px); padding: 8px; border-radius: 12px; background: #fff; }
+.qr-img svg { display: block; width: 100%; height: 100%; }
+.qr-txt { display: flex; flex-direction: column; gap: 4px; }
+.qr-txt b { font-size: clamp(14px, 1.15vw, 19px); font-weight: 600; }
+.qr-txt span { color: var(--text-2); font-size: clamp(12px, .95vw, 15px); line-height: 1.35; }
+.qr.small { bottom: 3vh; padding: 10px 14px 10px 10px; max-width: 300px; }
+.qr.small .qr-img { width: clamp(64px, 7vh, 92px); height: clamp(64px, 7vh, 92px); padding: 6px; }
+body.welcome-on #s-attract .qr { bottom: clamp(22px, 4vh, 44px); } /* com as boas-vindas, o cartão desce para não disputar a base com o texto */
+
+/* ============================================================
+   Celular (retrato ou telas estreitas): coluna única com rolagem
+   ============================================================ */
+@media (max-width: 900px), ((orientation: portrait) and (max-width: 1100px)) {
+  :root { --logo-h: 42px; --top-h: 62px; --pad: 16px; --rail-w: 0px; --radius: 12px; }
+  body { font-size: 16px; touch-action: pan-y; }
+  #globe-canvas, #viewer-canvas { touch-action: none; }
+  #top { padding: 0 14px; background: linear-gradient(180deg, rgba(5, 7, 11, .9), rgba(5, 7, 11, 0)); }
+  .ribbon, .prov { display: none !important; }
+  .lang button { padding: 7px 12px; min-width: 44px; font-size: 13px; }
+  /* trilho → faixa horizontal de abas */
+  #rail { left: 0; right: 0; top: var(--top-h); bottom: auto; width: auto; height: 50px; flex-direction: row; justify-content: flex-start; align-items: center; gap: 6px; padding: 0 12px; overflow-x: auto; overflow-y: hidden; transform: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; background: linear-gradient(180deg, rgba(5, 7, 11, .75), rgba(5, 7, 11, 0)); }
+  #rail::-webkit-scrollbar { display: none; }
+  #rail button { flex: none; min-height: 38px; padding: 6px 14px 6px 10px; border: 1px solid var(--line); border-left-width: 1px; border-radius: 999px; font-size: 14px; gap: 8px; background: rgba(11, 16, 23, .7); white-space: nowrap; }
+  #rail button.on { border-color: var(--plat); padding-left: 10px; background: rgba(191, 211, 230, .16); }
+  #rail button .i { width: 18px; height: 18px; }
+  #rail .sep { display: none; }
+  /* telas: rolagem vertical; o preenchimento (sem eventos) deixa o globo arrastável por trás */
+  .screen .content { top: calc(var(--top-h) + 50px); left: 0; right: 0; bottom: 0; display: block; padding: 10px 16px calc(24px + env(safe-area-inset-bottom)); overflow-y: auto; overflow-x: hidden; touch-action: pan-y; pointer-events: none; -webkit-overflow-scrolling: touch; }
+  .screen .content > * { pointer-events: auto; }
+  .screen h2 { font-size: 28px; }
+  .screen .lead { font-size: 16px; }
+  /* início: globo em cima, texto embaixo */
+  #s-home .content { padding-top: 44vh; }
+  #s-home .intro { max-width: none; }
+  #s-home .intro h2 { font-size: 28px; }
+  #s-home .stats { gap: 18px 28px; margin-top: 18px; }
+  .stat .v { font-size: 30px; }
+  .qr.small { position: static; margin-top: 22px; max-width: none; }
+  #s-attract .hero { max-width: none; left: 16px; right: 16px; bottom: 120px; }
+  #s-attract h1 { font-size: 40px; }
+  #s-attract .counter { top: calc(var(--top-h) + 10px); }
+  #s-attract .qr { display: none; }
+  /* história */
+  #s-history .content > .reveal { padding-top: 6px; }
+  .tl .years span { font-size: 12px; }
+  .tl-card { grid-template-columns: 1fr; gap: 10px; min-height: 0; margin-top: 22px; }
+  .tl-card .y { font-size: 54px; }
+  .tl-card .y.txt { font-size: 32px; }
+  .tl-card h3 { font-size: 22px; }
+  .tl-card p { font-size: 16px; }
+  /* nosso time */
+  .team { grid-template-columns: 1fr; gap: 18px; }
+  .team-text h2 { font-size: 30px; }
+  .team-stats { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .tstat .v { font-size: 32px; }
+  .team-photos { max-height: none; aspect-ratio: 16 / 10; }
+  /* presença global: globo em cima, lista por continente embaixo */
+  #s-world .content { padding-top: 38vh; }
+  #s-world .side { width: auto; flex: none; flex-direction: row; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  #s-world .side .big { font-size: 56px; }
+  #s-world .side .cap { max-width: none; font-size: 15px; margin-top: 0; }
+  #s-world .side .hint { flex-basis: 100%; margin-top: 4px; font-size: 13px; }
+  #s-world .list { flex-direction: column; gap: 14px; padding: 12px 12px 8px; font-size: 14px; }
+  #s-world .grp-stack { gap: 14px; }
+  #s-world .grp .items { columns: 2; }
+  #s-world .list button { padding: 3px 4px; min-height: 30px; }
+  #s-world .list button .flag { width: 20px; }
+  /* mercados e produtos: seletor em faixa, detalhe embaixo */
+  .split { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+  .picker { flex-direction: row; overflow-x: auto; overflow-y: hidden; gap: 6px; padding: 2px 0 6px; scrollbar-width: none; flex: none; }
+  .picker::-webkit-scrollbar { display: none; }
+  .picker button { flex: none; min-height: 42px; padding: 6px 14px 6px 10px; font-size: 15px; border: 1px solid var(--line); border-radius: 999px; gap: 8px; white-space: nowrap; }
+  .picker button .i { width: 20px; height: 20px; }
+  .picker button .k { display: none; }
+  .detail { border-left: 0; padding-left: 0; overflow: visible; flex: none; }
+  .detail .photo { height: 46vw; min-height: 160px; max-height: 260px; }
+  .detail h3 { font-size: 24px; }
+  .detail .sum { font-size: 16px; }
+  .detail li { font-size: 15px; }
+  /* clientes */
+  .logo-wall { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 92px; gap: 10px; margin-top: 14px; flex: none; }
+  .logo-wall .tile { padding: 10px; }
+  .logo-wall .tile img { max-height: 72%; }
+  /* certificações */
+  .certs { grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
+  .cert { min-height: 0; padding: 16px; }
+  .cert .std { font-size: 28px; }
+  .cert .seal { height: 56px; }
+  .compliance { margin-top: 14px; }
+  /* ambiental */
+  #s-env .content { padding-top: 10px; }
+  .env-head .lead { font-size: 14px; }
+  .env-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; flex: none; }
+  .env-flowcard .flow { height: 62vw; max-height: 300px; flex: none; }
+  .env-kpis { grid-template-columns: 1fr 1fr; grid-auto-rows: auto; gap: 10px; }
+  .tile { padding: 12px; min-height: 92px; }
+  .tile .v .n { font-size: 28px; }
+  #env-chart { height: 190px; flex: none; }
+  .env-green { min-height: 360px; }
+  .env-green .pct { font-size: 64px; }
+  .env-foot { font-size: 11px; margin: 10px 0 0; }
+  /* visualizador 3D: controles como folha inferior */
+  #s-viewer .content { padding: 8px 12px; overflow: visible; pointer-events: none; }
+  #s-viewer .vtop { gap: 10px; }
+  #s-viewer .vtop h2 { font-size: 20px; }
+  #s-viewer .vtop .sub { display: none; }
+  .back { padding: 8px 12px 8px 10px; min-height: 40px; font-size: 14px; }
+  .modes { left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); transform: none; overflow-x: auto; justify-content: flex-start; gap: 4px; padding: 5px; scrollbar-width: none; }
+  .modes::-webkit-scrollbar { display: none; }
+  .modes button { padding: 10px 14px; min-height: 42px; font-size: 14px; }
+  .vpanel { left: 10px; right: 10px; top: auto; bottom: calc(66px + env(safe-area-inset-bottom)); width: auto; max-height: 34vh; overflow-y: auto; padding: 12px 14px; transform: translateY(12px); }
+  #s-viewer .vtop h2 { font-size: 17px; line-height: 1.15; }
+  .vpanel h4 { font-size: 15px; }
+  .readout .t { font-size: 34px; }
+  #rt-chart { height: 90px; }
+  .lbl3d.l, .lbl3d.r { --gap: 22px; }
+  .lbl3d { font-size: 12px; padding: 4px 8px; }
+  /* painel administrativo e avisos */
+  .admin { right: 12px; left: 12px; width: auto; }
+}
+
 </style>
 </head>
 <body>
@@ -468,6 +671,7 @@ body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
         </button>
       </div>
       <div class="tap"><span class="ring"></span><span id="tap-label" data-i18n="tap"></span></div>
+      <div class="qr reveal"><div class="qr-img"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 33" shape-rendering="crispEdges" role="img" aria-label="QR code"><path d="M0 0h7v1h-7zM8 0h2v1h-2zM11 0h1v1h-1zM13 0h1v1h-1zM15 0h2v1h-2zM18 0h1v1h-1zM22 0h3v1h-3zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM10 1h1v1h-1zM12 1h3v1h-3zM18 1h2v1h-2zM21 1h1v1h-1zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM9 2h2v1h-2zM14 2h1v1h-1zM17 2h2v1h-2zM20 2h4v1h-4zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h2v1h-2zM11 3h1v1h-1zM16 3h2v1h-2zM22 3h1v1h-1zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h1v1h-1zM13 4h1v1h-1zM16 4h1v1h-1zM19 4h1v1h-1zM21 4h3v1h-3zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h1v1h-1zM14 5h2v1h-2zM17 5h2v1h-2zM20 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h1v1h-1zM14 7h1v1h-1zM17 7h1v1h-1zM19 7h3v1h-3zM23 7h1v1h-1zM0 8h1v1h-1zM4 8h1v1h-1zM6 8h3v1h-3zM15 8h1v1h-1zM17 8h2v1h-2zM21 8h1v1h-1zM25 8h5v1h-5zM32 8h1v1h-1zM0 9h1v1h-1zM2 9h2v1h-2zM8 9h1v1h-1zM11 9h2v1h-2zM14 9h5v1h-5zM21 9h5v1h-5zM29 9h2v1h-2zM0 10h2v1h-2zM3 10h4v1h-4zM8 10h8v1h-8zM18 10h1v1h-1zM21 10h1v1h-1zM23 10h2v1h-2zM29 10h1v1h-1zM31 10h1v1h-1zM1 11h1v1h-1zM3 11h2v1h-2zM7 11h2v1h-2zM11 11h3v1h-3zM15 11h1v1h-1zM21 11h1v1h-1zM23 11h1v1h-1zM25 11h1v1h-1zM31 11h1v1h-1zM0 12h2v1h-2zM3 12h1v1h-1zM5 12h3v1h-3zM9 12h3v1h-3zM13 12h1v1h-1zM16 12h1v1h-1zM21 12h1v1h-1zM26 12h1v1h-1zM28 12h2v1h-2zM4 13h2v1h-2zM9 13h1v1h-1zM11 13h2v1h-2zM14 13h1v1h-1zM17 13h4v1h-4zM22 13h2v1h-2zM27 13h1v1h-1zM30 13h1v1h-1zM0 14h1v1h-1zM3 14h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM10 14h1v1h-1zM12 14h1v1h-1zM14 14h2v1h-2zM18 14h1v1h-1zM20 14h7v1h-7zM30 14h2v1h-2zM0 15h5v1h-5zM7 15h1v1h-1zM10 15h1v1h-1zM15 15h3v1h-3zM21 15h2v1h-2zM24 15h5v1h-5zM1 16h2v1h-2zM5 16h2v1h-2zM8 16h1v1h-1zM10 16h5v1h-5zM17 16h1v1h-1zM19 16h3v1h-3zM23 16h1v1h-1zM26 16h1v1h-1zM28 16h1v1h-1zM31 16h1v1h-1zM0 17h1v1h-1zM4 17h2v1h-2zM9 17h1v1h-1zM12 17h2v1h-2zM15 17h2v1h-2zM18 17h1v1h-1zM23 17h3v1h-3zM29 17h3v1h-3zM2 18h1v1h-1zM5 18h2v1h-2zM8 18h1v1h-1zM11 18h2v1h-2zM14 18h2v1h-2zM17 18h1v1h-1zM21 18h3v1h-3zM27 18h1v1h-1zM29 18h1v1h-1zM3 19h1v1h-1zM5 19h1v1h-1zM7 19h5v1h-5zM16 19h3v1h-3zM20 19h2v1h-2zM23 19h1v1h-1zM25 19h3v1h-3zM32 19h1v1h-1zM0 20h2v1h-2zM4 20h1v1h-1zM6 20h1v1h-1zM11 20h1v1h-1zM18 20h3v1h-3zM26 20h1v1h-1zM28 20h2v1h-2zM31 20h2v1h-2zM0 21h1v1h-1zM7 21h4v1h-4zM14 21h1v1h-1zM16 21h2v1h-2zM19 21h1v1h-1zM21 21h1v1h-1zM23 21h3v1h-3zM27 21h1v1h-1zM31 21h1v1h-1zM4 22h1v1h-1zM6 22h2v1h-2zM10 22h1v1h-1zM12 22h2v1h-2zM16 22h2v1h-2zM19 22h1v1h-1zM23 22h4v1h-4zM29 22h1v1h-1zM31 22h1v1h-1zM2 23h1v1h-1zM5 23h1v1h-1zM7 23h8v1h-8zM17 23h6v1h-6zM24 23h1v1h-1zM28 23h1v1h-1zM31 23h2v1h-2zM0 24h4v1h-4zM6 24h2v1h-2zM9 24h1v1h-1zM13 24h1v1h-1zM15 24h3v1h-3zM21 24h8v1h-8zM8 25h3v1h-3zM15 25h4v1h-4zM21 25h1v1h-1zM23 25h2v1h-2zM28 25h1v1h-1zM30 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM13 26h1v1h-1zM15 26h1v1h-1zM18 26h1v1h-1zM20 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h2v1h-2zM31 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM9 27h1v1h-1zM11 27h4v1h-4zM22 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM31 27h2v1h-2zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h2v1h-2zM13 28h4v1h-4zM22 28h1v1h-1zM24 28h6v1h-6zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM9 29h2v1h-2zM12 29h1v1h-1zM17 29h4v1h-4zM23 29h1v1h-1zM26 29h4v1h-4zM31 29h1v1h-1zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM11 30h2v1h-2zM15 30h1v1h-1zM18 30h1v1h-1zM20 30h1v1h-1zM24 30h1v1h-1zM26 30h3v1h-3zM30 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM9 31h2v1h-2zM13 31h1v1h-1zM15 31h4v1h-4zM21 31h1v1h-1zM23 31h3v1h-3zM0 32h7v1h-7zM8 32h3v1h-3zM12 32h2v1h-2zM17 32h6v1h-6zM24 32h1v1h-1zM26 32h1v1h-1zM29 32h1v1h-1zM32 32h1v1h-1z" fill="#0B1017"/></svg></div><div class="qr-txt"><b data-i18n="qrTitle"></b><span data-i18n="qrText"></span></div></div>
     </section>
 
     <section id="s-home" class="screen" data-screen="home">
@@ -481,6 +685,7 @@ body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
             <div class="stat"><div class="v" id="stat-people">100</div><div class="k" data-i18n="statPeople"></div></div>
           </div>
         </div>
+        <div class="qr small"><div class="qr-img"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 33" shape-rendering="crispEdges" role="img" aria-label="QR code"><path d="M0 0h7v1h-7zM8 0h2v1h-2zM11 0h1v1h-1zM13 0h1v1h-1zM15 0h2v1h-2zM18 0h1v1h-1zM22 0h3v1h-3zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM10 1h1v1h-1zM12 1h3v1h-3zM18 1h2v1h-2zM21 1h1v1h-1zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM9 2h2v1h-2zM14 2h1v1h-1zM17 2h2v1h-2zM20 2h4v1h-4zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h2v1h-2zM11 3h1v1h-1zM16 3h2v1h-2zM22 3h1v1h-1zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h1v1h-1zM13 4h1v1h-1zM16 4h1v1h-1zM19 4h1v1h-1zM21 4h3v1h-3zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h1v1h-1zM14 5h2v1h-2zM17 5h2v1h-2zM20 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h1v1h-1zM14 7h1v1h-1zM17 7h1v1h-1zM19 7h3v1h-3zM23 7h1v1h-1zM0 8h1v1h-1zM4 8h1v1h-1zM6 8h3v1h-3zM15 8h1v1h-1zM17 8h2v1h-2zM21 8h1v1h-1zM25 8h5v1h-5zM32 8h1v1h-1zM0 9h1v1h-1zM2 9h2v1h-2zM8 9h1v1h-1zM11 9h2v1h-2zM14 9h5v1h-5zM21 9h5v1h-5zM29 9h2v1h-2zM0 10h2v1h-2zM3 10h4v1h-4zM8 10h8v1h-8zM18 10h1v1h-1zM21 10h1v1h-1zM23 10h2v1h-2zM29 10h1v1h-1zM31 10h1v1h-1zM1 11h1v1h-1zM3 11h2v1h-2zM7 11h2v1h-2zM11 11h3v1h-3zM15 11h1v1h-1zM21 11h1v1h-1zM23 11h1v1h-1zM25 11h1v1h-1zM31 11h1v1h-1zM0 12h2v1h-2zM3 12h1v1h-1zM5 12h3v1h-3zM9 12h3v1h-3zM13 12h1v1h-1zM16 12h1v1h-1zM21 12h1v1h-1zM26 12h1v1h-1zM28 12h2v1h-2zM4 13h2v1h-2zM9 13h1v1h-1zM11 13h2v1h-2zM14 13h1v1h-1zM17 13h4v1h-4zM22 13h2v1h-2zM27 13h1v1h-1zM30 13h1v1h-1zM0 14h1v1h-1zM3 14h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM10 14h1v1h-1zM12 14h1v1h-1zM14 14h2v1h-2zM18 14h1v1h-1zM20 14h7v1h-7zM30 14h2v1h-2zM0 15h5v1h-5zM7 15h1v1h-1zM10 15h1v1h-1zM15 15h3v1h-3zM21 15h2v1h-2zM24 15h5v1h-5zM1 16h2v1h-2zM5 16h2v1h-2zM8 16h1v1h-1zM10 16h5v1h-5zM17 16h1v1h-1zM19 16h3v1h-3zM23 16h1v1h-1zM26 16h1v1h-1zM28 16h1v1h-1zM31 16h1v1h-1zM0 17h1v1h-1zM4 17h2v1h-2zM9 17h1v1h-1zM12 17h2v1h-2zM15 17h2v1h-2zM18 17h1v1h-1zM23 17h3v1h-3zM29 17h3v1h-3zM2 18h1v1h-1zM5 18h2v1h-2zM8 18h1v1h-1zM11 18h2v1h-2zM14 18h2v1h-2zM17 18h1v1h-1zM21 18h3v1h-3zM27 18h1v1h-1zM29 18h1v1h-1zM3 19h1v1h-1zM5 19h1v1h-1zM7 19h5v1h-5zM16 19h3v1h-3zM20 19h2v1h-2zM23 19h1v1h-1zM25 19h3v1h-3zM32 19h1v1h-1zM0 20h2v1h-2zM4 20h1v1h-1zM6 20h1v1h-1zM11 20h1v1h-1zM18 20h3v1h-3zM26 20h1v1h-1zM28 20h2v1h-2zM31 20h2v1h-2zM0 21h1v1h-1zM7 21h4v1h-4zM14 21h1v1h-1zM16 21h2v1h-2zM19 21h1v1h-1zM21 21h1v1h-1zM23 21h3v1h-3zM27 21h1v1h-1zM31 21h1v1h-1zM4 22h1v1h-1zM6 22h2v1h-2zM10 22h1v1h-1zM12 22h2v1h-2zM16 22h2v1h-2zM19 22h1v1h-1zM23 22h4v1h-4zM29 22h1v1h-1zM31 22h1v1h-1zM2 23h1v1h-1zM5 23h1v1h-1zM7 23h8v1h-8zM17 23h6v1h-6zM24 23h1v1h-1zM28 23h1v1h-1zM31 23h2v1h-2zM0 24h4v1h-4zM6 24h2v1h-2zM9 24h1v1h-1zM13 24h1v1h-1zM15 24h3v1h-3zM21 24h8v1h-8zM8 25h3v1h-3zM15 25h4v1h-4zM21 25h1v1h-1zM23 25h2v1h-2zM28 25h1v1h-1zM30 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM13 26h1v1h-1zM15 26h1v1h-1zM18 26h1v1h-1zM20 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h2v1h-2zM31 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM9 27h1v1h-1zM11 27h4v1h-4zM22 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM31 27h2v1h-2zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h2v1h-2zM13 28h4v1h-4zM22 28h1v1h-1zM24 28h6v1h-6zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM9 29h2v1h-2zM12 29h1v1h-1zM17 29h4v1h-4zM23 29h1v1h-1zM26 29h4v1h-4zM31 29h1v1h-1zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM11 30h2v1h-2zM15 30h1v1h-1zM18 30h1v1h-1zM20 30h1v1h-1zM24 30h1v1h-1zM26 30h3v1h-3zM30 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM9 31h2v1h-2zM13 31h1v1h-1zM15 31h4v1h-4zM21 31h1v1h-1zM23 31h3v1h-3zM0 32h7v1h-7zM8 32h3v1h-3zM12 32h2v1h-2zM17 32h6v1h-6zM24 32h1v1h-1zM26 32h1v1h-1zM29 32h1v1h-1zM32 32h1v1h-1z" fill="#0B1017"/></svg></div><div class="qr-txt"><b data-i18n="qrTitle"></b><span data-i18n="qrText"></span></div></div>
       </div>
     </section>
 
@@ -509,12 +714,27 @@ body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
       </div>
     </section>
 
+    <section id="s-team" class="screen" data-screen="team">
+      <div class="content">
+        <div class="team reveal">
+          <div class="team-text">
+            <div class="eyebrow" data-i18n="teamTitle"></div>
+            <h2 id="team-title"></h2>
+            <p class="lead" id="team-lead"></p>
+            <div class="team-stats" id="team-stats"></div>
+            <div class="team-pillars" id="team-pillars"></div>
+          </div>
+          <div class="team-photos photo" id="team-photos"></div>
+        </div>
+      </div>
+    </section>
+
     <section id="s-world" class="screen" data-screen="world">
       <div class="content">
         <div class="side reveal">
           <div class="big" id="world-big">57</div>
           <div class="cap" data-i18n="worldCap"></div>
-          <div class="regions" id="world-regions"></div>
+          <div class="hint" data-i18n="worldHint"></div>
         </div>
         <div class="list" id="world-list"></div>
       </div>
@@ -545,6 +765,25 @@ body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
           <div class="certs" id="certs"></div>
           <div class="compliance" id="compliance"></div>
         </div>
+      </div>
+    </section>
+
+    <section id="s-env" class="screen" data-screen="env">
+      <div class="content">
+        <div class="env-head">
+          <h2 data-i18n="envTitle"></h2>
+          <p class="lead" id="env-lead"></p>
+        </div>
+        <div class="env-grid">
+          <div class="card env-flowcard" id="env-flow"></div>
+          <div class="env-kpis" id="env-kpis"></div>
+          <div class="card env-chartcard">
+            <div class="ch-head"><b id="env-chart-title"></b><span class="legend"><i class="pv"></i><span id="env-leg-pv"></span><i class="ld"></i><span id="env-leg-load"></span></span></div>
+            <canvas id="env-chart"></canvas>
+          </div>
+          <div class="card env-green" id="env-green"></div>
+        </div>
+        <div class="env-foot" id="env-foot"></div>
       </div>
     </section>
 
@@ -608,7 +847,7 @@ body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
         <h4 data-i18n="scaleTitle"></h4>
         <div class="hint" data-i18n="scaleHint"></div>
         <div class="rrow"><span class="k" data-i18n="element"></span><span class="v" id="scale-dims"></span></div>
-        <div class="rrow"><span class="k" data-i18n="coin"></span><span class="v">27<small>mm</small></span></div>
+        <div class="rrow"><span class="k" data-i18n="coin"></span><span class="v" id="scale-coin"></span></div>
       </div>
     </section>
   </main>
@@ -616,7 +855,7 @@ body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-1532</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-2101</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -5030,7 +5269,7 @@ const SENSOR_DATA = {
       body: { pt: 'Cgcre · Inmetro', en: 'Cgcre · Inmetro' },
       seals: [{ img: 'seals/inmetro.png', alt: 'Inmetro' }] },
   ],
-  compliance: ['RoHS', 'REACH', 'CETESB'],
+  compliance: ['RoHS', 'REACH'],
 
   products: [
     { id: 'cww', icon: 'cww', has3d: true,
@@ -5072,6 +5311,34 @@ const SENSOR_DATA = {
                  en: ['Pt100 to Pt1000 in compact formats', 'Fast response', 'Stock availability for series volumes'] } },
   ],
 
+  // Nosso time — números do site institucional (confirmar)
+  team: {
+    title: { pt: 'Artesãs da platina', en: 'The platinum artisans' },
+    lead: { pt: 'A produção da Sensor Technology é conduzida por uma equipe 100% feminina: artesãs de precisão que enrolam fios de platina mais finos que um fio de cabelo. É um ofício que leva anos para formar — por isso cultivamos plano de carreira, retenção de conhecimento, melhoria contínua e meritocracia.',
+            en: 'Production at Sensor Technology is run by an all-female team: precision artisans who wind platinum wire thinner than a human hair. It is a craft that takes years to master — so we cultivate career paths, knowledge retention, continuous improvement and meritocracy.' },
+    stats: [
+      { v: '100%', k: { pt: 'da produção nas mãos de artesãs especialistas', en: 'of production in the hands of specialist artisans' } },
+      { v: '>94%', k: { pt: 'de satisfação interna entre os colaboradores', en: 'internal satisfaction among our people' }, confirm: true },
+      { v: '~100', k: { pt: 'pessoas em Diadema, SP', en: 'people in Diadema, Brazil' } },
+    ],
+    pillars: { pt: ['Plano de carreira', 'Retenção de conhecimento', 'Melhoria contínua', 'Meritocracia'], en: ['Career plan', 'Knowledge retention', 'Continuous improvement', 'Meritocracy'] },
+    photos: ['team/team-scope.webp', 'team/team-line.webp', 'team/team-lead.webp'],
+  },
+
+  // Ambiental — usina fotovoltaica da fábrica. Enquanto energia.json não trouxer dados ao vivo
+  // (SolisCloud/medidor), o app simula geração e consumo com estes parâmetros.
+  energy: {
+    plant: { kwp: 114.8, modules: 164, since: '2025', inverters: 'Solis 60 kW + 15 kW' },
+    pr: 0.8,                                     // performance ratio da simulação
+    loadPeakKw: 60, loadBaseKw: 11,              // carga da fábrica na simulação: pico em dia útil e base noturna (kW)
+    anchor: { date: '2026-11-01', kwh: 125000, confirm: true },   // geração acumulada conhecida nesta data (estimativa — ajustar)
+    co2FactorKgPerKwh: 0.0385,                   // fator médio do SIN (MCTI, 2023) em kg CO₂/kWh
+    co2Source: { pt: 'fator médio do SIN 2023 · MCTI', en: 'SIN grid average 2023 · MCTI' },
+    treeKgPerYear: 22,                           // CO₂ absorvido por árvore adulta por ano (kg)
+    claims: { renewablePct: 100, solarPct: 70, gridPct: 30 },
+    dataUrl: 'energia.json', refreshSeconds: 300,
+  },
+
   // Parâmetros do visualizador 3D do CWW
   cww: {
     sizes: [                       // PROVISÓRIO: tamanhos de catálogo (mm)
@@ -5105,12 +5372,25 @@ const SENSOR_DATA = {
 const I18N = {
   pt: {
     tap: 'Toque para explorar', prov: 'dados provisórios',
+    qrTitle: 'Leve no celular', qrText: 'Aponte a câmera para abrir esta apresentação no seu telefone.', qrHello: 'Bem-vindo! Navegue pelas seções acima.',
     navHome: 'Início', navHistory: 'História', navWorld: 'Presença global', navMarkets: 'Mercados e aplicações',
-    navClients: 'Clientes', navCerts: 'Certificações', navProducts: 'Produtos',
+    navClients: 'Clientes', navCerts: 'Certificações', navProducts: 'Produtos', navTeam: 'Nosso time', navEnv: 'Ambiental',
+    teamTitle: 'Nosso time',
+    envTitle: 'Energia limpa, medida em tempo real', envLead: 'A fábrica de Diadema gera a própria energia com {kwp} kWp de painéis fotovoltaicos no telhado ({modules} módulos). O que não vem do sol vem da rede brasileira, de matriz predominantemente hídrica.',
+    envFlow: 'Fluxo de energia agora', envPv: 'Fotovoltaica', envGrid: 'Rede', envLoad: 'Fábrica',
+    envNowPv: 'Gerando agora', envTodayPv: 'Gerado hoje', envSelf: 'Autossuficiência no mês', envMonthPv: 'Gerado no mês', envLifetime: 'Gerado desde o início', envCo2: 'CO₂ evitado',
+    envOfCap: '{p}% da capacidade instalada', envLoadToday: 'consumo hoje: {v} kWh', envSelfSub: 'geração solar ÷ consumo da fábrica', envMonthSub: 'consumo no mês: {v} kWh', envSince: 'desde {since}', envCo2Sub: 'fator {f} g CO₂/kWh',
+    envNoteImport: 'O sol cobre {p}% do consumo neste instante; o restante vem da rede.', envNoteExport: 'Sobram {kw} kW: a fábrica está injetando energia na rede.', envNoteBalanced: 'Geração e consumo equilibrados neste instante.', envNoteNight: 'Sem sol agora: a fábrica consome da rede e os créditos do dia compensam.',
+    envRenew: 'energia renovável', envRenewSub: 'Mais de {solar}% gerada no nosso telhado; menos de {grid}% vem da rede, de fonte predominantemente hídrica.', envBarSolar: 'solar própria {p}%', envBarGrid: 'rede {p}%',
+    envCo2Line: 'de CO₂ evitadas desde o início da usina', envTrees: '≈ o que {n} árvores absorvem em um ano',
+    envTodayCurve: 'Hoje, hora a hora', envLegPv: 'geração solar', envLegLoad: 'consumo da fábrica',
+    envLive: 'ao vivo · {time}', envSim: 'simulação', envFootLive: 'Dados ao vivo: {src}', envFootSim: 'Valores simulados a partir dos parâmetros da usina até a conexão com a SolisCloud',
+    envFactor: 'CO₂ calculado com {f} g/kWh ({src}) e 22 kg/árvore/ano',
     counterCap: 'sensores produzidos em {year}', statCountries: 'países atendidos', statPeople: 'pessoas em Diadema',
     statYear: 'sensores em {year}',
     historyTitle: 'Nossa história', prev: 'Anterior', next: 'Próximo', confirmFlag: 'Dado provisório — a confirmar',
     worldCap: 'países recebem sensores feitos em Diadema',
+    worldHint: 'Toque em um país para vê-lo no globo.',
     regions: { Americas: 'Américas', Europe: 'Europa', Asia: 'Ásia', Africa: 'África', Oceania: 'Oceania' },
     marketsTitle: 'Mercados e aplicações', applications: 'Aplicações', productsUsed: 'Produtos usados',
     clientsTitle: 'Principais clientes', clientSlot: 'logo do cliente', validUntil: 'válido até',
@@ -5124,11 +5404,11 @@ const I18N = {
     explodeTitle: 'Peça por peça', explodeHint: 'Cada componente afastado para ver como o elemento é construído.',
     tempTitle: 'Resposta à temperatura', tempHint: 'Arraste para aquecer ou resfriar. A resistência muda com a temperatura.',
     resistance: 'Resistência', cvdNote: 'Curva Callendar–Van Dusen, IEC 60751 (α = 0,003851 /°C).',
-    scaleTitle: 'Tamanho real', scaleHint: 'O elemento ao lado de uma moeda de R$ 1, em escala.', element: 'Elemento', coin: 'Moeda de R$ 1',
+    scaleTitle: 'Tamanho real', scaleHint: 'O elemento ao lado de uma moeda de 25 centavos de dólar (quarter), em escala.', element: 'Elemento', coin: 'Quarter dollar (EUA)',
     partBody: 'Corpo de alumina', partCoil: 'Espiral de platina', partLead: 'Terminais', partSeal: 'Selo vítreo', partFill: 'Pó cerâmico', partCap: 'Vidrados de selagem',
     partBodyD: 'alumina de alta pureza com dois capilares de precisão', partCoilD: 'hélice de platina em cada capilar — espira nunca toca espira', partLeadD: 'fios de platina soldados às espirais, saída para o circuito de medição',
     partSealD: 'vidro que fixa e protege as espirais', partFillD: 'pó fino em que as espirais se assentam e se movem livremente', partCapD: 'domo azul-cobalto sela a ponta; glaze branco fecha a saída dos terminais',
-    coinLabel: 'Moeda de R$ 1 · 27 mm', rulerLabel: 'mm',
+    coinLabel: 'Quarter dollar · 24,26 mm', rulerLabel: 'mm',
     adminTitle: 'Configuração', adminIdle: 'Volta à atração após', adminVersion: 'Versão', adminFs: 'Tela cheia', adminFsBtn: 'Ativar', adminClose: 'Fechar painel', close: 'Fechar',
     rotate: 'Gire o aparelho para a horizontal.',
     seconds: 's',
@@ -5136,12 +5416,25 @@ const I18N = {
   },
   en: {
     tap: 'Touch to explore', prov: 'provisional data',
+    qrTitle: 'Take it with you', qrText: 'Point your camera to open this presentation on your phone.', qrHello: 'Welcome! Browse the sections above.',
     navHome: 'Home', navHistory: 'History', navWorld: 'Global presence', navMarkets: 'Markets and applications',
-    navClients: 'Clients', navCerts: 'Certifications', navProducts: 'Products',
+    navClients: 'Clients', navCerts: 'Certifications', navProducts: 'Products', navTeam: 'Our team', navEnv: 'Environment',
+    teamTitle: 'Our team',
+    envTitle: 'Clean energy, measured in real time', envLead: 'The Diadema plant generates its own power with {kwp} kWp of rooftop photovoltaic panels ({modules} modules). What does not come from the sun comes from the Brazilian grid, which is predominantly hydroelectric.',
+    envFlow: 'Energy flow right now', envPv: 'Photovoltaic', envGrid: 'Grid', envLoad: 'Factory',
+    envNowPv: 'Generating now', envTodayPv: 'Generated today', envSelf: 'Self-sufficiency this month', envMonthPv: 'Generated this month', envLifetime: 'Generated since start', envCo2: 'CO₂ avoided',
+    envOfCap: '{p}% of installed capacity', envLoadToday: 'consumption today: {v} kWh', envSelfSub: 'solar generation ÷ factory consumption', envMonthSub: 'consumption this month: {v} kWh', envSince: 'since {since}', envCo2Sub: 'factor {f} g CO₂/kWh',
+    envNoteImport: 'The sun covers {p}% of consumption right now; the rest comes from the grid.', envNoteExport: '{kw} kW to spare: the factory is feeding energy into the grid.', envNoteBalanced: 'Generation and consumption balanced right now.', envNoteNight: 'No sun now: the factory draws from the grid and the day\'s credits compensate.',
+    envRenew: 'renewable energy', envRenewSub: 'More than {solar}% generated on our own roof; less than {grid}% comes from the grid, predominantly hydroelectric.', envBarSolar: 'own solar {p}%', envBarGrid: 'grid {p}%',
+    envCo2Line: 'of CO₂ avoided since the plant started', envTrees: '≈ what {n} trees absorb in a year',
+    envTodayCurve: 'Today, hour by hour', envLegPv: 'solar generation', envLegLoad: 'factory consumption',
+    envLive: 'live · {time}', envSim: 'simulation', envFootLive: 'Live data: {src}', envFootSim: 'Simulated values from the plant parameters until the SolisCloud connection is live',
+    envFactor: 'CO₂ computed with {f} g/kWh ({src}) and 22 kg per tree per year',
     counterCap: 'sensors made in {year}', statCountries: 'countries served', statPeople: 'people in Diadema',
     statYear: 'sensors in {year}',
     historyTitle: 'Our history', prev: 'Previous', next: 'Next', confirmFlag: 'Provisional — to be confirmed',
     worldCap: 'countries receive sensors made in Diadema',
+    worldHint: 'Tap a country to see it on the globe.',
     regions: { Americas: 'Americas', Europe: 'Europe', Asia: 'Asia', Africa: 'Africa', Oceania: 'Oceania' },
     marketsTitle: 'Markets and applications', applications: 'Applications', productsUsed: 'Products used',
     clientsTitle: 'Key clients', clientSlot: 'client logo', validUntil: 'valid until',
@@ -5155,11 +5448,11 @@ const I18N = {
     explodeTitle: 'Part by part', explodeHint: 'Each component pulled apart to show how the element is built.',
     tempTitle: 'Temperature response', tempHint: 'Drag to heat or cool. Resistance changes with temperature.',
     resistance: 'Resistance', cvdNote: 'Callendar–Van Dusen curve, IEC 60751 (α = 0.003851 /°C).',
-    scaleTitle: 'Real size', scaleHint: 'The element next to a 27 mm coin, to scale.', element: 'Element', coin: '27 mm coin',
+    scaleTitle: 'Real size', scaleHint: 'The element next to a US quarter, to scale.', element: 'Element', coin: 'US quarter',
     partBody: 'Alumina body', partCoil: 'Platinum coil', partLead: 'Lead wires', partSeal: 'Glass seal', partFill: 'Ceramic powder', partCap: 'Sealing glazes',
     partBodyD: 'high-purity alumina with two precision capillaries', partCoilD: 'platinum helix in each capillary — turn never touches turn', partLeadD: 'platinum wires welded to the coils, connection to the measuring circuit',
     partSealD: 'glass that fixes and protects the coils', partFillD: 'fine powder in which the coils rest and move freely', partCapD: 'cobalt-blue dome seals the tip; white glaze closes the lead end',
-    coinLabel: '27 mm coin', rulerLabel: 'mm',
+    coinLabel: 'US quarter · 24.26 mm', rulerLabel: 'mm',
     adminTitle: 'Settings', adminIdle: 'Back to attract after', adminVersion: 'Version', adminFs: 'Full screen', adminFsBtn: 'Enable', adminClose: 'Close panel', close: 'Close',
     rotate: 'Rotate the device to landscape.',
     seconds: 's',
@@ -5194,6 +5487,9 @@ const ICONS = {
   chip: P('<rect x="6" y="6" width="12" height="12" rx="1.5"/><path d="M9 9h6v6H9zM9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>'),
   wire: P('<path d="M3 16c3 0 3-8 6-8s3 8 6 8 3-8 6-8"/>'),
   quartz: P('<path d="M12 2l5 6-5 14-5-14z"/><path d="M7 8h10"/>'),
+  team: P('<circle cx="12" cy="7.5" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>'),
+  env: P('<path d="M5 20c0-8 5-13 15-14-1 10-6 14-13 14"/><path d="M5 20c3-5 7-8 11-10"/>'),
+  leaf: P('<path d="M4 20C4 10 10 4 21 3c-1 11-7 17-16 17"/><path d="M4 20c4-7 9-11 14-14"/>'),
 };
 
 /* ------------------------------------------------------------
@@ -5214,20 +5510,24 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const lerp = (a, b, t) => a + (b - a) * t;
 const ease = (t) => 1 - Math.pow(1 - t, 3);
 const D = SENSOR_DATA;
-const PT_NAMES = { TW: 'Taiwan', CZ: 'República Tcheca', US: 'Estados Unidos', GB: 'Reino Unido', NL: 'Holanda', AE: 'Emirados Árabes', KR: 'Coreia do Sul' };
+const PT_NAMES = { TW: 'Taiwan', CZ: 'República Tcheca', US: 'Estados Unidos', GB: 'Reino Unido', NL: 'Holanda', AE: 'Emirados Árabes', KR: 'Coreia do Sul', VN: 'Vietnã', PL: 'Polônia', RO: 'Romênia', PE: 'Peru' };
 const countryByA2 = new Map(GLOBE_DATA.countries.map((c, i) => [c.a2, Object.assign({ i }, c, PT_NAMES[c.a2] ? { pt: PT_NAMES[c.a2] } : {})]));
 const exportCountries = D.countries.map((a2) => countryByA2.get(a2)).filter(Boolean);
 
 /* ------------------------------------------------------------
    Estado, navegação e quiosque
    ------------------------------------------------------------ */
-const SCREENS = ['attract', 'home', 'history', 'world', 'markets', 'clients', 'certs', 'products', 'viewer'];
+const SCREENS = ['attract', 'home', 'history', 'team', 'world', 'markets', 'clients', 'certs', 'env', 'products', 'viewer'];
 const RAIL = [
-  ['home', 'navHome'], ['history', 'navHistory'], ['world', 'navWorld'], ['markets', 'navMarkets'],
-  ['clients', 'navClients'], ['certs', 'navCerts'], ['products', 'navProducts'],
+  ['home', 'navHome'], ['history', 'navHistory'], ['team', 'navTeam'], ['world', 'navWorld'], ['markets', 'navMarkets'],
+  ['clients', 'navClients'], ['certs', 'navCerts'], ['env', 'navEnv'], ['products', 'navProducts'],
 ];
 let current = 'attract';
 let lastTouch = performance.now();
+// Modo celular: layout em coluna com rolagem, sem atração/voz/vídeo/inatividade (o quiosque é 1920×1080 paisagem)
+const MQ_MOBILE = '(max-width: 900px), ((orientation: portrait) and (max-width: 1100px))';
+const IS_MOBILE = window.matchMedia(MQ_MOBILE).matches;
+if (IS_MOBILE) document.body.classList.add('mobile');
 
 function go(name) {
   if (!SCREENS.includes(name)) return;
@@ -5247,6 +5547,9 @@ function go(name) {
   if (name === 'home') Home.enter();
   if (name === 'history') History.enter(); else if (prev === 'history') History.leave();
   if (name === 'world') World.enter();
+  if (name === 'env') Energy.enter(); else if (prev === 'env') Energy.leave();
+  if (name === 'team') Team.enter(); else if (prev === 'team') Team.leave();
+  if (IS_MOBILE) { const c = $('#s-' + name + ' .content'); if (c) c.scrollTop = 0; const rb = $('#rail button.on'); if (rb && rb.scrollIntoView) rb.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); }
 }
 
 function buildRail() {
@@ -5279,7 +5582,7 @@ function applyI18n() {
   $('#stat-people').textContent = fmtInt(D.company.employees);
   $('#viewer-sub').textContent = T('viewerSub');
   $('#admin-idle').textContent = D.kiosk.idleSeconds + ' ' + T('seconds');
-  History.render(); World.render(); Markets.render(); Clients.render(); Certs.render(); Products.render(); Viewer.renderPanels();
+  History.render(); World.render(); Markets.render(); Clients.render(); Certs.render(); Products.render(); Viewer.renderPanels(); Team.render(); Energy.render();
 }
 
 let userChoseLang = false;
@@ -5291,15 +5594,14 @@ function kioskGuards() {
   document.addEventListener('gesturestart', (e) => e.preventDefault());
   document.addEventListener('touchmove', (e) => { if (e.touches.length > 1 && !e.target.closest('canvas')) e.preventDefault(); }, { passive: false });
   document.addEventListener('keydown', (e) => { if (e.key === 'F5' || (e.ctrlKey && 'rpw'.includes(e.key.toLowerCase()))) e.preventDefault(); });
-  // Prende o botão "voltar" do navegador
-  history.pushState({ k: 1 }, '');
-  window.addEventListener('popstate', () => history.pushState({ k: 1 }, ''));
+  // Prende o botão "voltar" do navegador (só no quiosque)
+  if (!IS_MOBILE) { history.pushState({ k: 1 }, ''); window.addEventListener('popstate', () => history.pushState({ k: 1 }, '')); }
   // Inatividade → tela de atração
   const touch = () => { lastTouch = performance.now(); };
   ['pointerdown', 'pointermove', 'keydown', 'wheel'].forEach((ev) => document.addEventListener(ev, touch, { passive: true }));
   setInterval(() => {
     const idle = (performance.now() - lastTouch) / 1000;
-    if (idle > D.kiosk.idleSeconds && current !== 'attract') { go('attract'); userChoseLang = false; const dl = RemoteConfig.cfg && RemoteConfig.cfg.defaultLang; if (dl && dl !== LANG) setLang(dl); }
+    if (!IS_MOBILE && idle > D.kiosk.idleSeconds && current !== 'attract') { go('attract'); userChoseLang = false; const dl = RemoteConfig.cfg && RemoteConfig.cfg.defaultLang; if (dl && dl !== LANG) setLang(dl); }
   }, 1000);
   // Mantém a tela acesa
   let lock = null;
@@ -5320,6 +5622,7 @@ function kioskGuards() {
     if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(() => {});
   });
   $$('.lang button').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang, true)));
+  $('#viewer-back').addEventListener('click', () => go('products'));
   $('#prov').hidden = !D.provisional;
 }
 
@@ -5328,7 +5631,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.09-1532';
+const BUILD = '2026.11.09-2101';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -5691,20 +5994,34 @@ const History = {
 const World = {
   render() {
     const list = $('#world-list'); list.innerHTML = '';
-    const sorted = exportCountries.slice().sort((a, b) => L({ pt: a.pt, en: a.en }).localeCompare(L({ pt: b.pt, en: b.en }), LANG === 'pt' ? 'pt' : 'en'));
-    sorted.forEach((c) => { const s = document.createElement('span'); s.dataset.a2 = c.a2; const f = document.createElement('img'); f.className = 'flag'; f.src = `flags/${c.a2.toLowerCase()}.svg`; f.alt = ''; f.draggable = false; f.decoding = 'async'; f.onerror = () => f.remove(); s.appendChild(f); s.appendChild(document.createTextNode(L({ pt: c.pt, en: c.en }))); list.appendChild(s); });
-    const reg = {}; exportCountries.forEach((c) => { reg[c.region] = (reg[c.region] || 0) + 1; });
-    const order = ['Americas', 'Europe', 'Asia', 'Africa', 'Oceania'];
-    const max = Math.max(1, ...Object.values(reg));
-    const el = $('#world-regions'); el.innerHTML = '';
-    order.filter((r) => reg[r]).forEach((r) => {
-      const d = document.createElement('div'); d.className = 'region';
-      d.innerHTML = `<span class="n">${reg[r]}</span><span class="r">${T('regions')[r] || r}</span><span class="bar"><i data-w="${(reg[r] / max) * 100}"></i></span>`;
-      el.appendChild(d);
-    });
+    const by = {}; exportCountries.forEach((c) => { (by[c.region] = by[c.region] || []).push(c); });
+    const name = (c) => L({ pt: c.pt, en: c.en });
+    const coll = new Intl.Collator(LANG === 'pt' ? 'pt' : 'en');
+    const group = (r) => {
+      const arr = (by[r] || []).slice().sort((a, b) => coll.compare(name(a), name(b)));
+      if (!arr.length) return null;
+      const g = document.createElement('div'); g.className = 'grp';
+      const cols = Math.max(1, Math.ceil(arr.length / 13)); g.style.setProperty('--cols', cols);
+      g.innerHTML = `<h5><span>${T('regions')[r] || r}</span><b>${arr.length}</b></h5>`;
+      const items = document.createElement('div'); items.className = 'items';
+      arr.forEach((c) => {
+        const b = document.createElement('button'); b.type = 'button'; b.dataset.a2 = c.a2;
+        const f = document.createElement('img'); f.className = 'flag'; f.src = `flags/${c.a2.toLowerCase()}.svg`; f.alt = ''; f.draggable = false; f.decoding = 'async'; f.onerror = () => f.remove();
+        b.appendChild(f); b.appendChild(document.createTextNode(name(c)));
+        b.addEventListener('click', () => { Globe.focus(c.a2); World.highlight(c.a2); });
+        items.appendChild(b);
+      });
+      g.appendChild(items); return g;
+    };
+    // Américas, Europa e Ásia em grupos próprios (2 colunas quando passam de 13); África e Oceania empilhadas
+    ['Americas', 'Europe', 'Asia'].forEach((r) => { const g = group(r); if (g) list.appendChild(g); });
+    const stack = document.createElement('div'); stack.className = 'grp-stack';
+    ['Africa', 'Oceania'].forEach((r) => { const g = group(r); if (g) stack.appendChild(g); });
+    if (stack.children.length) list.appendChild(stack);
+    Object.keys(by).filter((r) => !['Americas', 'Europe', 'Asia', 'Africa', 'Oceania'].includes(r)).forEach((r) => { const g = group(r); if (g) list.appendChild(g); });
   },
-  enter() { requestAnimationFrame(() => $$('#world-regions .bar i').forEach((i) => { i.style.width = i.dataset.w + '%'; })); },
-  highlight(a2) { $$('#world-list span').forEach((s) => s.classList.toggle('on', s.dataset.a2 === a2)); },
+  enter() {},
+  highlight(a2) { $$('#world-list button').forEach((s) => s.classList.toggle('on', s.dataset.a2 === a2)); },
 };
 
 /* ------------------------------------------------------------
@@ -5761,7 +6078,7 @@ const Clients = {
     const n = list.length;
     let cols = n <= 4 ? n : 4;
     if (n > 4) { const opts = [4, 5, 6].map((c) => ({ c, rest: (c - (n % c)) % c, rows: Math.ceil(n / c) })).filter((o) => o.rows <= 4); opts.sort((a, b) => a.rest - b.rest || a.c - b.c); cols = (opts[0] || { c: 6 }).c; }
-    w.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    w.style.gridTemplateColumns = IS_MOBILE ? '' : `repeat(${cols}, 1fr)`;
     list.forEach((c, k) => {
       const t = document.createElement('div'); t.className = 'tile'; t.style.setProperty('--k', k);
       if (!c) { t.classList.add('empty'); t.textContent = T('clientSlot'); }
@@ -5789,6 +6106,200 @@ const Certs = {
     co.innerHTML = `<span class="t">${T('compliance')}</span>` + D.compliance.map((c) => `<span class="pill"><i></i>${c}</span>`).join('');
   },
 };
+
+/* ------------------------------------------------------------
+   Nosso time
+   ------------------------------------------------------------ */
+const Team = {
+  timer: 0, i: 0,
+  render() {
+    const t = D.team; if (!t) return;
+    $('#team-title').textContent = L(t.title);
+    $('#team-lead').textContent = L(t.lead);
+    $('#team-stats').innerHTML = t.stats.map((x) => `<div class="tstat"><div class="v">${x.v}</div><div class="k">${L(x.k)}${x.confirm && D.provisional ? ` <i class="pflag">${T('confirmFlag')}</i>` : ''}</div></div>`).join('');
+    $('#team-pillars').innerHTML = ((t.pillars && (t.pillars[LANG] || t.pillars.pt)) || []).map((x) => `<span class="pill">${x}</span>`).join('');
+    const ph = $('#team-photos'); ph.innerHTML = (t.photos || []).map((src, i) => `<img class="ph${i === 0 ? ' on' : ''}" src="${src}" alt="" draggable="false" decoding="async">`).join('') + `<div class="dots">${(t.photos || []).map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>`;
+    this.i = 0;
+  },
+  enter() { clearInterval(this.timer); const n = (D.team.photos || []).length; if (n < 2) return; this.timer = setInterval(() => { this.i = (this.i + 1) % n; $$('#team-photos .ph').forEach((im, k) => im.classList.toggle('on', k === this.i)); $$('#team-photos .dots i').forEach((d, k) => d.classList.toggle('on', k === this.i)); }, 6000); },
+  leave() { clearInterval(this.timer); },
+};
+
+/* ------------------------------------------------------------
+   Ambiental — BI de energia solar da fábrica
+   Lê energia.json (fonte real: SolisCloud/medidor) e, enquanto não
+   houver dados ao vivo, simula geração e consumo com um modelo
+   determinístico (sol de Diadema por data/hora, nuvens pseudo-
+   aleatórias por dia, perfil de carga da fábrica por dia da semana).
+   ------------------------------------------------------------ */
+const Energy = (function () {
+  const DEG = Math.PI / 180, LAT = -23.69 * DEG;
+  let cfg = null, live = null, liveAt = 0, timer = 0, chartAt = 0, built = false, dayCache = new Map();
+
+  function conf() {
+    const base = D.energy || {}; const over = (RemoteConfig.cfg && RemoteConfig.cfg.energy) || {};
+    cfg = Object.assign({}, base, over, { plant: Object.assign({}, base.plant || {}, over.plant || {}), anchor: Object.assign({}, base.anchor || {}, over.anchor || {}), claims: Object.assign({}, base.claims || {}, over.claims || {}) });
+    return cfg;
+  }
+
+  // ---------- modelo ----------
+  const hash = (n) => { let x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+  const dayKey = (d) => d.getFullYear() * 1000 + dayOfYear(d);
+  function dayOfYear(d) { const s = new Date(d.getFullYear(), 0, 0); return Math.floor((d - s) / 86400000); }
+  function sunAlt(n, h) { const decl = 23.45 * DEG * Math.sin(2 * Math.PI * (284 + n) / 365); const H = (h - 12.1) * 15 * DEG; return Math.asin(Math.sin(LAT) * Math.sin(decl) + Math.cos(LAT) * Math.cos(decl) * Math.cos(H)); }
+  function cloud(k, h) {
+    // dia nublado ocasional + nuvens passageiras (ruído de valor suavizado em passos de 20 min)
+    const dayMood = hash(k * 3.1); const overcast = dayMood < 0.14 ? 0.28 + 0.2 * hash(k * 7.7) : dayMood < 0.4 ? 0.62 + 0.2 * hash(k * 5.3) : 0.9;
+    const slot = h * 3, i0 = Math.floor(slot), f = slot - i0, sm = f * f * (3 - 2 * f);
+    const n = lerp(hash(k * 13 + i0), hash(k * 13 + i0 + 1), sm);
+    return clamp(overcast * (0.78 + 0.32 * n), 0.08, 1.05);
+  }
+  function pvKw(d, h) { const a = sunAlt(dayOfYear(d), h); if (a <= 0) return 0; const g = Math.pow(Math.sin(a), 1.12); const temp = 1 - 0.0036 * Math.max(0, g * 28 - 5); return cfg.plant.kwp * (cfg.pr || 0.8) * g * cloud(dayKey(d), h) * temp; }
+  function loadKw(d, h) {
+    const wd = d.getDay(); const base = (cfg.loadBaseKw || 11) + 1.2 * Math.sin(h * 0.9), p = cfg.loadPeakKw || 60;
+    const ramp = (x, a, b) => clamp((x - a) / (b - a), 0, 1);
+    let v = base;
+    if (wd >= 1 && wd <= 5) { v = base + (p - base) * (ramp(h, 6.3, 7.4) - ramp(h, 16.6, 17.8)); v -= (p - base) * 0.22 * (ramp(h, 11.8, 12.2) - ramp(h, 12.9, 13.4)); }
+    else if (wd === 6) { v = base + (p * 0.45 - base) * (ramp(h, 7, 7.8) - ramp(h, 12, 12.8)); }
+    const k = dayKey(d); const n = hash(k * 17 + Math.floor(h * 6)); return v * (0.94 + 0.12 * n);
+  }
+  // integrais do dia (kWh) até a hora `until` — passos de 10 min, com cache por dia completo
+  function dayTotals(d, until) {
+    const full = until == null; const key = dayKey(d);
+    if (full && dayCache.has(key)) return dayCache.get(key);
+    let pv = 0, load = 0, selfc = 0, exp = 0, imp = 0; const end = full ? 24 : until;
+    for (let h = 0; h < end; h += 1 / 6) { const dt = Math.min(1 / 6, end - h); const p = pvKw(d, h + dt / 2), l = loadKw(d, h + dt / 2); pv += p * dt; load += l * dt; selfc += Math.min(p, l) * dt; exp += Math.max(0, p - l) * dt; imp += Math.max(0, l - p) * dt; }
+    const r = { pv, load, selfc, exp, imp }; if (full) dayCache.set(key, r); return r;
+  }
+  function simulate(now) {
+    const h = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
+    const pv = pvKw(now, h), load = loadKw(now, h);
+    const today = dayTotals(now, h);
+    const month = { pv: 0, load: 0 }; for (let dd = 1; dd < now.getDate(); dd++) { const t = dayTotals(new Date(now.getFullYear(), now.getMonth(), dd)); month.pv += t.pv; month.load += t.load; } month.pv += today.pv; month.load += today.load;
+    // acumulado: âncora conhecida + dias simulados desde então
+    let life = cfg.anchor.kwh || 0; const a0 = new Date(cfg.anchor.date + 'T00:00:00'); const d = new Date(a0);
+    while (d < now && (now - d) < 400 * 86400000) { if (dayKey(d) === dayKey(now)) { life += today.pv; break; } life += dayTotals(d).pv; d.setDate(d.getDate() + 1); }
+    const curve = []; for (let hh = 0; hh <= 24; hh += 0.25) curve.push({ h: hh, pv: hh <= h ? pvKw(now, hh) : null, pvF: pvKw(now, hh), load: hh <= h ? loadKw(now, hh) : null });
+    return { source: 'sim', now: { pv, load, grid: load - pv }, today, month, lifetimeKwh: life, curve, hour: h };
+  }
+
+  // ---------- dados ao vivo (energia.json) ----------
+  async function fetchLive() {
+    if (location.protocol === 'file:') return;
+    try {
+      const r = await fetch((cfg.dataUrl || 'energia.json') + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) { live = null; return; }
+      const j = await r.json();
+      if (j && j.source && j.source !== 'sim' && j.updated) { const age = Date.now() - new Date(j.updated).getTime(); live = age < 2 * 3600000 ? j : null; liveAt = Date.now(); } else live = null;
+    } catch (e) { live = null; }
+  }
+  // mistura: usa o que vier ao vivo, completa com a simulação (ex.: consumo sem medidor)
+  function snapshot() {
+    const now = new Date(); const sim = simulate(now);
+    if (!live) return sim;
+    const s = Object.assign({}, sim, { source: live.source, updated: live.updated });
+    const n = live.now || {}; if (n.pv_kw != null) s.now.pv = n.pv_kw; if (n.load_kw != null) s.now.load = n.load_kw; s.now.grid = s.now.load - s.now.pv;
+    const t = live.today || {}; if (t.pv_kwh != null) s.today = Object.assign({}, s.today, { pv: t.pv_kwh }); if (t.load_kwh != null) s.today.load = t.load_kwh;
+    const m = live.month || {}; if (m.pv_kwh != null) s.month = Object.assign({}, s.month, { pv: m.pv_kwh }); if (m.load_kwh != null) s.month.load = m.load_kwh;
+    if (live.lifetime && live.lifetime.pv_kwh != null) s.lifetimeKwh = live.lifetime.pv_kwh;
+    if (Array.isArray(live.curve) && live.curve.length > 4) s.curve = live.curve.map((p) => ({ h: p.h != null ? p.h : (+p.t.slice(0, 2) + (+p.t.slice(3, 5)) / 60), pv: p.pv, pvF: p.pv, load: p.load != null ? p.load : null })).concat(sim.curve.filter((p) => p.h > sim.hour).map((p) => ({ h: p.h, pv: null, pvF: null, load: null })));
+    return s;
+  }
+
+  // ---------- interface ----------
+  function render() {
+    conf(); const root = $('#s-env'); if (!root) return;
+    $('#env-lead').textContent = T('envLead', { kwp: fmtDec(cfg.plant.kwp, 1), modules: fmtInt(cfg.plant.modules || 0) });
+    $('#env-flow').innerHTML = `
+      <div class="ch-head"><b>${T('envFlow')}</b><span class="live" id="env-live"></span></div>
+      <svg viewBox="0 0 420 300" class="flow" aria-hidden="true">
+        <defs><linearGradient id="gpv" x1="0" x2="1"><stop offset="0" stop-color="#FFD27A"/><stop offset="1" stop-color="#FF7A1A"/></linearGradient></defs>
+        <path class="track" d="M112 94 C 150 150, 160 165, 194 190"/>
+        <path class="track" d="M308 94 C 270 150, 260 165, 226 190"/>
+        <path class="track" d="M125 62 C 170 20, 250 20, 295 62"/>
+        <path class="run pv" id="fl-pv" d="M112 94 C 150 150, 160 165, 194 190"/>
+        <path class="run grid" id="fl-grid" d="M308 94 C 270 150, 260 165, 226 190"/>
+        <path class="run exp" id="fl-exp" d="M125 62 C 170 20, 250 20, 295 62"/>
+        <g class="node"><circle cx="90" cy="70" r="34"/><path class="ic sun" d="M90 52v-8M90 96v-8M72 70h-8M116 70h-8M77.3 57.3l-5.7-5.7M108.4 88.4l-5.7-5.7M102.7 57.3l5.7-5.7M71.6 88.4l5.7-5.7"/><circle class="ic sun" cx="90" cy="70" r="9"/></g>
+        <g class="node"><circle cx="330" cy="70" r="34"/><path class="ic bolt" d="M334 50l-14 22h11l-3 18 14-22h-11z"/></g>
+        <g class="node fac"><circle cx="210" cy="222" r="34"/><path class="ic" d="M192 236v-19l9 6v-6l9 6v-6l11 6v13z"/><path class="ic" d="M214 217v-10h4v12"/></g>
+        <text x="90" y="124" class="lbl">${T('envPv')}</text><text x="90" y="142" class="val" id="fv-pv">–</text>
+        <text x="330" y="124" class="lbl">${T('envGrid')}</text><text x="330" y="142" class="val" id="fv-grid">–</text>
+        <text x="210" y="276" class="lbl fac" id="fl-fac">${T('envLoad')}</text>
+        <text x="210" y="295" class="val" id="fv-load">–</text>
+      </svg>
+      <div class="flow-note" id="env-flow-note"></div>`;
+    const tile = (id, k, unit) => `<div class="tile" id="tile-${id}"><div class="k">${T(k)}</div><div class="v"><span class="n" id="tv-${id}">–</span><small>${unit}</small></div><div class="s" id="ts-${id}"></div></div>`;
+    $('#env-kpis').innerHTML = tile('pvnow', 'envNowPv', 'kW') + tile('today', 'envTodayPv', 'kWh') + tile('self', 'envSelf', '%') + tile('month', 'envMonthPv', 'MWh') + tile('life', 'envLifetime', 'MWh') + tile('co2', 'envCo2', 't');
+    $('#env-green').innerHTML = `
+      <div class="leaf">${ICONS.leaf}</div>
+      <div class="pct">${fmtInt(cfg.claims.renewablePct || 100)}<small>%</small></div>
+      <div class="ttl">${T('envRenew')}</div>
+      <p class="sub">${T('envRenewSub', { solar: fmtInt(cfg.claims.solarPct || 70), grid: fmtInt(cfg.claims.gridPct || 30) })}</p>
+      <div class="bar"><i style="width:${clamp(cfg.claims.solarPct || 70, 0, 100)}%"></i></div>
+      <div class="bar-lbl"><span>${T('envBarSolar', { p: fmtInt(cfg.claims.solarPct || 70) })}</span><span>${T('envBarGrid', { p: fmtInt(cfg.claims.gridPct || 30) })}</span></div>
+      <div class="trees" id="env-trees"></div>`;
+    $('#env-chart-title').textContent = T('envTodayCurve');
+    $('#env-leg-pv').textContent = T('envLegPv'); $('#env-leg-load').textContent = T('envLegLoad');
+    built = true; update(true);
+  }
+  function fmtKw(v) { return fmtDec(Math.max(0, v), v < 10 ? 1 : 0); }
+  function update(force) {
+    if (!built || !cfg) return;
+    const s = snapshot(); const now = new Date();
+    const pv = s.now.pv, load = s.now.load, imp = Math.max(0, load - pv), exp = Math.max(0, pv - load);
+    $('#fv-pv').textContent = fmtKw(pv) + ' kW'; $('#fv-load').textContent = fmtKw(load) + ' kW';
+    $('#fv-grid').textContent = (imp > 0.05 ? fmtKw(imp) : exp > 0.05 ? fmtKw(exp) : '0') + ' kW';
+    const flow = (id, kw, max) => { const el = $('#' + id); const on = kw > 0.05; el.style.opacity = on ? 1 : 0; el.style.animationDuration = on ? clamp(2.4 - 1.9 * Math.min(1, kw / max), 0.55, 2.4).toFixed(2) + 's' : '0s'; };
+    flow('fl-pv', Math.min(pv, load), cfg.plant.kwp * 0.6); flow('fl-grid', imp, 60); flow('fl-exp', exp, 40);
+    $('#env-flow-note').textContent = imp > 0.05 ? T('envNoteImport', { p: fmtInt(load > 0 ? 100 * Math.min(pv, load) / load : 0) }) : exp > 0.05 ? T('envNoteExport', { kw: fmtKw(exp) }) : pv > 0.05 ? T('envNoteBalanced') : T('envNoteNight');
+    $('#tv-pvnow').textContent = fmtKw(pv); $('#ts-pvnow').textContent = T('envOfCap', { p: fmtInt(100 * pv / cfg.plant.kwp) });
+    $('#tv-today').textContent = fmtInt(s.today.pv); $('#ts-today').textContent = T('envLoadToday', { v: fmtInt(s.today.load) });
+    const selfPct = s.month.load > 0 ? 100 * s.month.pv / s.month.load : 0;
+    $('#tv-self').textContent = fmtInt(clamp(selfPct, 0, 100)); $('#ts-self').textContent = T('envSelfSub');
+    $('#tv-month').textContent = fmtDec(s.month.pv / 1000, 1); $('#ts-month').textContent = T('envMonthSub', { v: fmtInt(s.month.load) });
+    $('#tv-life').textContent = fmtInt(s.lifetimeKwh / 1000); $('#ts-life').textContent = T('envSince', { since: cfg.plant.since || '' });
+    const co2t = s.lifetimeKwh * (cfg.co2FactorKgPerKwh || 0.0385) / 1000; const trees = Math.round(co2t * 1000 / (cfg.treeKgPerYear || 22));
+    $('#tv-co2').textContent = fmtDec(co2t, 1); $('#ts-co2').textContent = T('envCo2Sub', { f: fmtDec((cfg.co2FactorKgPerKwh || 0.0385) * 1000, 1) });
+    $('#env-trees').innerHTML = `<b>${fmtDec(co2t, 1)} t</b> ${T('envCo2Line')}<br><span>${T('envTrees', { n: fmtInt(trees) })}</span>`;
+    const liveEl = $('#env-live'); const isLive = s.source && s.source !== 'sim';
+    liveEl.textContent = isLive ? T('envLive', { time: new Date(s.updated).toLocaleTimeString(LANG === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' }) }) : T('envSim');
+    liveEl.classList.toggle('on', !!isLive);
+    $('#env-foot').textContent = (isLive ? T('envFootLive', { src: L(cfg.liveLabel || { pt: 'SolisCloud', en: 'SolisCloud' }) }) : T('envFootSim')) + ' · ' + T('envFactor', { f: fmtDec((cfg.co2FactorKgPerKwh || 0.0385) * 1000, 1), src: L(cfg.co2Source || '') });
+    if (force || performance.now() - chartAt > 60000) { drawChart(s); chartAt = performance.now(); }
+  }
+  function drawChart(s) {
+    const c = $('#env-chart'); const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const W = c.clientWidth, H = c.clientHeight; if (!W || !H) return;
+    c.width = W * dpr; c.height = H * dpr; const g = c.getContext('2d'); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
+    const padL = 34, padR = 12, padT = 18, padB = 24; const maxV = Math.max(10, ...s.curve.map((p) => Math.max(p.pvF || 0, p.load || 0, p.pv || 0))) * 1.12;
+    const X = (h) => padL + (h / 24) * (W - padL - padR), Y = (v) => H - padB - (v / maxV) * (H - padT - padB);
+    g.strokeStyle = 'rgba(191,211,230,.14)'; g.lineWidth = 1; g.fillStyle = '#76829A'; g.font = '11px Archivo, sans-serif'; g.textAlign = 'center';
+    for (let h = 0; h <= 24; h += 6) { g.beginPath(); g.moveTo(X(h), padT); g.lineTo(X(h), H - padB); g.stroke(); g.fillText(String(h).padStart(2, '0') + 'h', X(h), H - 8); }
+    g.textAlign = 'right'; [0.5, 1].forEach((f) => { const v = Math.round(maxV * f / 10) * 10; g.beginPath(); g.moveTo(padL, Y(v)); g.lineTo(W - padR, Y(v)); g.stroke(); g.fillText(v + '', padL - 6, Y(v) + 4); });
+    // previsão de sol (céu limpo/modelo) para o resto do dia: linha pontilhada
+    g.setLineDash([3, 5]); g.strokeStyle = 'rgba(255,210,122,.35)'; g.lineWidth = 1.5; g.beginPath(); let started = false;
+    s.curve.forEach((p) => { if (p.pvF == null) return; const x = X(p.h), y = Y(p.pvF); started ? g.lineTo(x, y) : g.moveTo(x, y); started = true; }); g.stroke(); g.setLineDash([]);
+    // geração realizada: área
+    const pts = s.curve.filter((p) => p.pv != null);
+    if (pts.length > 1) {
+      const grd = g.createLinearGradient(0, padT, 0, H - padB); grd.addColorStop(0, 'rgba(255,170,60,.55)'); grd.addColorStop(1, 'rgba(255,122,26,.03)');
+      g.beginPath(); g.moveTo(X(pts[0].h), Y(0)); pts.forEach((p) => g.lineTo(X(p.h), Y(p.pv))); g.lineTo(X(pts[pts.length - 1].h), Y(0)); g.closePath(); g.fillStyle = grd; g.fill();
+      g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(X(p.h), Y(p.pv)) : g.moveTo(X(p.h), Y(p.pv)))); g.strokeStyle = '#FFD27A'; g.lineWidth = 2; g.stroke();
+    }
+    // consumo: linha platina
+    const lp = s.curve.filter((p) => p.load != null);
+    if (lp.length > 1) { g.beginPath(); lp.forEach((p, i) => (i ? g.lineTo(X(p.h), Y(p.load)) : g.moveTo(X(p.h), Y(p.load)))); g.strokeStyle = '#BFD3E6'; g.lineWidth = 2; g.stroke(); }
+    // agora
+    const xn = X(s.hour); g.strokeStyle = 'rgba(232,241,251,.6)'; g.setLineDash([2, 4]); g.beginPath(); g.moveTo(xn, padT); g.lineTo(xn, H - padB); g.stroke(); g.setLineDash([]);
+    g.fillStyle = '#E8F1FB'; g.beginPath(); g.arc(xn, Y(s.now.pv), 4, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#76829A'; g.textAlign = 'left'; g.fillText('kW', 4, 10);
+  }
+  function enter() { conf(); update(true); clearInterval(timer); timer = setInterval(() => update(false), 1000); if (!liveAt || Date.now() - liveAt > (cfg.refreshSeconds || 300) * 1000) fetchLive().then(() => update(true)); }
+  function leave() { clearInterval(timer); timer = 0; }
+  function start() { conf(); fetchLive(); setInterval(() => { conf(); fetchLive(); }, (cfg.refreshSeconds || 300) * 1000); }
+  return { render, enter, leave, start, update, simulate: () => simulate(new Date()), snapshot };
+})();
 
 /* ------------------------------------------------------------
    Globo — malha de pontos, arcos e passeio pelos países
@@ -5990,6 +6501,19 @@ const Globe = (function () {
     spotCur = 0; spotT = 0; tourT = 0; tourCountry = null; rotTarget = null;
     faceSpot(true);
   }
+  // Foco pedido pelo visitante (toque na lista): o globo vira até o país e segura alguns segundos
+  let focusUntil = 0, focusing = false;
+  function focus(a2) {
+    const c = countryByA2.get(a2); if (!c) return;
+    const now = performance.now();
+    tourCountry = c; tourT = now; tourI = Math.max(0, exportCountries.indexOf(c)); focusUntil = now + 12000; focusing = true;
+    spotT = focusUntil - SPOT_SECONDS * 1000 + 1500; // o passeio das boas-vindas espera o foco acabar
+    const v = latLon(c.lat, c.lon, R * 1.004);
+    active.geometry.attributes.position.set([v.x, v.y, v.z]); active.geometry.attributes.position.needsUpdate = true;
+    setLabel(L({ pt: c.pt, en: c.en }), c.a2);
+    rotTarget = Math.atan2(-v.x, v.z) - 0.3; vel = 0;
+    pitchT = clamp(0.16 + (c.lat - 15) * 0.006, -0.25, 0.55);
+  }
   function faceSpot(instant) {
     if (!spots.length) { rotTarget = null; return; }
     const sp = spots[spotCur]; const v = latLon(sp.c.lat, sp.c.lon, 1);
@@ -6014,9 +6538,19 @@ const Globe = (function () {
   let tourI = -1, tourT = 0, labelEl = null, tourCountry = null;
   const labels = document.getElementById('labels');
 
+  const modePitch = (m) => (m === 'world' ? 0.16 : (m === 'attract' || m === 'home') ? 0.22 : 0.25);
   function setMode(m) {
     mode = m;
     const wide = w > h * 1.1;
+    if (IS_MOBILE) {
+      // celular: globo na parte de cima da tela, conteúdo rola por baixo
+      const tall = h > w * 1.3;
+      if (m === 'home' || m === 'attract') { offXT = 0; offYT = tall ? 0.3 : 0.12; distT = tall ? 5.4 : 4.6; brightT = 1; pitchT = 0.22; }
+      else if (m === 'world') { offXT = 0; offYT = tall ? 0.34 : 0.14; distT = tall ? 5.6 : 4.8; brightT = 1; pitchT = 0.16; }
+      else { offXT = 0; offYT = tall ? 0.42 : 0.2; distT = 6.5; brightT = 0.25; pitchT = 0.25; }
+      if (labelEl) labelEl.classList.remove('on');
+      return;
+    }
     if (m === 'attract') { offXT = wide ? -0.21 : -0.1; offYT = 0.02; distT = 4.3; brightT = 1; pitchT = 0.22; }
     else if (m === 'home') { offXT = wide ? -0.24 : -0.1; offYT = 0.06; distT = 4.1; brightT = 0.95; pitchT = 0.22; }
     else if (m === 'world') { offXT = wide ? -0.2 : -0.05; offYT = 0.05; distT = 4.7; brightT = 1; pitchT = 0.16; }
@@ -6045,7 +6579,9 @@ const Globe = (function () {
   const tmp = new THREE.Vector3();
   function tour(now) {
     if (!exportCountries.length) return;
-    if (spots.length) {
+    if (focusing && now > focusUntil) { focusing = false; if (!spots.length) rotTarget = null; pitchT = modePitch(mode); tourT = now; }
+    if (now < focusUntil) { /* país escolhido pelo visitante: mantém */ }
+    else if (spots.length) {
       if (!tourCountry || (now - spotT > SPOT_SECONDS * 1000 && !dragging)) {
         if (tourCountry) spotCur = (spotCur + 1) % spots.length;
         const sp = spots[spotCur]; tourCountry = sp.c; spotT = now; tourT = now;
@@ -6069,9 +6605,9 @@ const Globe = (function () {
     tmp.project(camera);
     const sx = (tmp.x * 0.5 + 0.5) * w, sy = (-tmp.y * 0.5 + 0.5) * h;
     const el = ensureLabel();
-    const vis = facing > 0.15 && mode !== 'viewer' && !['markets', 'clients', 'certs', 'products', 'history'].includes(mode);
+    const vis = facing > 0.15 && mode !== 'viewer' && !['markets', 'clients', 'certs', 'products', 'history', 'env', 'team'].includes(mode);
     el.classList.toggle('on', vis);
-    el.style.left = clamp(sx, 90, w - 90) + 'px'; el.style.top = clamp(sy - 34, 96, h - 40) + 'px';
+    el.style.left = clamp(sx, 90, w - 90) + 'px'; el.style.top = clamp(sy - 34, IS_MOBILE ? 136 : 96, h - 40) + 'px';
     active.material.opacity = vis ? 0.75 + 0.25 * Math.sin(now * 0.006) : 0;
   }
 
@@ -6086,7 +6622,7 @@ const Globe = (function () {
     camera.position.z = dist; camera.lookAt(0, 0, 0);
     root.rotation.x = pitch;
     if (!dragging) {
-      if (spots.length && rotTarget != null) {
+      if (rotTarget != null && (spots.length || now < focusUntil)) {
         rotTarget += 0.012 * dt; // deriva lenta enquanto encara o país
         let dr = rotTarget - globe.rotation.y; dr = Math.atan2(Math.sin(dr), Math.cos(dr));
         globe.rotation.y += dr * (1 - Math.pow(0.25, dt));
@@ -6115,7 +6651,7 @@ const Globe = (function () {
     renderer.render(scene, camera);
   }
   window.addEventListener('resize', resize); resize();
-  return { setMode, render, resize, spotlight, debug: () => ({ spots: spots.map((x) => x.a2), spotCur, tour: tourCountry && tourCountry.a2, rotY: globe.rotation.y, rotTarget }) };
+  return { setMode, render, resize, spotlight, focus, debug: () => ({ spots: spots.map((x) => x.a2), spotCur, tour: tourCountry && tourCountry.a2, rotY: globe.rotation.y, rotTarget }) };
 })();
 
 /* ------------------------------------------------------------
@@ -6148,9 +6684,115 @@ const Viewer = (function () {
       lead: new THREE.MeshStandardMaterial({ color: 0xd6dae2, roughness: 0.3, metalness: 0.92, envMapIntensity: 1.3 }),
       bore: new THREE.MeshStandardMaterial({ color: 0x2e2a22, roughness: 0.9, metalness: 0, side: THREE.BackSide, transparent: true, opacity: 0.26, depthWrite: false }),
       powder: new THREE.MeshStandardMaterial({ color: 0xf2ecdd, roughness: 0.95, metalness: 0, transparent: true, opacity: 0.16, depthWrite: false }),
-      coinRing: new THREE.MeshStandardMaterial({ color: 0xc8c8c2, roughness: 0.38, metalness: 0.9, transparent: true, opacity: 0 }),
-      coinCore: new THREE.MeshStandardMaterial({ color: 0xc9a96a, roughness: 0.42, metalness: 0.85, transparent: true, opacity: 0 }),
     };
+    const ct = coinTextures();
+    M.coinFace = new THREE.MeshStandardMaterial({ map: ct.map, normalMap: ct.normal, normalScale: new THREE.Vector2(0.9, 0.9), color: 0xffffff, roughness: 0.34, metalness: 0.9, envMapIntensity: 1.25, transparent: true, opacity: 0 });
+    M.coinEdge = new THREE.MeshStandardMaterial({ map: ct.edge, normalMap: ct.edgeNormal, normalScale: new THREE.Vector2(1, 1), color: 0xffffff, roughness: 0.4, metalness: 0.9, envMapIntensity: 1.1, transparent: true, opacity: 0 });
+  }
+
+  /* Quarter dollar (EUA): Ø 24,26 mm, 1,75 mm, 119 frisos na borda, cuproníquel sobre núcleo de cobre.
+     Texturas procedurais: albedo + mapa de normais calculado de um mapa de altura (aro, busto e legendas em relevo).
+     Se existir coin/obverse.png (foto real), ela substitui o anverso desenhado. */
+  const COIN_R = 12.13, COIN_T = 1.75;
+  let coinTex = null;
+  function coinTextures() {
+    if (coinTex) return coinTex;
+    const S = 1024, c = S / 2, R = S * 0.49;
+    const al = document.createElement('canvas'); al.width = al.height = S; const g = al.getContext('2d');
+    const hm = document.createElement('canvas'); hm.width = hm.height = S; const hg = hm.getContext('2d');
+    // campo de cuproníquel com leve escovado
+    g.fillStyle = '#111'; g.fillRect(0, 0, S, S);
+    const base = g.createRadialGradient(c * 0.78, c * 0.78, R * 0.1, c, c, R); base.addColorStop(0, '#e4e5e1'); base.addColorStop(0.65, '#cdd0cc'); base.addColorStop(1, '#b4b8b4');
+    g.fillStyle = base; g.beginPath(); g.arc(c, c, R, 0, Math.PI * 2); g.fill();
+    let seed = 7; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    g.save(); g.beginPath(); g.arc(c, c, R, 0, Math.PI * 2); g.clip(); g.globalAlpha = 0.07;
+    for (let i = 0; i < 220; i++) { const a = rnd() * Math.PI * 2, r0 = R * (0.12 + rnd() * 0.5); g.strokeStyle = rnd() < 0.5 ? '#fff' : '#333'; g.lineWidth = 1 + rnd(); g.beginPath(); g.moveTo(c + Math.cos(a) * r0, c + Math.sin(a) * r0); g.lineTo(c + Math.cos(a) * R, c + Math.sin(a) * R); g.stroke(); }
+    g.restore();
+    // altura: campo 0.35, aro 1.0, relevo 0.8
+    hg.fillStyle = '#595959'; hg.fillRect(0, 0, S, S);
+    hg.strokeStyle = '#fff'; hg.lineWidth = S * 0.03; hg.beginPath(); hg.arc(c, c, R - S * 0.013, 0, Math.PI * 2); hg.stroke();
+    g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = S * 0.03; g.beginPath(); g.arc(c, c, R - S * 0.013, 0, Math.PI * 2); g.stroke();
+    g.strokeStyle = 'rgba(0,0,0,.18)'; g.lineWidth = S * 0.006; g.beginPath(); g.arc(c, c, R - S * 0.03, 0, Math.PI * 2); g.stroke();
+    const both = (fn) => { fn(g, '#eceeea', '#9d9f9b'); fn(hg, '#cfcfcf', '#cfcfcf'); };
+    // busto neoclássico de perfil (voltado para a esquerda), em baixo-relevo: cabeça, cabelo preso e tronco truncado
+    const bust = (x) => {
+      x.beginPath();
+      x.moveTo(575, 800);
+      x.bezierCurveTo(588, 740, 590, 660, 586, 600);          // nuca
+      x.bezierCurveTo(640, 560, 670, 480, 656, 400);          // parte de trás da cabeça
+      x.bezierCurveTo(646, 330, 610, 262, 548, 234);          // coroa
+      x.bezierCurveTo(500, 214, 446, 226, 418, 266);          // alto da testa
+      x.bezierCurveTo(400, 296, 392, 336, 392, 372);          // testa
+      x.bezierCurveTo(390, 392, 388, 402, 380, 412);          // sobrancelha
+      x.bezierCurveTo(366, 430, 348, 448, 344, 462);          // dorso do nariz
+      x.bezierCurveTo(350, 474, 364, 476, 370, 482);          // ponta e narina
+      x.bezierCurveTo(376, 494, 364, 502, 362, 510);          // filtro
+      x.bezierCurveTo(356, 518, 362, 528, 370, 532);          // lábios
+      x.bezierCurveTo(378, 540, 370, 552, 368, 560);          // sulco do queixo
+      x.bezierCurveTo(370, 574, 384, 586, 398, 592);          // queixo
+      x.bezierCurveTo(424, 606, 448, 626, 458, 656);          // garganta
+      x.bezierCurveTo(468, 692, 470, 730, 464, 766);          // pescoço
+      x.bezierCurveTo(460, 790, 474, 806, 500, 810);          // truncamento
+      x.bezierCurveTo(530, 814, 556, 810, 575, 800); x.closePath();
+    };
+    const hair = (x) => {
+      x.beginPath();
+      x.moveTo(418, 266);
+      x.bezierCurveTo(446, 226, 500, 214, 548, 234); x.bezierCurveTo(610, 262, 646, 330, 656, 400); x.bezierCurveTo(670, 480, 640, 560, 586, 600);
+      x.bezierCurveTo(560, 560, 530, 540, 512, 500); x.bezierCurveTo(488, 450, 466, 400, 446, 352); x.bezierCurveTo(434, 322, 424, 294, 418, 266); x.closePath();
+    };
+    const queue = (x) => { x.beginPath(); x.moveTo(566, 590); x.bezierCurveTo(620, 596, 658, 620, 654, 662); x.bezierCurveTo(650, 690, 626, 696, 610, 676); x.bezierCurveTo(596, 652, 580, 628, 560, 616); x.closePath(); };
+    both((x, col) => { x.fillStyle = col; bust(x); x.fill(); queue(x); x.fill(); });
+    hg.fillStyle = '#dcdcdc'; hair(hg); hg.fill(); queue(hg); hg.fill();
+    g.fillStyle = '#e4e6e2'; hair(g); g.fill(); queue(g); g.fill();
+    // sombra suave do busto no albedo (dá leitura de volume mesmo sem luz rasante)
+    g.save(); g.globalAlpha = 0.35; g.strokeStyle = '#8b8e8a'; g.lineWidth = 3; bust(g); g.stroke(); queue(g); g.stroke(); g.restore();
+    // legendas em arco e retas
+    const arcText = (x, txt, radius, centerA, size, bottom) => {
+      x.font = `700 ${size}px "Times New Roman", Georgia, "Noto Serif", serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
+      const widths = [...txt].map((ch) => x.measureText(ch).width + size * 0.12); const total = widths.reduce((p, q) => p + q, 0) / radius;
+      let a = bottom ? centerA + total / 2 : centerA - total / 2;
+      [...txt].forEach((ch, i) => { const w = widths[i] / radius; const am = bottom ? a - w / 2 : a + w / 2; x.save(); x.translate(c + Math.cos(am) * radius, c + Math.sin(am) * radius); x.rotate(am + (bottom ? -Math.PI / 2 : Math.PI / 2)); x.fillText(ch, 0, 0); x.restore(); a = bottom ? a - w : a + w; });
+    };
+    both((x, col) => {
+      x.fillStyle = col;
+      arcText(x, 'UNITED STATES OF AMERICA', R * 0.845, -Math.PI / 2, S * 0.066, false);
+      arcText(x, 'QUARTER DOLLAR', R * 0.845, Math.PI / 2, S * 0.066, true);
+      x.font = `700 ${S * 0.058}px "Times New Roman", Georgia, "Noto Serif", serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
+      // LIBERTY à esquerda (atrás da cabeça), IN GOD WE TRUST à direita, marca da casa P
+      x.font = `700 ${S * 0.052}px "Times New Roman", Georgia, "Noto Serif", serif`; x.fillText('LIBERTY', c - R * 0.635, c - R * 0.1);
+      x.font = `700 ${S * 0.046}px "Times New Roman", Georgia, "Noto Serif", serif`;
+      x.fillText('IN GOD', c + R * 0.6, c + R * 0.12); x.fillText('WE TRUST', c + R * 0.6, c + R * 0.24);
+      x.font = `700 ${S * 0.05}px "Times New Roman", Georgia, "Noto Serif", serif`; x.fillText('P', c + R * 0.6, c + R * 0.4);
+    });
+    // mapa de normais a partir da altura (Sobel) com leve desfoque
+    const normal = normalFromHeight(hm, 2.6, 1.6);
+    // borda: núcleo de cobre entre camadas de cuproníquel + 119 frisos
+    const ew = 1428, eh = 64; const ec = document.createElement('canvas'); ec.width = ew; ec.height = eh; const eg = ec.getContext('2d');
+    const eg1 = eg.createLinearGradient(0, 0, 0, eh); eg1.addColorStop(0, '#cfd1cd'); eg1.addColorStop(0.2, '#cfd1cd'); eg1.addColorStop(0.24, '#b87a45'); eg1.addColorStop(0.5, '#c98a52'); eg1.addColorStop(0.76, '#b87a45'); eg1.addColorStop(0.8, '#cfd1cd'); eg1.addColorStop(1, '#cfd1cd');
+    eg.fillStyle = eg1; eg.fillRect(0, 0, ew, eh);
+    const en = document.createElement('canvas'); en.width = ew; en.height = eh; const eng = en.getContext('2d'); const id = eng.createImageData(ew, eh);
+    for (let x = 0; x < ew; x++) { const ph = (x / ew) * 119 * Math.PI * 2; const nx = Math.sin(ph) * 0.75, nz = Math.sqrt(1 - nx * nx); const sh = 0.5 + 0.5 * Math.cos(ph); for (let y = 0; y < eh; y++) { const i = (y * ew + x) * 4; id.data[i] = (nx * 0.5 + 0.5) * 255; id.data[i + 1] = 128; id.data[i + 2] = (nz * 0.5 + 0.5) * 255; id.data[i + 3] = 255; } eg.fillStyle = `rgba(0,0,0,${(0.28 * (1 - sh)).toFixed(3)})`; eg.fillRect(x, 0, 1, eh); }
+    eng.putImageData(id, 0, 0);
+    const tex = (cv, srgb) => { const t = new THREE.CanvasTexture(cv); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
+    coinTex = { map: tex(al, true), normal: tex(normal, false), edge: tex(ec, true), edgeNormal: tex(en, false) };
+    coinTex.edge.wrapS = coinTex.edgeNormal.wrapS = THREE.RepeatWrapping;
+    // foto real do anverso, se publicada em coin/obverse.png
+    if (location.protocol !== 'file:') { const img = new Image(); img.onload = () => { const t = new THREE.Texture(img); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; t.needsUpdate = true; M.coinFace.map = t; M.coinFace.normalMap = null; M.coinFace.needsUpdate = true; }; img.src = 'coin/obverse.png'; }
+    return coinTex;
+  }
+  function normalFromHeight(src, strength, blur) {
+    const S = src.width; const tmp = document.createElement('canvas'); tmp.width = tmp.height = S; const tg = tmp.getContext('2d');
+    try { tg.filter = `blur(${blur}px)`; } catch (e) { /* sem filtro */ }
+    tg.drawImage(src, 0, 0);
+    const h = tg.getImageData(0, 0, S, S).data; const out = tg.createImageData(S, S); const o = out.data;
+    const H = (x, y) => h[((Math.min(S - 1, Math.max(0, y)) * S) + Math.min(S - 1, Math.max(0, x))) * 4] / 255;
+    for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+      const dx = (H(x + 1, y) - H(x - 1, y)) * strength, dy = (H(x, y + 1) - H(x, y - 1)) * strength;
+      let nx = -dx, ny = dy, nz = 1; const l = Math.hypot(nx, ny, nz); nx /= l; ny /= l; nz /= l;
+      const i = (y * S + x) * 4; o[i] = (nx * 0.5 + 0.5) * 255; o[i + 1] = (ny * 0.5 + 0.5) * 255; o[i + 2] = (nz * 0.5 + 0.5) * 255; o[i + 3] = 255;
+    }
+    tg.filter = 'none'; tg.putImageData(out, 0, 0); return tmp;
   }
 
   // Ambiente de estúdio: equiretangular pintado em canvas (256×128) → PMREM. Barato e suficiente
@@ -6229,20 +6871,20 @@ const Viewer = (function () {
     });
     // Moeda (de pé, virada para a câmera) e régua — modo escala real
     coin = new THREE.Group();
-    const ring = new THREE.Mesh(new THREE.CylinderGeometry(13.5, 13.5, 1.95, 64), M.coinRing);
-    const core2 = new THREE.Mesh(new THREE.CylinderGeometry(8.2, 8.2, 2.0, 48), M.coinCore);
-    coin.add(ring, core2); coin.rotation.x = Math.PI / 2; coin.visible = false; model.add(coin);
+    const edge = new THREE.Mesh(new THREE.CylinderGeometry(COIN_R, COIN_R, COIN_T, 180, 1, true), M.coinEdge);
+    const face = new THREE.Mesh(new THREE.CircleGeometry(COIN_R, 180), M.coinFace); face.rotation.x = -Math.PI / 2; face.position.y = COIN_T / 2;
+    const back = new THREE.Mesh(new THREE.CircleGeometry(COIN_R, 180), M.coinFace); back.rotation.x = Math.PI / 2; back.position.y = -COIN_T / 2;
+    coin.add(edge, face, back); coin.rotation.x = Math.PI / 2; coin.rotation.y = 0; coin.visible = false; model.add(coin);
     ruler = makeRuler(40); ruler.visible = false; model.add(ruler);
     scene.add(model);
     parts.dims = { Rr, hh, l, cx, rc, rb, rw, rl, lc, coilTop, coilBot, weldY, ll, domeT, domeB, tipY, top: hh + domeT, bottom: tipY - rl };
-    const span = parts.dims.top - parts.dims.bottom;
-    baseDist = span * 2.3 + 3;
-    camDistT = baseDist;
-    if (rimLight) { rimLight.position.set(-0.5, -0.36, -0.46).multiplyScalar(span); rimLight.intensity = 0.9 * rimLight.position.lengthSq(); }
+    frame(); camDistT = baseDist;
     applyTween(1);
     built = true;
   }
 
+  // distância-base da câmera: o elemento ocupa ~75% da altura útil (em retrato, a folha de controles cobre a base da tela)
+  function frame() { if (!parts) return; const span = parts.dims.top - parts.dims.bottom; baseDist = (span * 2.3 + 3) * (w < h ? 1.6 : 1); if (rimLight) { rimLight.position.set(-0.5, -0.36, -0.46).multiplyScalar(span); rimLight.intensity = 0.9 * rimLight.position.lengthSq(); } }
   function makeRuler(mm) {
     const c = document.createElement('canvas'); c.width = 1600; c.height = 160; const g = c.getContext('2d');
     g.fillStyle = 'rgba(239,236,230,.07)'; g.fillRect(0, 0, c.width, c.height);
@@ -6275,7 +6917,9 @@ const Viewer = (function () {
   }
   function resize() {
     w = window.innerWidth; h = window.innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
-    const narrow = w / h < 1.5; camera.setViewOffset(w, h, narrow ? -0.04 * w : -0.075 * w, 0, w, h);
+    const narrow = w / h < 1.5, portrait = w < h;
+    camera.setViewOffset(w, h, portrait ? 0 : narrow ? -0.04 * w : -0.075 * w, portrait ? 0.015 * h : 0, w, h);
+    if (built) { const f = camDistT / (baseDist || 1); frame(); camDistT = baseDist * f; }
   }
   function controls() {
     const ptrs = new Map();
@@ -6299,8 +6943,8 @@ const Viewer = (function () {
     else { yaw = 0.6; pitch = 0.15; }
     camDistT = baseDist * (mode === 'scale' ? scaleDistFactor() : mode === 'explode' ? 1.3 : 1);
   }
-  function scaleBounds() { const dm = parts.dims; return { top: Math.max(dm.top, 13.5), bottom: Math.min(dm.bottom, -13.5) - 2.5 - ruler.geometry.parameters.height }; }
-  function scaleDistFactor() { const b = scaleBounds(); const halfH = (b.top - b.bottom) / 2 * (w / h < 1.5 ? 1.38 : 1.27); return Math.max(1, (halfH / Math.tan(15 * Math.PI / 180)) / baseDist); }
+  function scaleBounds() { const dm = parts.dims; const cx = -(dm.Rr + COIN_R + 4); const wmm = ruler.geometry.parameters.width; return { top: Math.max(dm.top, COIN_R), bottom: Math.min(dm.bottom, -COIN_R) - 2.5 - ruler.geometry.parameters.height, left: cx - COIN_R - 1, right: Math.max(dm.Rr + 1, cx - COIN_R + wmm - 2 * ruler.userData.pad) }; }
+  function scaleDistFactor() { const b = scaleBounds(); const halfH = (b.top - b.bottom) / 2 * (w / h < 1.5 ? 1.5 : 1.4); const halfW = (b.right - b.left) / 2 * 1.15 / Math.max(0.3, w / h); const half = Math.max(halfH, halfW) * (w < h ? 1.5 : 1); return Math.max(1, (half / Math.tan(15 * Math.PI / 180)) / baseDist); }
 
   // Callendar–Van Dusen (IEC 60751)
   const CVD = { A: 3.9083e-3, B: -5.775e-7, C: -4.183e-12 };
@@ -6361,7 +7005,7 @@ const Viewer = (function () {
     updateScaleDims();
     if (built) { updateTemp(); buildLabels(); }
   }
-  function updateScaleDims() { $('#scale-dims').innerHTML = `Ø ${fmtDec(size.d, 1)} × ${fmtInt(size.l)}<small>mm</small>`; }
+  function updateScaleDims() { $('#scale-dims').innerHTML = `Ø ${fmtDec(size.d, 1)} × ${fmtInt(size.l)}<small>mm</small>`; $('#scale-coin').innerHTML = `Ø ${fmtDec(COIN_R * 2, 2)}<small>mm</small>`; }
 
   function setMode(m) {
     mode = m; lastInteract = performance.now();
@@ -6392,7 +7036,7 @@ const Viewer = (function () {
       add('partBody', () => new THREE.Vector3(-dm.Rr, dm.coilTop - dm.lc * 0.5, 0), 'l');
       add('partFill', () => new THREE.Vector3(dm.cx + dm.rb * 0.9, dm.coilBot + dm.lc * 0.22, 0), 'r');
     } else if (mode === 'scale') {
-      add('coinLabel', () => new THREE.Vector3(coin.position.x, coin.position.y - 13.5 - 1.2, 0), 'c', 'hero');
+      add('coinLabel', () => new THREE.Vector3(coin.position.x, coin.position.y - COIN_R - 1.2, 0), 'c', 'hero');
     }
   }
   function placeLabels() {
@@ -6421,13 +7065,13 @@ const Viewer = (function () {
     // escala real: moeda de pé à esquerda, régua embaixo
     const s = ease(tw.scaleT);
     coin.visible = tw.scaleT > 0.01; ruler.visible = tw.scaleT > 0.01;
-    M.coinRing.opacity = s; M.coinCore.opacity = s; ruler.material.opacity = s * 0.95;
-    coin.position.set(-(dm.Rr + 13.5 + 4), 0, 0);
-    const wmm = ruler.geometry.parameters.width, hmm = ruler.geometry.parameters.height, x0 = coin.position.x - 13.5;
-    ruler.position.set(x0 + wmm / 2 - ruler.userData.pad, Math.min(dm.bottom, -13.5) - 2.5 - hmm / 2, 0); // marca 0 sob a borda esquerda da moeda
+    M.coinFace.opacity = s; M.coinEdge.opacity = s; ruler.material.opacity = s * 0.95;
+    coin.position.set(-(dm.Rr + COIN_R + 4), 0, 0);
+    const wmm = ruler.geometry.parameters.width, hmm = ruler.geometry.parameters.height, x0 = coin.position.x - COIN_R;
+    ruler.position.set(x0 + wmm / 2 - ruler.userData.pad, Math.min(dm.bottom, -COIN_R) - 2.5 - hmm / 2, 0); // marca 0 sob a borda esquerda da moeda
     const sb = scaleBounds();
     const exTop = dm.top + e * dm.l * 0.3, exBot = dm.bottom - e * dm.l * 0.42;
-    lookXT = s * (x0 + 23); lookYT = s * ((sb.top + sb.bottom) / 2) + (1 - s) * ((exTop + exBot) / 2);
+    lookXT = s * ((sb.left + sb.right) / 2); lookYT = s * ((sb.top + sb.bottom) / 2 + (sb.top - sb.bottom) * (w < h ? -0.3 : 0.07)) + (1 - s) * ((exTop + exBot) / 2);
   }
 
   let visible = false;
@@ -6466,7 +7110,9 @@ function loop(now) {
 buildRail();
 kioskGuards();
 applyI18n();
-go('attract');
+if (IS_MOBILE) { setLang((navigator.language || 'pt').toLowerCase().startsWith('pt') ? 'pt' : 'en', true); }
+go(IS_MOBILE ? 'home' : 'attract');
+if (IS_MOBILE && new URLSearchParams(location.search).get('qr')) setTimeout(() => toast(T('qrHello')), 1200);
 requestAnimationFrame(loop);
 $('#video-layer').addEventListener('pointerup', () => { Videos.stop(false); go('home'); });
 $('#w-voice').addEventListener('click', () => Welcome.speak(false));
@@ -6474,7 +7120,8 @@ document.addEventListener('pointerdown', () => Welcome.unlock(), { passive: true
 try { if (window.fully && typeof fully.bind === 'function') fully.bind('onMotion', 'window.SensorApp && window.SensorApp.Welcome.onMotion();'); } catch (e) {}
 RemoteConfig.start();
 Updater.start();
-window.SensorApp = { go, setLang, Viewer, Globe, Welcome, Videos, RemoteConfig, data: D, build: BUILD, checkUpdate: () => Updater.check() };
+Energy.start();
+window.SensorApp = { go, setLang, Viewer, Globe, Welcome, Videos, RemoteConfig, Energy, data: D, build: BUILD, checkUpdate: () => Updater.check() };
 })();
 
 </script>

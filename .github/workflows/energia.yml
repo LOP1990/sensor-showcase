@@ -1,0 +1,41 @@
+# Atualiza energia.json (aba Ambiental do app) a partir da SolisCloud a cada 15 min durante o dia.
+# Só faz algo depois que os segredos SOLIS_KEY_ID e SOLIS_KEY_SECRET (e, opcionalmente,
+# SOLIS_STATION_ID e LOAD_URL) forem cadastrados em Settings → Secrets and variables → Actions.
+name: energia
+
+on:
+  schedule:
+    - cron: '*/15 8-22 * * *'   # 05:00–19:59 em Brasília (UTC−3)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: energia
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Gerar energia.json
+        env:
+          SOLIS_KEY_ID: ${{ secrets.SOLIS_KEY_ID }}
+          SOLIS_KEY_SECRET: ${{ secrets.SOLIS_KEY_SECRET }}
+          SOLIS_STATION_ID: ${{ secrets.SOLIS_STATION_ID }}
+          LOAD_URL: ${{ secrets.LOAD_URL }}
+          LOAD_KEYS: ${{ vars.LOAD_KEYS }}
+        run: python scripts/energia.py energia.json
+      - name: Publicar se mudou
+        run: |
+          if [ ! -f energia.json ] || git diff --quiet -- energia.json; then echo "sem mudanças"; exit 0; fi
+          git config user.name "energia-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add energia.json
+          git commit -m "energia.json: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push

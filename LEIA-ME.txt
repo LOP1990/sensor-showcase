@@ -16,3 +16,29 @@ Para atualizar
 Para editar o conteúdo
   Tudo fica no bloco SENSOR_DATA no começo do index.html (textos PT/EN, países, história, clientes, produtos).
   Depois de editar, mude também o valor de "version" no version.json (qualquer texto diferente) para o tablet recarregar.
+
+Celular e QR code
+  O mesmo endereço funciona no telefone (layout em coluna, sem a tela de atração nem o retorno
+  por inatividade). O QR code da tela inicial aponta para
+  https://lop1990.github.io/sensor-showcase/?qr=1
+
+Aba Ambiental (energia solar)
+  O app lê energia.json ao lado do index.html. Enquanto ele não trouxer dados ao vivo, a aba mostra
+  uma SIMULAÇÃO calculada a partir dos parâmetros da usina (114,8 kWp, perfil de carga da fábrica,
+  sol de Diadema por data/hora) — e diz "simulação" no canto do fluxo de energia.
+
+  Para ligar aos dados reais da SolisCloud:
+    1. No GitHub, em Settings → Secrets and variables → Actions, cadastre os segredos
+         SOLIS_KEY_ID        (KeyId da API SolisCloud — o mesmo usado nos agentes do EnergiaMonitor)
+         SOLIS_KEY_SECRET    (KeySecret)
+         SOLIS_STATION_ID    (opcional: id da usina; sem ele usa a 1ª usina da conta)
+         LOAD_URL            (opcional: URL JSON com a potência consumida agora — medidor ISSO)
+    2. Em Actions → "energia" → Run workflow para testar. Depois ele roda sozinho a cada 15 min
+       (05h–20h de Brasília) e grava energia.json; o app troca de "simulação" para "ao vivo".
+  O mesmo script roda em qualquer máquina:  python scripts/energia.py energia.json
+  (com as variáveis de ambiente acima) — dá para publicar o arquivo pelo painel ou por git.
+
+  Parâmetros ajustáveis no config.json (chave "energy"): plant.kwp, anchor.date/anchor.kwh
+  (geração acumulada conhecida numa data — usada pela simulação), co2FactorKgPerKwh (fator de
+  emissão; padrão 0,0385 = média do SIN 2023/MCTI), treeKgPerYear, claims.solarPct/gridPct
+  (os percentuais do selo "100% renovável"), loadPeakKw/loadBaseKw (carga simulada).
