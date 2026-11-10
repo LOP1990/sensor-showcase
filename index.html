@@ -952,7 +952,7 @@ body.mobile .brand-rep { margin-top: 12px; }
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-2238</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-2359</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -5542,7 +5542,7 @@ const I18N = {
   pt: {
     tap: 'Toque para explorar', prov: 'dados provisórios',
     heroCww: 'CWW · elemento Pt100 wire-wound', heroEw: 'EW · micro-aquecedor', heroTap: 'Toque no elemento para explorar em 3D',
-    qrTitle: 'Leve no celular', qrText: 'Aponte a câmera para abrir esta apresentação no seu telefone.', qrHello: 'Bem-vindo! Navegue pelas seções acima.',
+    qrTitle: 'Leve no celular', qrText: 'Aponte a câmera para abrir esta apresentação no seu telefone.', qrHello: 'Bem-vindo! Navegue pelas seções acima.', desktopHint: 'Dica: desative “Site para computador” no menu do navegador para ver a versão para celular.',
     navHome: 'Início', navHistory: 'História', navWorld: 'Presença global', navMarkets: 'Mercados e aplicações',
     navClients: 'Clientes', navCerts: 'Certificações', navProducts: 'Produtos', navTeam: 'Nosso time', navEnv: 'Ambiental',
     sinceAt: 'Na Sensor desde {y}',
@@ -5588,7 +5588,7 @@ const I18N = {
   en: {
     tap: 'Touch to explore', prov: 'provisional data',
     heroCww: 'CWW · Pt100 wire-wound element', heroEw: 'EW · micro-heater', heroTap: 'Tap the element to explore it in 3D',
-    qrTitle: 'Take it with you', qrText: 'Point your camera to open this presentation on your phone.', qrHello: 'Welcome! Browse the sections above.',
+    qrTitle: 'Take it with you', qrText: 'Point your camera to open this presentation on your phone.', qrHello: 'Welcome! Browse the sections above.', desktopHint: 'Tip: turn off “Desktop site” in the browser menu to get the phone version.',
     navHome: 'Home', navHistory: 'History', navWorld: 'Global presence', navMarkets: 'Markets and applications',
     navClients: 'Clients', navCerts: 'Certifications', navProducts: 'Products', navTeam: 'Our team', navEnv: 'Environment',
     sinceAt: 'At Sensor since {y}',
@@ -5696,6 +5696,7 @@ const RAIL = [
   ['clients', 'navClients'], ['certs', 'navCerts'], ['env', 'navEnv'], ['products', 'navProducts'],
 ];
 let current = 'attract';
+let viewerFrom = 'products'; // tela de onde o 3D foi aberto (Voltar retorna para ela)
 let lastTouch = performance.now();
 // Modo celular: layout em coluna com rolagem, sem atração/voz/vídeo/inatividade (o quiosque é 1920×1080 paisagem)
 // Decisão por tamanho físico de tela (não por media query aninhada, que navegadores antigos ignoram).
@@ -5708,6 +5709,9 @@ const IS_MOBILE = FORCE_M === '1' ? true : FORCE_M === '0' ? false : (() => {
   return minSide <= 600 || iw <= 760 || (ih > iw && iw <= 1100);
 })();
 if (IS_MOBILE) document.body.classList.add('mobile');
+// Celular com “Site para computador” ligado: tela em pé, toque, mas layout largo (≈ 980 px) e DPR rebaixado ≈ 1
+const DESKTOP_SITE_ON_PHONE = IS_MOBILE && !FORCE_M && window.innerHeight > window.innerWidth && window.innerWidth >= 900
+  && matchMedia('(pointer: coarse)').matches && (window.devicePixelRatio || 1) < 1.5;
 
 function go(name) {
   if (!SCREENS.includes(name)) return;
@@ -5723,7 +5727,7 @@ function go(name) {
   g.classList.toggle('dim', !['attract', 'home', 'world'].includes(name));
   Globe.setMode(name);
   if (prev === 'home' && name !== 'home') Viewer.hideHero();
-  if (name === 'viewer') Viewer.show(); else if (prev === 'viewer') Viewer.hide();
+  if (name === 'viewer') { if (prev !== 'viewer') viewerFrom = prev === 'attract' ? 'home' : prev; Viewer.show(); } else if (prev === 'viewer') Viewer.hide();
   if (name === 'home') Viewer.showHero();
   if (name === 'attract') Attract.enter(); else if (prev === 'attract') Attract.leave();
   if (name === 'home') Home.enter();
@@ -5805,7 +5809,7 @@ function kioskGuards() {
     if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(() => {});
   });
   $$('.lang button').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang, true)));
-  $('#viewer-back').addEventListener('click', () => go('products'));
+  $('#viewer-back').addEventListener('click', () => go(viewerFrom));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') Team.close(); });
   $('#prov').hidden = !D.provisional;
 }
@@ -5815,7 +5819,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.09-2238';
+const BUILD = '2026.11.09-2359';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -6089,9 +6093,9 @@ const Videos = {
   },
 };
 
-function toast(msg) {
+function toast(msg, ms = 2200) {
   const t = $('#toast'); t.textContent = msg; t.classList.add('on');
-  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('on'), 2200);
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('on'), ms);
 }
 
 /* ------------------------------------------------------------
@@ -7058,10 +7062,10 @@ const Viewer = (function () {
     });
     // Vidrados: domo azul-cobalto na ponta, glaze branco arredondado na saída dos terminais
     const capDisk = new THREE.CircleGeometry(Rr * 1.03, 28);
-    parts.capT = new THREE.Group(); parts.capT.renderOrder = 4; model.add(parts.capT);
+    parts.capT = new THREE.Group(); parts.capT.renderOrder = 4; parts.capT.position.y = hh - 0.02; model.add(parts.capT);
     const domeT_ = new THREE.Mesh(new THREE.SphereGeometry(Rr * 1.03, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2), mats.glazeBlue); domeT_.scale.y = 1.15; parts.capT.add(domeT_);
     const diskT = new THREE.Mesh(capDisk, mats.glazeBlue); diskT.rotation.x = Math.PI / 2; parts.capT.add(diskT);
-    parts.capB = new THREE.Group(); parts.capB.renderOrder = 4; model.add(parts.capB);
+    parts.capB = new THREE.Group(); parts.capB.renderOrder = 4; parts.capB.position.y = -hh + 0.02; model.add(parts.capB);
     const domeB_ = new THREE.Mesh(new THREE.SphereGeometry(Rr * 1.03, 28, 14, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), mats.glazeWhite); domeB_.scale.y = 0.75; parts.capB.add(domeB_);
     const diskB = new THREE.Mesh(capDisk, mats.glazeWhite); diskB.rotation.x = -Math.PI / 2; parts.capB.add(diskB);
     [domeT_, diskT, domeB_, diskB].forEach((o) => { o.renderOrder = 4; });
@@ -7106,52 +7110,68 @@ const Viewer = (function () {
     built = true;
   }
 
-  /* ---------- Hero do Início: CWW translúcido com espirais acesas + EW micro-aquecedor com partículas térmicas ---------- */
+  /* ---------- Hero do Início: CWW realista (corpo de alumina, domo de vidrado) + EW micro-aquecedor aquecendo no fluxo ---------- */
   let hero = null, heroOn = false, heroCam = null, heroLabelEls = [], heroTap = null;
   const cCold = new THREE.Color(0x3a6fd8), cHot = new THREE.Color(0xff7a1a), cTmp = new THREE.Color();
   function heroMaterials() {
     const c = (m, fn) => { const x = m.clone(); fn(x); return x; };
+    const solid = (x) => { x.opacity = 1; x.transparent = false; x.depthWrite = true; };
     return {
-      ceramic: c(M.ceramic, (x) => { x.opacity = 0.42; x.depthWrite = false; }),
-      glazeBlue: c(M.glazeBlue, (x) => { x.opacity = 0.94; }), glazeWhite: c(M.glazeWhite, (x) => { x.opacity = 0.92; }),
-      platinum: c(M.platinum, (x) => { x.emissive.setHex(0xf0a03c); x.emissiveIntensity = 0.15; }),
-      lead: M.lead, bore: c(M.bore, (x) => { x.opacity = 0.2; }), powder: c(M.powder, (x) => { x.opacity = 0.1; }),
+      ceramic: c(M.ceramic, solid), glazeBlue: c(M.glazeBlue, solid), glazeWhite: c(M.glazeWhite, solid),
+      platinum: M.platinum.clone(), lead: M.lead, bore: M.bore.clone(), powder: M.powder.clone(),
       ewCore: new THREE.MeshStandardMaterial({ color: 0xe9e4d8, roughness: 0.55, metalness: 0.05, envMapIntensity: 0.8 }),
       ewCoil: new THREE.MeshStandardMaterial({ color: 0xd8dce4, roughness: 0.3, metalness: 0.9, emissive: 0xff6a1a, emissiveIntensity: 0.3, envMapIntensity: 1.2 }),
-      glass: new THREE.MeshStandardMaterial({ color: 0x9fb6d8, transparent: true, opacity: 0.1, roughness: 0.05, metalness: 0, side: THREE.DoubleSide, depthWrite: false, envMapIntensity: 1.6 }),
+      glass: new THREE.MeshStandardMaterial({ color: 0xc9d8ee, transparent: true, opacity: 0.16, roughness: 0.04, metalness: 0, depthWrite: false, envMapIntensity: 1.8 }),
     };
   }
   function buildHero() {
     const HM = heroMaterials(); hero = new THREE.Group(); hero.visible = false; hero.HM = HM; scene.add(hero);
-    const el = buildElement({ d: 2.0, l: 10 }, HM); hero.cww = el; el.model.rotation.z = 0.5; hero.add(el.model);
+    // CWW: o modelo gira no próprio eixo dentro de um suporte inclinado (sem precessão)
+    const el = buildElement({ d: 2.0, l: 10 }, HM); hero.cww = el; const rig = new THREE.Group(); hero.cwwRig = rig; rig.add(el.model); hero.add(rig);
+    // EW: núcleo de alumina com a espiral de platina enrolada por fora e revestida de vidro; 2 terminais numa ponta
     const ew = new THREE.Group(); hero.ew = ew; hero.add(ew);
-    const core = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 9, 32), HM.ewCore); ew.add(core);
-    const capT = new THREE.Mesh(new THREE.SphereGeometry(0.7, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), HM.ewCore); capT.position.y = 4.5; ew.add(capT);
-    const capB = new THREE.Mesh(new THREE.SphereGeometry(0.7, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), HM.ewCore); capB.position.y = -4.5; ew.add(capB);
-    ew.add(new THREE.Mesh(tube(new Helix(0, 0.86, 7.2, 26, 0), 26 * 12, 0.07, 6), HM.ewCoil));
-    [-0.25, 0.25].forEach((x) => { const ld = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.6, 10), HM.lead); ld.position.set(x, 5.8, 0); ew.add(ld); });
-    const glass = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 9.8, 48, 1, true), HM.glass); glass.renderOrder = 5; ew.add(glass);
-    const N = 140, pos = new Float32Array(N * 3), col = new Float32Array(N * 3), spd = [];
-    for (let i = 0; i < N; i++) { const a = Math.random() * Math.PI * 2, r = 1.6 + Math.random() * 1.9; pos[i * 3] = Math.cos(a) * r; pos[i * 3 + 1] = -5 + Math.random() * 10; pos[i * 3 + 2] = Math.sin(a) * r; spd.push(0.15 + Math.random() * 0.35); }
-    const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); pg.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    const pts = new THREE.Points(pg, new THREE.PointsMaterial({ size: 0.18, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false })); pts.renderOrder = 6; ew.add(pts); ew.pts = pts; ew.spd = spd;
-    ew.position.set(11, -4.5, -8); ew.rotation.z = -0.4; ew.scale.setScalar(0.95);
+    const spin = new THREE.Group(); ew.add(spin); ew.spin = spin;
+    const CL = 9.6, CR = 0.7;
+    spin.add(new THREE.Mesh(new THREE.CapsuleGeometry(CR, CL, 6, 32), HM.ewCore));
+    spin.add(new THREE.Mesh(tube(new Helix(0, CR + 0.14, 7.8, 30, 0), 30 * 12, 0.07, 6), HM.ewCoil));
+    [-0.24, 0.24].forEach((x) => { const ld = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.8, 10), HM.lead); ld.position.set(x, CL / 2 + CR + 1.2, 0); spin.add(ld); });
+    const glass = new THREE.Mesh(new THREE.CapsuleGeometry(CR + 0.3, CL - 0.4, 6, 48), HM.glass); glass.renderOrder = 5; spin.add(glass);
+    // fluxo do fluido: filetes finos cruzando o elemento, azuis a montante e aquecidos a jusante
+    const N = 90, pos = new Float32Array(N * 6), col = new Float32Array(N * 6), fl = [];
+    for (let i = 0; i < N; i++) {
+      const y = -5.2 + Math.random() * 10.4, z = (Math.random() - 0.5) * 3.2, x = -3.6 + Math.random() * 8.2;
+      fl.push({ x, y, z, v: 1.6 + Math.random() * 1.6, len: 0.5 + Math.random() * 0.7 });
+    }
+    const fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); fg.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    const flow = new THREE.LineSegments(fg, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, depthWrite: false }));
+    flow.renderOrder = 6; ew.add(flow); ew.flow = flow; ew.fl = fl;
+    ew.scale.setScalar(0.95);
     heroCam = new THREE.PerspectiveCamera(30, 1, 0.1, 500);
     heroResize();
   }
   function heroResize() {
     if (!heroCam) return; heroCam.aspect = w / h; heroCam.updateProjectionMatrix();
     const portrait = w < h, narrow = w / h < 1.5;
-    heroCam.setViewOffset(w, h, portrait ? 0.03 * w : narrow ? -0.25 * w : -0.28 * w, portrait ? 0.19 * h : 0, w, h);
-    heroCam.position.set(0, 1.5, portrait ? 82 : narrow ? 64 : 54); heroCam.lookAt(3, -2.2, 0);
-    if (hero) { hero.ew.position.x = portrait ? 8 : 11; hero.ew.position.y = portrait ? -1 : -4.5; }
+    if (hero) {
+      const rig = hero.cwwRig, ew = hero.ew;
+      if (portrait) { rig.rotation.z = 0.95; rig.position.set(-1.5, 1.0, 0); ew.rotation.z = 0.8; ew.position.set(7.5, 3.5, -6); }
+      else { rig.rotation.z = 0.5; rig.position.set(0, 0, 0); ew.rotation.z = -0.4; ew.position.set(w / h >= 1.7 ? 11 : narrow ? 8.6 : 9.4, narrow ? -7 : -4.5, -8); }
+    }
+    if (portrait) {
+      // retrato: o par deitado em diagonal, na faixa entre o trilho de abas e o texto (centro ≈ 30 % da altura)
+      heroCam.setViewOffset(w, h, 0, 0.215 * h, w, h);
+      heroCam.position.set(3, 0.5, 93); heroCam.lookAt(3, 0.5, 0);
+    } else {
+      heroCam.setViewOffset(w, h, narrow ? -0.25 * w : -0.28 * w, 0, w, h);
+      heroCam.position.set(0, 1.5, narrow ? 64 : 54); heroCam.lookAt(3, -2.2, 0);
+    }
   }
   function buildHeroLabels() {
     heroLabelEls.forEach((l) => l.el.remove()); heroLabelEls = [];
     const add = (key, anchor, side) => { const el = document.createElement('div'); el.className = 'lbl3d ' + side; el.textContent = T(key); labels.appendChild(el); heroLabelEls.push({ el, anchor }); };
     const dm = hero.cww.dims;
     add('heroCww', () => hero.cww.model.localToWorld(new THREE.Vector3(dm.Rr, -dm.hh * 0.1, 0)), 'r');
-    add('heroEw', () => hero.ew.localToWorld(new THREE.Vector3(1.1, 1.6, 0)), 'r');
+    add('heroEw', () => hero.ew.localToWorld(new THREE.Vector3(-1.05, -1.6, 0)), 'l');
   }
   function placeHeroLabels() {
     const v = new THREE.Vector3();
@@ -7169,16 +7189,21 @@ const Viewer = (function () {
     if (!visible) canvas.hidden = true;
   }
   function renderHero(now) {
-    const t = now / 1000, dt = Math.min(0.05, (now - lastFrame) / 1000); lastFrame = now;
-    const cw = hero.cww; cw.model.rotation.y = t * 0.3;
-    const warm = 0.5 + 0.5 * Math.sin(t * 1.35); cw.parts.core.scale.y = 1 + 0.016 * Math.sin(t * 1.35);
-    hero.HM.platinum.emissiveIntensity = 0.12 + 0.3 * warm;
-    const ew = hero.ew; ew.rotation.y = t * 0.35; const heat = 0.5 + 0.5 * Math.sin(t * 0.35);
+    const t = now / 1000, dt = clamp((now - lastFrame) / 1000, 0, 0.05); lastFrame = now;
+    hero.cww.model.rotation.y = t * 0.3;
+    const ew = hero.ew; ew.spin.rotation.y = t * 0.5; const heat = 0.5 + 0.5 * Math.sin(t * 0.35);
     hero.HM.ewCoil.emissive.setRGB(1.0, 0.42 * (1 - heat * 0.5) + 0.1, 0.05); hero.HM.ewCoil.emissiveIntensity = 0.25 + Math.pow(heat, 1.15) * 0.9;
-    ew.pts.material.opacity = 0.4 + heat * 0.5;
-    const pa = ew.pts.geometry.attributes.position.array, ca = ew.pts.geometry.attributes.color.array, spdMul = 0.4 + heat * 2.2;
-    for (let i = 0; i < ew.spd.length; i++) { pa[i * 3 + 1] += ew.spd[i] * 1.3 * spdMul * dt; if (pa[i * 3 + 1] > 5.2) pa[i * 3 + 1] = -5.2; const f = clamp(((pa[i * 3 + 1] + 5.2) / 10.4) * 0.5 + heat * 0.6, 0, 1); cTmp.copy(cCold).lerp(cHot, f); ca[i * 3] = cTmp.r; ca[i * 3 + 1] = cTmp.g; ca[i * 3 + 2] = cTmp.b; }
-    ew.pts.geometry.attributes.position.needsUpdate = true; ew.pts.geometry.attributes.color.needsUpdate = true;
+    ew.flow.material.opacity = 0.35 + heat * 0.45;
+    const pa = ew.flow.geometry.attributes.position.array, ca = ew.flow.geometry.attributes.color.array, vMul = 0.5 + heat * 1.2;
+    for (let i = 0; i < ew.fl.length; i++) {
+      const f = ew.fl[i]; f.x += f.v * vMul * dt; if (f.x > 4.6 || f.x < -3.8) { f.x = -3.6; f.y = -5.2 + Math.random() * 10.4; f.z = (Math.random() - 0.5) * 3.2; }
+      const near = Math.max(0, 1 - Math.hypot(f.y * 0.18, f.z * 0.6)); // filetes que passam rente ao elemento aquecem mais
+      const warm = clamp((f.x + 0.6) / 3.2, 0, 1) * (0.25 + 0.75 * near) * (0.4 + heat * 0.6);
+      cTmp.copy(cCold).lerp(cHot, warm);
+      const o = i * 6; pa[o] = f.x - f.len; pa[o + 1] = f.y; pa[o + 2] = f.z; pa[o + 3] = f.x; pa[o + 4] = f.y; pa[o + 5] = f.z;
+      ca[o] = cTmp.r * 0.35; ca[o + 1] = cTmp.g * 0.35; ca[o + 2] = cTmp.b * 0.35; ca[o + 3] = cTmp.r; ca[o + 4] = cTmp.g; ca[o + 5] = cTmp.b;
+    }
+    ew.flow.geometry.attributes.position.needsUpdate = true; ew.flow.geometry.attributes.color.needsUpdate = true;
     hero.updateMatrixWorld(true); placeHeroLabels();
     renderer.render(scene, heroCam);
   }
@@ -7392,7 +7417,7 @@ const Viewer = (function () {
   function render(now) {
     if (heroOn && hero) { renderHero(now); return; }
     if (!visible || !built) return;
-    const dt = Math.min(0.05, (now - lastFrame) / 1000); lastFrame = now;
+    const dt = clamp((now - lastFrame) / 1000, 0, 0.05); lastFrame = now;
     applyTween(1 - Math.pow(0.004, dt));
     if (!dragging) { yaw += yawV; yawV *= Math.pow(0.01, dt); if (now - lastInteract > 5000 && mode !== 'scale') yaw += 0.15 * dt; }
     const kc = 1 - Math.pow(0.004, dt);
@@ -7420,6 +7445,7 @@ applyI18n();
 if (IS_MOBILE) { setLang((navigator.language || 'pt').toLowerCase().startsWith('pt') ? 'pt' : 'en', true); }
 go(IS_MOBILE ? 'home' : 'attract');
 if (IS_MOBILE && new URLSearchParams(location.search).get('qr')) setTimeout(() => toast(T('qrHello')), 1200);
+if (DESKTOP_SITE_ON_PHONE) setTimeout(() => toast(T('desktopHint'), 8000), 2600);
 requestAnimationFrame(loop);
 $('#video-layer').addEventListener('pointerup', () => { Videos.stop(false); go('home'); });
 $('#w-voice').addEventListener('click', () => Welcome.speak(false));
