@@ -22,6 +22,9 @@ Celular e QR code
   sem a tela de atração nem o retorno por inatividade). O app decide pelo tamanho da tela;
   para forçar, acrescente ?m=1 (celular) ou ?m=0 (quiosque) ao endereço.
   O QR code da tela inicial aponta para https://lop1990.github.io/sensor-showcase/?qr=1
+  Se no telefone tudo aparecer miúdo (letras pequenas, abas estreitas), o navegador está com
+  "Site para computador" ligado para este endereço: desligue no menu ⋮ do Chrome. O app avisa
+  com uma mensagem quando detecta essa situação.
 
 Aba Ambiental (energia solar)
   O app lê energia.json ao lado do index.html. Enquanto ele não trouxer dados ao vivo, a aba mostra
