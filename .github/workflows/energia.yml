@@ -19,11 +19,17 @@ jobs:
   atualizar:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Há chaves da SolisCloud?
+        id: chk
+        run: echo "ok=${{ secrets.SOLIS_KEY_ID != '' && secrets.SOLIS_KEY_SECRET != '' }}" >> "$GITHUB_OUTPUT"
+      - if: steps.chk.outputs.ok == 'true'
+        uses: actions/checkout@v4
+      - if: steps.chk.outputs.ok == 'true'
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Gerar energia.json
+        if: steps.chk.outputs.ok == 'true'
         env:
           SOLIS_KEY_ID: ${{ secrets.SOLIS_KEY_ID }}
           SOLIS_KEY_SECRET: ${{ secrets.SOLIS_KEY_SECRET }}
@@ -32,6 +38,7 @@ jobs:
           LOAD_KEYS: ${{ vars.LOAD_KEYS }}
         run: python scripts/energia.py energia.json
       - name: Publicar se mudou
+        if: steps.chk.outputs.ok == 'true'
         run: |
           if [ ! -f energia.json ] || git diff --quiet -- energia.json; then echo "sem mudanças"; exit 0; fi
           git config user.name "energia-bot"
