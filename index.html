@@ -198,10 +198,16 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .counter .num { font-size: clamp(34px, 3.6vw, 60px); font-weight: 600; font-stretch: 108%; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -.01em; }
 .counter .cap { color: var(--text-3); margin-top: 8px; font-size: clamp(13px, 1vw, 16px); }
 
-/* ---------- início ---------- */
-#s-home .content { justify-content: flex-end; }
-#s-home .intro { max-width: 40vw; }
-#s-home .intro h2 { font-size: clamp(28px, 3vw, 48px); }
+/* ---------- início (hero 3D: CWW + EW à direita, texto à esquerda) ---------- */
+#s-home .content { justify-content: center; }
+#s-home .intro { max-width: 37vw; }
+#s-home .intro h2 { font-size: clamp(34px, 3.8vw, 64px); font-stretch: 110%; line-height: 1.02; letter-spacing: -.015em; }
+#s-home .intro .lead { max-width: 48ch; }
+.hero-hint { display: inline-flex; align-items: center; gap: 12px; margin-top: clamp(20px, 3vh, 36px); font-size: clamp(13px, 1vw, 16px); color: var(--plat); }
+.hero-hint .ring { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--plat); position: relative; flex: none; }
+.hero-hint .ring::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; border: 1px solid var(--plat); opacity: .5; animation: ringOut 2.6s ease-out infinite; }
+body.hero-on .lbl3d { pointer-events: none; }
+body.mobile.hero-on #viewer-canvas { touch-action: pan-y; }
 #s-home .stats { display: flex; gap: clamp(28px, 4vw, 72px); margin-top: clamp(22px, 3vh, 40px); flex-wrap: wrap; }
 .stat .v { font-size: clamp(28px, 2.8vw, 46px); font-weight: 600; font-stretch: 108%; font-variant-numeric: tabular-nums; line-height: 1; }
 .stat .k { color: var(--text-3); margin-top: 8px; font-size: clamp(13px, 1vw, 16px); }
@@ -421,55 +427,78 @@ body.viewer-on .vpanel { background: rgba(11, 16, 23, .9); }
 body.viewer-on .modes { background: rgba(11, 16, 23, .88); }
 body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
 
-/* ---------- nosso time: direção + produção ---------- */
+/* ---------- nosso time: organograma (direção → áreas → base) ---------- */
 #s-team .content { justify-content: flex-start; }
-.team-head { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
-.team-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 999px; border: 1px solid var(--line); background: rgba(11, 16, 23, .7); }
-.team-tabs button { padding: 10px 20px; border-radius: 999px; font-weight: 500; color: var(--text-2); min-height: 44px; font-size: clamp(14px, 1.05vw, 17px); transition: background .25s, color .25s; }
-.team-tabs button.on { background: var(--plat); color: var(--bg); font-weight: 600; }
-#s-team[data-view="mgmt"] .team, #s-team[data-view="prod"] .leaders-wrap { display: none; }
-.leaders-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.leaders-wrap .lead { margin-top: 6px; }
-.leaders { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 1.6vw, 28px); margin-top: clamp(16px, 2.4vh, 28px); align-items: stretch; }
-.leader { display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(180deg, rgba(16, 22, 31, .92), rgba(16, 22, 31, .5)); overflow: hidden; animation: tileIn .6s var(--ease) both; }
-.leader:nth-child(2) { animation-delay: .08s; } .leader:nth-child(3) { animation-delay: .16s; }
-.lphoto { position: relative; flex: none; height: clamp(150px, 30vh, 320px); background: linear-gradient(160deg, #1a2330, #0d131c); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--line); }
-.lphoto .ini { font-size: clamp(44px, 4.6vw, 76px); font-weight: 650; font-stretch: 112%; letter-spacing: .02em; color: rgba(191, 211, 230, .35); }
-.lphoto .ph-hint { position: absolute; right: 12px; bottom: 10px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); border: 1px dashed var(--line-2); border-radius: 999px; padding: 3px 9px; }
-.lphoto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-.lphoto.has .ini, .lphoto.has .ph-hint { display: none; }
-.lbody { padding: clamp(14px, 1.5vw, 24px); display: flex; flex-direction: column; gap: 8px; min-height: 0; }
-.lbody h3 { font-size: clamp(20px, 1.8vw, 30px); line-height: 1.1; letter-spacing: -.01em; }
-.lrole { color: var(--plat); font-size: clamp(13px, 1vw, 16px); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
-.lbody blockquote { margin: 6px 0 0; padding: 0 0 0 14px; border-left: 2px solid var(--plat); color: var(--text); font-size: clamp(14px, 1.15vw, 19px); line-height: 1.4; font-style: italic; }
-.lbody blockquote .pflag { display: block; font-style: normal; color: var(--glow); font-size: 11px; margin-top: 4px; }
-.lbio { color: var(--text-2); font-size: clamp(13px, 1.02vw, 16px); line-height: 1.45; margin-top: 4px; }
-.lmeta { display: flex; flex-direction: column; gap: 2px; padding-top: 8px; margin-top: auto; border-top: 1px solid var(--line); font-size: clamp(13px, 1vw, 16px); color: var(--text); }
+.org { flex: 1; min-height: 0; display: flex; flex-direction: column; margin-top: clamp(10px, 1.6vh, 20px); }
+.org-tier { display: flex; flex-direction: column; align-items: center; }
+.tier-lbl { font-size: clamp(11px, .85vw, 13px); letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); font-weight: 600; margin-bottom: clamp(8px, 1.2vh, 14px); }
+.org .row { position: relative; display: flex; justify-content: center; gap: clamp(22px, 3.4vw, 64px); width: 100%; }
+.org .t1 .row::before, .org .t2 .row::before { content: ''; position: absolute; left: 18%; right: 18%; top: var(--cy, 50px); height: 1px; background: var(--line-2); z-index: 0; }
+.org .t1 .row { --cy: calc(clamp(96px, 14vh, 150px) / 2); }
+.org .t2 .row { --cy: calc(clamp(72px, 10vh, 104px) / 2); }
+.org-link { width: 1px; height: clamp(14px, 2.6vh, 28px); margin: clamp(6px, 1vh, 12px) auto; background: linear-gradient(180deg, var(--line-2), transparent); }
+.person { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; width: clamp(150px, 15vw, 240px); color: var(--text); }
+.person .avatar { position: relative; display: flex; align-items: center; justify-content: center; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 35% 30%, #27333f, #0d131c 70%); box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px rgba(191, 211, 230, .45), 0 18px 40px rgba(0, 0, 0, .5); transition: transform .3s var(--ease), box-shadow .3s; }
+.person.xl .avatar { width: clamp(96px, 14vh, 150px); height: clamp(96px, 14vh, 150px); }
+.person.md .avatar { width: clamp(72px, 10vh, 104px); height: clamp(72px, 10vh, 104px); }
+.person .avatar .ini { font-size: clamp(26px, 4.2vh, 44px); font-weight: 650; font-stretch: 112%; letter-spacing: .02em; color: rgba(191, 211, 230, .55); }
+.person.md .avatar .ini { font-size: clamp(20px, 3vh, 30px); }
+.person .avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.person .avatar.has .ini { display: none; }
+.person .avatar.icon { color: var(--plat); background: radial-gradient(circle at 35% 30%, #1d2733, #0b1017 70%); box-shadow: 0 0 0 3px var(--bg), 0 0 0 4px var(--line-2); }
+.person .avatar.icon svg { width: 44%; height: 44%; }
+.person.slot { opacity: .78; }
+.person.slot .avatar { border: 1px dashed var(--line-2); }
+button.person:active .avatar { transform: scale(.96); }
+button.person .avatar::after { content: ''; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 0 rgba(191, 211, 230, 0); transition: box-shadow .3s; }
+button.person:hover .avatar { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--plat), 0 18px 40px rgba(0, 0, 0, .5); }
+.person .nm { font-weight: 600; font-size: clamp(14px, 1.15vw, 19px); line-height: 1.15; margin-top: 4px; }
+.person.md .nm { font-size: clamp(13px, 1vw, 16px); }
+.person .rl { color: var(--text-3); font-size: clamp(11px, .85vw, 13px); line-height: 1.3; letter-spacing: .02em; }
+.org .base { flex: 1; min-height: 0; }
+.base-card { width: 100%; flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(260px, .9fr) 1.4fr; gap: clamp(18px, 2.4vw, 40px); align-items: center; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(180deg, rgba(16, 22, 31, .9), rgba(16, 22, 31, .45)); padding: clamp(12px, 1.4vw, 22px); max-height: clamp(170px, 27vh, 300px); }
+.base-card .team-photos { height: 100%; max-height: clamp(140px, 23vh, 256px); aspect-ratio: 16 / 10; width: auto; max-width: 100%; }
+.base-text h3 { font-size: clamp(20px, 1.9vw, 32px); line-height: 1.1; }
+.base-text p { color: var(--text-2); font-size: clamp(13px, 1.02vw, 16px); margin-top: 8px; max-width: 70ch; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.base-text .team-stats { display: flex; gap: clamp(18px, 2.6vw, 48px); margin-top: clamp(10px, 1.6vh, 18px); }
+.tstat .v { font-size: clamp(24px, 2.4vw, 40px); font-weight: 650; font-stretch: 110%; line-height: 1; letter-spacing: -.01em; color: var(--plat-2); font-variant-numeric: tabular-nums; }
+.tstat .k { color: var(--text-2); margin-top: 6px; font-size: clamp(12px, .95vw, 15px); line-height: 1.3; max-width: 20ch; }
+.tstat .pflag { display: block; font-style: normal; color: var(--glow); font-size: 11px; margin-top: 3px; }
+.team-photos { position: relative; border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: 0 18px 50px rgba(0, 0, 0, .45); isolation: isolate; }
+.team-photos .ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.08); transition: opacity 1.4s var(--ease); }
+.team-photos .ph.on { opacity: 1; animation: kenburns 7s linear forwards; }
+.team-photos::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 7, 11, 0) 60%, rgba(5, 7, 11, .5) 100%); pointer-events: none; }
+.team-photos .dots { position: absolute; right: 12px; bottom: 10px; display: flex; gap: 6px; z-index: 1; }
+.team-photos .dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, .35); transition: background .4s, transform .4s; }
+.team-photos .dots i.on { background: var(--plat-2); transform: scale(1.3); }
+/* perfil (sobreposição) */
+.profile { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(5, 7, 11, .62); backdrop-filter: blur(6px); opacity: 0; transition: opacity .3s var(--ease); pointer-events: auto; }
+.profile.on { opacity: 1; }
+.profile[hidden] { display: none; }
+.pcard { position: relative; width: min(960px, 92vw); max-height: 88vh; overflow: auto; border: 1px solid var(--line-2); border-radius: 20px; background: linear-gradient(180deg, #121a25, #0c1119); box-shadow: 0 40px 120px rgba(0, 0, 0, .6); transform: translateY(14px); transition: transform .35s var(--ease); }
+.profile.on .pcard { transform: none; }
+.pclose { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-2); display: flex; align-items: center; justify-content: center; color: var(--text); background: rgba(11, 16, 23, .8); z-index: 2; }
+.pbody { display: grid; grid-template-columns: minmax(220px, .8fr) 1.4fr; gap: clamp(18px, 2.6vw, 40px); padding: clamp(18px, 2.4vw, 36px); }
+.pphoto { position: relative; aspect-ratio: 4 / 5; border-radius: 16px; overflow: hidden; background: linear-gradient(160deg, #1a2330, #0d131c); display: flex; align-items: center; justify-content: center; }
+.pphoto .avatar { width: 100%; height: 100%; border-radius: 16px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.pphoto .avatar .ini { font-size: clamp(56px, 7vw, 110px); font-weight: 650; font-stretch: 112%; color: rgba(191, 211, 230, .3); }
+.pphoto .avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.pphoto .avatar.has .ini { display: none; }
+.pphoto .ph-hint { position: absolute; right: 12px; bottom: 10px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); border: 1px dashed var(--line-2); border-radius: 999px; padding: 3px 9px; }
+.pphoto:has(.avatar.has) .ph-hint { display: none; }
+.ptext { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding-right: 40px; }
+.ptext h3 { font-size: clamp(26px, 2.6vw, 42px); line-height: 1.05; letter-spacing: -.01em; }
+.lrole { color: var(--plat); font-size: clamp(13px, 1vw, 16px); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+.ptext blockquote { margin: 8px 0 0; padding: 0 0 0 16px; border-left: 2px solid var(--plat); color: var(--text); font-size: clamp(16px, 1.3vw, 22px); line-height: 1.4; font-style: italic; }
+.ptext blockquote .pflag { display: block; font-style: normal; color: var(--glow); font-size: 11px; margin-top: 4px; }
+.lbio { color: var(--text-2); font-size: clamp(14px, 1.1vw, 18px); line-height: 1.5; margin-top: 4px; }
+.lmeta { display: flex; flex-direction: column; gap: 2px; padding-top: 10px; margin-top: 6px; border-top: 1px solid var(--line); font-size: clamp(14px, 1.05vw, 17px); color: var(--text); }
 .lmeta .k { color: var(--text-3); font-size: clamp(11px, .85vw, 13px); letter-spacing: .08em; text-transform: uppercase; }
 .brand-rep { display: inline-flex; align-items: center; gap: 14px; margin-top: 16px; padding: 10px 16px 10px 10px; border-radius: 12px; background: #fff; color: #1d2430; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
 .brand-rep img { height: clamp(34px, 3.4vh, 46px); width: auto; display: block; }
 .brand-rep b { font-weight: 700; font-size: 18px; letter-spacing: .04em; }
 .brand-rep span { display: flex; flex-direction: column; font-size: clamp(13px, 1vw, 16px); font-weight: 600; line-height: 1.2; }
 .brand-rep span small { font-weight: 500; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #5b6573; }
-#s-team .team-head + .team { margin-top: clamp(16px, 2.6vh, 32px); }
-.team { flex: 1; min-height: 0; align-content: center; }
-.team { display: grid; grid-template-columns: minmax(320px, 1fr) minmax(0, 1.15fr); gap: clamp(28px, 3.6vw, 72px); align-items: center; }
-.eyebrow { font-size: clamp(12px, .95vw, 15px); letter-spacing: .14em; text-transform: uppercase; color: var(--plat); font-weight: 600; margin-bottom: 14px; }
-.team-text h2 { font-size: clamp(32px, 3.6vw, 58px); }
-.team-text .lead { max-width: 52ch; }
-.team-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 1.6vw, 28px); margin-top: clamp(22px, 3.2vh, 40px); }
-.tstat .v { font-size: clamp(32px, 3.2vw, 54px); font-weight: 650; font-stretch: 110%; line-height: 1; letter-spacing: -.01em; color: var(--plat-2); font-variant-numeric: tabular-nums; }
-.tstat .k { color: var(--text-2); margin-top: 8px; font-size: clamp(13px, 1vw, 16px); line-height: 1.35; }
-.tstat .pflag { display: block; font-style: normal; color: var(--glow); font-size: 12px; margin-top: 4px; }
-.team-pillars { display: flex; flex-wrap: wrap; gap: 8px; margin-top: clamp(18px, 2.6vh, 30px); }
-.team-pillars .pill { border: 1px solid var(--line-2); border-radius: 999px; padding: 8px 14px; font-size: clamp(13px, 1vw, 16px); color: var(--text-2); }
-.team-photos { position: relative; aspect-ratio: 16 / 10; width: 100%; max-height: 66vh; border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: 0 24px 70px rgba(0, 0, 0, .5); isolation: isolate; }
-.team-photos .ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.08); transition: opacity 1.4s var(--ease); }
-.team-photos .ph.on { opacity: 1; animation: kenburns 7s linear forwards; }
-.team-photos::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 7, 11, 0) 60%, rgba(5, 7, 11, .5) 100%); pointer-events: none; }
-.team-photos .dots { position: absolute; right: 16px; bottom: 16px; display: flex; gap: 6px; z-index: 1; }
-.team-photos .dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, .35); transition: background .4s, transform .4s; }
-.team-photos .dots i.on { background: var(--plat-2); transform: scale(1.3); }
 
 /* ---------- ambiental (BI de energia) ---------- */
 :root { --leaf: #7FD4A6; --leaf-2: #B9F0CF; --sun: #FFD27A; }
@@ -539,6 +568,7 @@ body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
 .qr-txt b { font-size: clamp(14px, 1.15vw, 19px); font-weight: 600; }
 .qr-txt span { color: var(--text-2); font-size: clamp(12px, .95vw, 15px); line-height: 1.35; }
 .qr.small { bottom: 3vh; padding: 10px 14px 10px 10px; max-width: 300px; }
+#s-home .qr.small { right: auto; left: calc(var(--pad) + var(--rail-w) + clamp(24px, 3vw, 56px)); }
 .qr.small .qr-img { width: clamp(64px, 7vh, 92px); height: clamp(64px, 7vh, 92px); padding: 6px; }
 body.welcome-on #s-attract .qr { bottom: clamp(22px, 4vh, 44px); } /* com as boas-vindas, o cartão desce para não disputar a base com o texto */
 
@@ -577,7 +607,8 @@ body.mobile .screen .lead { font-size: 16px; }
 /* início: globo no alto, texto embaixo */
 body.mobile #s-home .content { padding-top: 46vh; }
 body.mobile #s-home .intro { max-width: none; }
-body.mobile #s-home .intro h2 { font-size: 28px; }
+body.mobile #s-home .intro h2 { font-size: 30px; }
+body.mobile .hero-hint { margin-top: 14px; font-size: 13px; }
 body.mobile #s-home .stats { gap: 18px 28px; margin-top: 18px; }
 body.mobile .stat .v { font-size: 30px; }
 body.mobile .qr.small { position: static; margin-top: 22px; max-width: none; }
@@ -593,11 +624,6 @@ body.mobile .tl-card .y.txt { font-size: 32px; }
 body.mobile .tl-card h3 { font-size: 22px; }
 body.mobile .tl-card p { font-size: 16px; }
 /* nosso time */
-body.mobile .team { grid-template-columns: 1fr; gap: 18px; }
-body.mobile .team-text h2 { font-size: 30px; }
-body.mobile .team-stats { grid-template-columns: 1fr 1fr; gap: 14px; }
-body.mobile .tstat .v { font-size: 32px; }
-body.mobile .team-photos { max-height: none; aspect-ratio: 16 / 10; }
 /* presença global: globo no alto, lista por continente embaixo */
 body.mobile #s-world .content { padding-top: 40vh; }
 body.mobile #s-world .side { width: auto; flex: none; flex-direction: row; align-items: baseline; gap: 12px; flex-wrap: wrap; }
@@ -663,16 +689,23 @@ body.mobile .admin { position: fixed; right: 12px; left: 12px; width: auto; }
 body.mobile .toast { bottom: 18px; }
 
 /* celular: direção empilhada no estilo lista (foto à esquerda), anos da linha do tempo só no ativo */
-body.mobile .team-head { align-items: flex-start; flex-direction: column; gap: 12px; }
-body.mobile .leaders { grid-template-columns: 1fr; gap: 12px; }
-body.mobile .leader { flex-direction: row; align-items: stretch; }
-body.mobile .lphoto { width: 34%; min-width: 110px; height: auto; min-height: 170px; border-bottom: 0; border-right: 1px solid var(--line); }
-body.mobile .lphoto .ini { font-size: 34px; }
-body.mobile .lphoto .ph-hint { right: 8px; bottom: 8px; font-size: 10px; padding: 2px 7px; }
-body.mobile .lbody { padding: 12px 14px; }
-body.mobile .lbody h3 { font-size: 19px; }
-body.mobile .lbody blockquote { font-size: 14px; }
-body.mobile .lbio { font-size: 14px; }
+body.mobile .org { margin-top: 6px; }
+body.mobile .org .row { flex-wrap: wrap; gap: 14px 10px; }
+body.mobile .org .t1 .row::before, body.mobile .org .t2 .row::before { display: none; }
+body.mobile .person { width: calc(33.33% - 8px); }
+body.mobile .person.xl .avatar { width: 92px; height: 92px; }
+body.mobile .person.md .avatar { width: 72px; height: 72px; }
+body.mobile .person .nm { font-size: 14px; }
+body.mobile .person .rl { font-size: 11px; }
+body.mobile .base-card { grid-template-columns: 1fr; max-height: none; padding: 12px; gap: 12px; }
+body.mobile .base-card .team-photos { width: 100%; height: auto; max-height: none; aspect-ratio: 16 / 10; }
+body.mobile .base-text p { -webkit-line-clamp: 6; }
+body.mobile .base-text .team-stats { flex-wrap: wrap; gap: 12px 20px; }
+body.mobile .pbody { grid-template-columns: 1fr; padding: 16px; gap: 14px; }
+body.mobile .pphoto { aspect-ratio: 4 / 3; max-height: 40vh; }
+body.mobile .ptext { padding-right: 0; }
+body.mobile .ptext h3 { font-size: 24px; }
+body.mobile.hero-on .lbl3d { display: none; }
 body.mobile .tl .years span:not(.on) { visibility: hidden; }
 body.mobile .brand-rep { margin-top: 12px; }
 
@@ -731,6 +764,7 @@ body.mobile .brand-rep { margin-top: 12px; }
     <section id="s-home" class="screen" data-screen="home">
       <div class="content">
         <div class="intro reveal">
+          <div class="eyebrow" id="home-eyebrow"></div>
           <h2 id="home-title"></h2>
           <p class="lead" id="home-text"></p>
           <div class="stats">
@@ -738,6 +772,7 @@ body.mobile .brand-rep { margin-top: 12px; }
             <div class="stat"><div class="v" id="stat-year">0</div><div class="k" id="stat-year-k"></div></div>
             <div class="stat"><div class="v" id="stat-people">100</div><div class="k" data-i18n="statPeople"></div></div>
           </div>
+          <div class="hero-hint"><span class="ring"></span><span data-i18n="heroTap"></span></div>
         </div>
         <div class="qr small"><div class="qr-img"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 33" shape-rendering="crispEdges" role="img" aria-label="QR code"><path d="M0 0h7v1h-7zM8 0h2v1h-2zM11 0h1v1h-1zM13 0h1v1h-1zM15 0h2v1h-2zM18 0h1v1h-1zM22 0h3v1h-3zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM10 1h1v1h-1zM12 1h3v1h-3zM18 1h2v1h-2zM21 1h1v1h-1zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM9 2h2v1h-2zM14 2h1v1h-1zM17 2h2v1h-2zM20 2h4v1h-4zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h2v1h-2zM11 3h1v1h-1zM16 3h2v1h-2zM22 3h1v1h-1zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h1v1h-1zM13 4h1v1h-1zM16 4h1v1h-1zM19 4h1v1h-1zM21 4h3v1h-3zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h1v1h-1zM14 5h2v1h-2zM17 5h2v1h-2zM20 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h1v1h-1zM14 7h1v1h-1zM17 7h1v1h-1zM19 7h3v1h-3zM23 7h1v1h-1zM0 8h1v1h-1zM4 8h1v1h-1zM6 8h3v1h-3zM15 8h1v1h-1zM17 8h2v1h-2zM21 8h1v1h-1zM25 8h5v1h-5zM32 8h1v1h-1zM0 9h1v1h-1zM2 9h2v1h-2zM8 9h1v1h-1zM11 9h2v1h-2zM14 9h5v1h-5zM21 9h5v1h-5zM29 9h2v1h-2zM0 10h2v1h-2zM3 10h4v1h-4zM8 10h8v1h-8zM18 10h1v1h-1zM21 10h1v1h-1zM23 10h2v1h-2zM29 10h1v1h-1zM31 10h1v1h-1zM1 11h1v1h-1zM3 11h2v1h-2zM7 11h2v1h-2zM11 11h3v1h-3zM15 11h1v1h-1zM21 11h1v1h-1zM23 11h1v1h-1zM25 11h1v1h-1zM31 11h1v1h-1zM0 12h2v1h-2zM3 12h1v1h-1zM5 12h3v1h-3zM9 12h3v1h-3zM13 12h1v1h-1zM16 12h1v1h-1zM21 12h1v1h-1zM26 12h1v1h-1zM28 12h2v1h-2zM4 13h2v1h-2zM9 13h1v1h-1zM11 13h2v1h-2zM14 13h1v1h-1zM17 13h4v1h-4zM22 13h2v1h-2zM27 13h1v1h-1zM30 13h1v1h-1zM0 14h1v1h-1zM3 14h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM10 14h1v1h-1zM12 14h1v1h-1zM14 14h2v1h-2zM18 14h1v1h-1zM20 14h7v1h-7zM30 14h2v1h-2zM0 15h5v1h-5zM7 15h1v1h-1zM10 15h1v1h-1zM15 15h3v1h-3zM21 15h2v1h-2zM24 15h5v1h-5zM1 16h2v1h-2zM5 16h2v1h-2zM8 16h1v1h-1zM10 16h5v1h-5zM17 16h1v1h-1zM19 16h3v1h-3zM23 16h1v1h-1zM26 16h1v1h-1zM28 16h1v1h-1zM31 16h1v1h-1zM0 17h1v1h-1zM4 17h2v1h-2zM9 17h1v1h-1zM12 17h2v1h-2zM15 17h2v1h-2zM18 17h1v1h-1zM23 17h3v1h-3zM29 17h3v1h-3zM2 18h1v1h-1zM5 18h2v1h-2zM8 18h1v1h-1zM11 18h2v1h-2zM14 18h2v1h-2zM17 18h1v1h-1zM21 18h3v1h-3zM27 18h1v1h-1zM29 18h1v1h-1zM3 19h1v1h-1zM5 19h1v1h-1zM7 19h5v1h-5zM16 19h3v1h-3zM20 19h2v1h-2zM23 19h1v1h-1zM25 19h3v1h-3zM32 19h1v1h-1zM0 20h2v1h-2zM4 20h1v1h-1zM6 20h1v1h-1zM11 20h1v1h-1zM18 20h3v1h-3zM26 20h1v1h-1zM28 20h2v1h-2zM31 20h2v1h-2zM0 21h1v1h-1zM7 21h4v1h-4zM14 21h1v1h-1zM16 21h2v1h-2zM19 21h1v1h-1zM21 21h1v1h-1zM23 21h3v1h-3zM27 21h1v1h-1zM31 21h1v1h-1zM4 22h1v1h-1zM6 22h2v1h-2zM10 22h1v1h-1zM12 22h2v1h-2zM16 22h2v1h-2zM19 22h1v1h-1zM23 22h4v1h-4zM29 22h1v1h-1zM31 22h1v1h-1zM2 23h1v1h-1zM5 23h1v1h-1zM7 23h8v1h-8zM17 23h6v1h-6zM24 23h1v1h-1zM28 23h1v1h-1zM31 23h2v1h-2zM0 24h4v1h-4zM6 24h2v1h-2zM9 24h1v1h-1zM13 24h1v1h-1zM15 24h3v1h-3zM21 24h8v1h-8zM8 25h3v1h-3zM15 25h4v1h-4zM21 25h1v1h-1zM23 25h2v1h-2zM28 25h1v1h-1zM30 25h1v1h-1zM0 26h7v1h-7zM8 26h1v1h-1zM13 26h1v1h-1zM15 26h1v1h-1zM18 26h1v1h-1zM20 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h2v1h-2zM31 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM9 27h1v1h-1zM11 27h4v1h-4zM22 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM31 27h2v1h-2zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h2v1h-2zM13 28h4v1h-4zM22 28h1v1h-1zM24 28h6v1h-6zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM9 29h2v1h-2zM12 29h1v1h-1zM17 29h4v1h-4zM23 29h1v1h-1zM26 29h4v1h-4zM31 29h1v1h-1zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM11 30h2v1h-2zM15 30h1v1h-1zM18 30h1v1h-1zM20 30h1v1h-1zM24 30h1v1h-1zM26 30h3v1h-3zM30 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM9 31h2v1h-2zM13 31h1v1h-1zM15 31h4v1h-4zM21 31h1v1h-1zM23 31h3v1h-3zM0 32h7v1h-7zM8 32h3v1h-3zM12 32h2v1h-2zM17 32h6v1h-6zM24 32h1v1h-1zM26 32h1v1h-1zM29 32h1v1h-1zM32 32h1v1h-1z" fill="#0B1017"/></svg></div><div class="qr-txt"><b data-i18n="qrTitle"></b><span data-i18n="qrText"></span></div></div>
       </div>
@@ -768,25 +803,25 @@ body.mobile .brand-rep { margin-top: 12px; }
       </div>
     </section>
 
-    <section id="s-team" class="screen" data-screen="team" data-view="mgmt">
+    <section id="s-team" class="screen" data-screen="team">
       <div class="content">
-        <div class="team-head">
-          <h2 data-i18n="teamTitle"></h2>
-          <div class="team-tabs" id="team-tabs" role="tablist"><button type="button" data-view="mgmt"></button><button type="button" data-view="prod"></button></div>
-        </div>
-        <div class="leaders-wrap">
-          <p class="lead" id="leaders-lead"></p>
-          <div class="leaders" id="leaders"></div>
-        </div>
-        <div class="team reveal">
-          <div class="team-text">
-            <div class="eyebrow" data-i18n="teamTitle"></div>
-            <h2 id="team-title"></h2>
-            <p class="lead" id="team-lead"></p>
-            <div class="team-stats" id="team-stats"></div>
-            <div class="team-pillars" id="team-pillars"></div>
+        <h2 data-i18n="teamTitle"></h2>
+        <div class="org">
+          <div class="org-tier t1"><div class="tier-lbl" data-i18n="teamMgmt"></div><div class="row" id="org-board"></div></div>
+          <div class="org-link"></div>
+          <div class="org-tier t2"><div class="tier-lbl" data-i18n="teamAreas"></div><div class="row" id="org-areas"></div></div>
+          <div class="org-link"></div>
+          <div class="org-tier base">
+            <div class="tier-lbl" data-i18n="teamBase"></div>
+            <div class="base-card">
+              <div class="team-photos photo" id="team-photos"></div>
+              <div class="base-text">
+                <h3 id="base-title"></h3>
+                <p id="base-lead"></p>
+                <div class="team-stats" id="base-stats"></div>
+              </div>
+            </div>
           </div>
-          <div class="team-photos photo" id="team-photos"></div>
         </div>
       </div>
     </section>
@@ -917,9 +952,15 @@ body.mobile .brand-rep { margin-top: 12px; }
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-2203</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-2238</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
+  </div>
+  <div id="profile" class="profile" hidden>
+    <div class="pcard">
+      <button type="button" class="pclose" id="profile-close" aria-label="Fechar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <div class="pbody"></div>
+    </div>
   </div>
   <div id="rotate-hint" data-i18n="rotate"></div>
   <div id="toast" class="toast"></div>
@@ -5183,10 +5224,11 @@ const SENSOR_DATA = {
     },
   },
   home: {
-    title: { pt: 'Conheça a Sensor Technology', en: 'Meet Sensor Technology' },
+    eyebrow: { pt: 'Soluções em temperatura industrial · desde 1989', en: 'Industrial temperature solutions · since 1989' },
+    title: { pt: 'A precisão nasce no fio de platina.', en: 'Precision is born in the platinum wire.' },
     text: {
-      pt: 'Líder global em elementos de platina CWW (Ceramic Wire Wound): fio de platina enrolado em corpo cerâmico, selado em vidro, calibrado em laboratório acreditado.',
-      en: 'Global leader in CWW (Ceramic Wire Wound) platinum elements: platinum wire wound into a ceramic body, glass-sealed and calibrated in an accredited laboratory.',
+      pt: 'Elementos sensores cerâmicos wire-wound — Pt100, Pt200, Pt500 e Pt1000 — fabricados no Brasil e embarcados para {n} países. Espirais de platina protegidas em capilares de alumina, seladas com glaze cerâmico: estabilidade de −200 °C a +850 °C.',
+      en: 'Ceramic wire-wound sensing elements — Pt100, Pt200, Pt500 and Pt1000 — made in Brazil and shipped to {n} countries. Platinum coils protected in alumina capillaries, sealed with ceramic glaze: stability from −200 °C to +850 °C.',
     },
   },
 
@@ -5406,25 +5448,37 @@ const SENSOR_DATA = {
 
   // Direção — perfis no estilo "management team" (fotos: team/<arquivo>; sem o arquivo aparecem as iniciais)
   leaders: [
-    { name: 'Lucas Pereira', photo: 'team/lucas-pereira.jpg',
+    { id: 'lucas', name: 'Lucas Pereira', photo: 'team/lucas-pereira.jpg',
       role: { pt: 'Diretor de Operações', en: 'Chief Operating Officer' },
       quote: { pt: 'Precisão é hábito: medir, melhorar e repetir — todos os dias.', en: 'Precision is a habit: measure, improve and repeat — every day.' }, quoteConfirm: true,
       bio: { pt: 'Responsável pela operação da Sensor Technology — produção, sistemas, finanças e os projetos de digitalização da fábrica — e sucessor na condução da empresa, ao lado dos sócios fundadores.',
              en: 'Responsible for Sensor Technology\'s operations — production, systems, finance and the factory\'s digitalisation projects — and successor in leading the company alongside the founding partners.' },
       hobbies: { pt: 'Natação, kart e tempo com a família', en: 'Swimming, karting and family time' } },
-    { name: 'Rui Pereira', photo: 'team/rui-pereira.jpg',
+    { id: 'rui', name: 'Rui Pereira', photo: 'team/rui-pereira.jpg',
       role: { pt: 'Sócio · Conselheiro', en: 'Partner · Board Advisor' },
       quote: { pt: 'Uma empresa se constrói com números confiáveis e pessoas de confiança.', en: 'A company is built on reliable numbers and people you can rely on.' }, quoteConfirm: true,
       bio: { pt: 'Começou como controller na operação brasileira da Heraeus e, no MBO de 2011, tornou-se sócio da Sensor Technology em partes iguais com Luis Bombonatti. Hoje, fora do dia a dia da operação, atua como conselheiro da empresa.',
              en: 'Started as controller of the Heraeus operation in Brazil and, in the 2011 management buyout, became a partner of Sensor Technology in equal shares with Luis Bombonatti. Today, outside day-to-day operations, he serves as the company\'s board advisor.' },
       hobbies: { pt: 'Corrida e cinema', en: 'Running and movies' } },
-    { name: 'Luis Bombonatti', photo: 'team/luis-bombonatti.jpg',
+    { id: 'luis', name: 'Luis Bombonatti', photo: 'team/luis-bombonatti.jpg',
       role: { pt: 'Sócio · Diretor Comercial e Técnico', en: 'Partner · Sales & Technical Director' },
       quote: { pt: 'Cada sensor que sai daqui leva o nosso nome — e a nossa palavra.', en: 'Every sensor that leaves here carries our name — and our word.' }, quoteConfirm: true,
       bio: { pt: 'Sócio da Sensor Technology desde o MBO de 2011, em partes iguais com Rui Pereira. Dirige a área comercial e a área técnica: clientes, aplicações e o desenvolvimento dos produtos.',
              en: 'Partner of Sensor Technology since the 2011 management buyout, in equal shares with Rui Pereira. He leads the sales and the technical areas: customers, applications and product development.' },
       hobbies: { pt: 'Ciclismo e vela', en: 'Cycling and sailing' } },
   ],
+
+  // Organograma do Nosso time: direção (bolinhas grandes, na ordem abaixo), áreas (nomes/fotos a preencher) e a base (produção)
+  org: {
+    board: ['luis', 'rui', 'lucas'],
+    areas: [
+      { id: 'eng', icon: 'lab', area: { pt: 'Engenharia', en: 'Engineering' }, people: [] },
+      { id: 'sales', icon: 'clients', area: { pt: 'Comercial', en: 'Sales' }, people: [] },
+      { id: 'supply', icon: 'products', area: { pt: 'Supply', en: 'Supply' }, people: [] },
+      { id: 'pcp', icon: 'calib', area: { pt: 'PCP', en: 'Planning (PPC)' }, people: [] },
+      { id: 'log', icon: 'auto', area: { pt: 'Logística', en: 'Logistics' }, people: [] },
+    ],
+  },
 
   // Nosso time — números do site institucional (confirmar)
   team: {
@@ -5487,11 +5541,12 @@ const SENSOR_DATA = {
 const I18N = {
   pt: {
     tap: 'Toque para explorar', prov: 'dados provisórios',
+    heroCww: 'CWW · elemento Pt100 wire-wound', heroEw: 'EW · micro-aquecedor', heroTap: 'Toque no elemento para explorar em 3D',
     qrTitle: 'Leve no celular', qrText: 'Aponte a câmera para abrir esta apresentação no seu telefone.', qrHello: 'Bem-vindo! Navegue pelas seções acima.',
     navHome: 'Início', navHistory: 'História', navWorld: 'Presença global', navMarkets: 'Mercados e aplicações',
     navClients: 'Clientes', navCerts: 'Certificações', navProducts: 'Produtos', navTeam: 'Nosso time', navEnv: 'Ambiental',
     sinceAt: 'Na Sensor desde {y}',
-    teamTitle: 'Nosso time', teamMgmt: 'Direção', teamProd: 'Produção', teamMgmtLead: 'Quem conduz a Sensor Technology.', hobbies: 'Fora do trabalho', photoHint: 'foto', brandRep: 'Marca representada',
+    teamTitle: 'Nosso time', teamMgmt: 'Direção', teamProd: 'Produção', teamAreas: 'Áreas', teamBase: 'A nossa base', orgSoon: 'equipe · em breve', teamMgmtLead: 'Quem conduz a Sensor Technology.', hobbies: 'Fora do trabalho', photoHint: 'foto', brandRep: 'Marca representada',
     envTitle: 'Energia limpa, medida em tempo real', envLead: 'A fábrica de Diadema gera a própria energia com {kwp} kWp de painéis fotovoltaicos no telhado ({modules} módulos). O que não vem do sol vem da rede brasileira, de matriz predominantemente hídrica.',
     envFlow: 'Fluxo de energia agora', envPv: 'Fotovoltaica', envGrid: 'Rede', envLoad: 'Fábrica',
     envNowPv: 'Gerando agora', envTodayPv: 'Gerado hoje', envSelf: 'Autossuficiência no mês', envMonthPv: 'Gerado no mês', envLifetime: 'Gerado desde o início', envCo2: 'CO₂ evitado',
@@ -5532,11 +5587,12 @@ const I18N = {
   },
   en: {
     tap: 'Touch to explore', prov: 'provisional data',
+    heroCww: 'CWW · Pt100 wire-wound element', heroEw: 'EW · micro-heater', heroTap: 'Tap the element to explore it in 3D',
     qrTitle: 'Take it with you', qrText: 'Point your camera to open this presentation on your phone.', qrHello: 'Welcome! Browse the sections above.',
     navHome: 'Home', navHistory: 'History', navWorld: 'Global presence', navMarkets: 'Markets and applications',
     navClients: 'Clients', navCerts: 'Certifications', navProducts: 'Products', navTeam: 'Our team', navEnv: 'Environment',
     sinceAt: 'At Sensor since {y}',
-    teamTitle: 'Our team', teamMgmt: 'Management', teamProd: 'Production', teamMgmtLead: 'The people who lead Sensor Technology.', hobbies: 'Outside work', photoHint: 'photo', brandRep: 'Represented brand',
+    teamTitle: 'Our team', teamMgmt: 'Management', teamProd: 'Production', teamAreas: 'Areas', teamBase: 'Our base', orgSoon: 'team · coming soon', teamMgmtLead: 'The people who lead Sensor Technology.', hobbies: 'Outside work', photoHint: 'photo', brandRep: 'Represented brand',
     envTitle: 'Clean energy, measured in real time', envLead: 'The Diadema plant generates its own power with {kwp} kWp of rooftop photovoltaic panels ({modules} modules). What does not come from the sun comes from the Brazilian grid, which is predominantly hydroelectric.',
     envFlow: 'Energy flow right now', envPv: 'Photovoltaic', envGrid: 'Grid', envLoad: 'Factory',
     envNowPv: 'Generating now', envTodayPv: 'Generated today', envSelf: 'Self-sufficiency this month', envMonthPv: 'Generated this month', envLifetime: 'Generated since start', envCo2: 'CO₂ avoided',
@@ -5663,10 +5719,12 @@ function go(name) {
   $('#top').style.opacity = name === 'attract' ? '0.85' : '1';
   // globo
   const g = $('#globe-canvas');
-  g.classList.toggle('hidden', name === 'viewer');
+  g.classList.toggle('hidden', name === 'viewer' || name === 'home');
   g.classList.toggle('dim', !['attract', 'home', 'world'].includes(name));
   Globe.setMode(name);
+  if (prev === 'home' && name !== 'home') Viewer.hideHero();
   if (name === 'viewer') Viewer.show(); else if (prev === 'viewer') Viewer.hide();
+  if (name === 'home') Viewer.showHero();
   if (name === 'attract') Attract.enter(); else if (prev === 'attract') Attract.leave();
   if (name === 'home') Home.enter();
   if (name === 'history') History.enter(); else if (prev === 'history') History.leave();
@@ -5698,6 +5756,7 @@ function applyI18n() {
   $('#attract-title').textContent = L(D.attract.title);
   $('#attract-text').textContent = L(D.attract.text);
   $('#counter-cap').textContent = T('counterCap', { year: y });
+  $('#home-eyebrow').textContent = L(D.home.eyebrow || '');
   $('#home-title').textContent = L(D.home.title);
   $('#home-text').textContent = L(D.home.text);
   $('#stat-year-k').textContent = T('statYear', { year: y });
@@ -5747,6 +5806,7 @@ function kioskGuards() {
   });
   $$('.lang button').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang, true)));
   $('#viewer-back').addEventListener('click', () => go('products'));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') Team.close(); });
   $('#prov').hidden = !D.provisional;
 }
 
@@ -5755,7 +5815,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.09-2203';
+const BUILD = '2026.11.09-2238';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -6236,41 +6296,50 @@ const Certs = {
    Nosso time
    ------------------------------------------------------------ */
 const Team = {
-  timer: 0, i: 0, view: 'mgmt',
+  timer: 0, i: 0,
+  ini(n) { return n.split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase(); },
+  avatar(l, cls) {
+    return `<span class="avatar ${cls || ''}"><span class="ini">${l ? Team.ini(l.name) : ''}</span>${l && l.photo ? `<img src="${l.photo}" alt="${l.name}" draggable="false" decoding="async" onload="this.parentNode.classList.add('has')" onerror="this.remove()">` : ''}</span>`;
+  },
   render() {
-    const t = D.team; if (!t) return;
-    // Direção (estilo "management team")
-    const ini = (n) => n.split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
-    $('#leaders').innerHTML = (D.leaders || []).map((l) => `
-      <article class="leader">
-        <div class="lphoto"><span class="ini">${ini(l.name)}</span><span class="ph-hint">${T('photoHint')}</span>${l.photo ? `<img src="${l.photo}" alt="${l.name}" draggable="false" decoding="async" onload="this.parentNode.classList.add('has')" onerror="this.remove()">` : ''}</div>
-        <div class="lbody">
-          <h3>${l.name}</h3>
-          <div class="lrole">${L(l.role)}</div>
-          ${l.quote ? `<blockquote>“${L(l.quote)}”${l.quoteConfirm && D.provisional ? `<i class="pflag">${T('confirmFlag')}</i>` : ''}</blockquote>` : ''}
-          <p class="lbio">${L(l.bio)}</p>
-          ${l.since ? `<div class="lmeta"><span class="k">${T('sinceAt', { y: l.since })}</span></div>` : ''}
-          ${l.hobbies ? `<div class="lmeta"><span class="k">${T('hobbies')}</span><span>${L(l.hobbies)}</span></div>` : ''}
-        </div>
-      </article>`).join('');
-    $('#leaders-lead').textContent = T('teamMgmtLead');
-    // Produção (artesãs)
-    $('#team-title').textContent = L(t.title);
-    $('#team-lead').textContent = L(t.lead);
-    $('#team-stats').innerHTML = t.stats.map((x) => `<div class="tstat"><div class="v">${x.v}</div><div class="k">${L(x.k)}${x.confirm && D.provisional ? ` <i class="pflag">${T('confirmFlag')}</i>` : ''}</div></div>`).join('');
-    $('#team-pillars').innerHTML = ((t.pillars && (t.pillars[LANG] || t.pillars.pt)) || []).map((x) => `<span class="pill">${x}</span>`).join('');
+    const t = D.team, org = D.org || { board: [], areas: [] }; if (!t) return;
+    const byId = {}; (D.leaders || []).forEach((l) => { byId[l.id] = l; });
+    // 1) direção
+    $('#org-board').innerHTML = org.board.map((id) => byId[id]).filter(Boolean).map((l) => `
+      <button type="button" class="person xl" data-id="${l.id}">${Team.avatar(l)}<span class="nm">${l.name}</span><span class="rl">${L(l.role)}</span></button>`).join('');
+    $$('#org-board .person').forEach((b) => b.addEventListener('click', () => Team.open(b.dataset.id)));
+    // 2) áreas (com ou sem pessoas definidas)
+    $('#org-areas').innerHTML = org.areas.map((a) => {
+      const ppl = (a.people || []).map((id) => byId[id]).filter(Boolean);
+      if (!ppl.length) return `<div class="person md slot"><span class="avatar icon">${ICONS[a.icon] || ''}</span><span class="nm">${L(a.area)}</span><span class="rl">${T('orgSoon')}</span></div>`;
+      return ppl.map((l) => `<button type="button" class="person md" data-id="${l.id}">${Team.avatar(l)}<span class="nm">${l.name}</span><span class="rl">${L(a.area)}</span></button>`).join('');
+    }).join('');
+    $$('#org-areas .person[data-id]').forEach((b) => b.addEventListener('click', () => Team.open(b.dataset.id)));
+    // 3) base: produção
+    $('#base-title').textContent = L(t.title);
+    $('#base-lead').textContent = L(t.lead);
+    $('#base-stats').innerHTML = t.stats.map((x) => `<div class="tstat"><div class="v">${x.v}</div><div class="k">${L(x.k)}${x.confirm && D.provisional ? ` <i class="pflag">${T('confirmFlag')}</i>` : ''}</div></div>`).join('');
     const ph = $('#team-photos'); ph.innerHTML = (t.photos || []).map((src, i) => `<img class="ph${i === 0 ? ' on' : ''}" src="${src}" alt="" draggable="false" decoding="async">`).join('') + `<div class="dots">${(t.photos || []).map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>`;
     this.i = 0;
-    $$('#team-tabs button').forEach((b) => { b.textContent = T(b.dataset.view === 'mgmt' ? 'teamMgmt' : 'teamProd'); b.onclick = () => Team.show(b.dataset.view); });
-    this.show(this.view);
+    $('#profile-close').onclick = () => Team.close();
+    $('#profile').onclick = (e) => { if (e.target === $('#profile')) Team.close(); };
   },
-  show(v) {
-    this.view = v; const sec = $('#s-team'); sec.dataset.view = v;
-    $$('#team-tabs button').forEach((b) => b.classList.toggle('on', b.dataset.view === v));
-    if (IS_MOBILE) window.scrollTo(0, 0);
+  open(id) {
+    const l = (D.leaders || []).find((x) => x.id === id); if (!l) return;
+    $('#profile .pbody').innerHTML = `
+      <div class="pphoto">${Team.avatar(l)}<span class="ph-hint">${T('photoHint')}</span></div>
+      <div class="ptext">
+        <h3>${l.name}</h3><div class="lrole">${L(l.role)}</div>
+        ${l.quote ? `<blockquote>“${L(l.quote)}”${l.quoteConfirm && D.provisional ? `<i class="pflag">${T('confirmFlag')}</i>` : ''}</blockquote>` : ''}
+        <p class="lbio">${L(l.bio)}</p>
+        ${l.since ? `<div class="lmeta"><span class="k">${T('sinceAt', { y: l.since })}</span></div>` : ''}
+        ${l.hobbies ? `<div class="lmeta"><span class="k">${T('hobbies')}</span><span>${L(l.hobbies)}</span></div>` : ''}
+      </div>`;
+    $('#profile').hidden = false; requestAnimationFrame(() => $('#profile').classList.add('on'));
   },
+  close() { const pr = $('#profile'); pr.classList.remove('on'); setTimeout(() => { if (!pr.classList.contains('on')) pr.hidden = true; }, 300); },
   enter() { clearInterval(this.timer); const n = (D.team.photos || []).length; if (n < 2) return; this.timer = setInterval(() => { this.i = (this.i + 1) % n; $$('#team-photos .ph').forEach((im, k) => im.classList.toggle('on', k === this.i)); $$('#team-photos .dots i').forEach((d, k) => d.classList.toggle('on', k === this.i)); }, 6000); },
-  leave() { clearInterval(this.timer); },
+  leave() { clearInterval(this.timer); this.close(); },
 };
 
 /* ------------------------------------------------------------
@@ -6963,8 +7032,8 @@ const Viewer = (function () {
   }
   const tube = (curve, segs, r, radial) => new THREE.TubeGeometry(curve, segs, r, radial, false);
 
-  function build(sz) {
-    if (model) { scene.remove(model); model.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); }
+  // Geometria do elemento CWW (compartilhada pelo visualizador e pelo hero do Início); mats = conjunto de materiais
+  function buildElement(sz, mats) {
     const d = sz.d, l = sz.l, Rr = d / 2, hh = l / 2;
     const cx = Rr * 0.45, rb = Rr * 0.33, rc = rb * 0.58, rw = Math.max(0.03, rb * 0.14);
     const domeT = Rr * 1.03 * 1.15, domeB = Rr * 1.03 * 0.75;
@@ -6973,39 +7042,39 @@ const Viewer = (function () {
     const weldY = -hh + sealH * 0.45;
     const ll = Math.max(5, l * 0.75), rl = Math.max(0.08, Rr * 0.1);
     const exitY = -hh - domeB * 0.6, tipY = exitY - ll, kneeY = exitY - ll * 0.62;
-    parts = {}; model = new THREE.Group();
+    const parts = {}; const model = new THREE.Group();
 
     // Corpo de alumina: tubo + duas faces de topo com os furos, capilares escuros e pó cerâmico (movem juntos)
     const bodyG = new THREE.Group(); model.add(bodyG); parts.bodyG = bodyG;
-    const shell = new THREE.Mesh(new THREE.CylinderGeometry(Rr, Rr, l, 48, 1, true), M.ceramic); shell.renderOrder = 3; bodyG.add(shell);
+    const shell = new THREE.Mesh(new THREE.CylinderGeometry(Rr, Rr, l, 48, 1, true), mats.ceramic); shell.renderOrder = 3; bodyG.add(shell);
     const faceShape = new THREE.Shape(); faceShape.absarc(0, 0, Rr, 0, Math.PI * 2, false);
     [-cx, cx].forEach((x) => { const hole = new THREE.Path(); hole.absarc(x, 0, rb * 1.02, 0, Math.PI * 2, true); faceShape.holes.push(hole); });
     const faceGeo = new THREE.ShapeGeometry(faceShape, 20);
-    const faceT = new THREE.Mesh(faceGeo, M.ceramic); faceT.rotation.x = -Math.PI / 2; faceT.position.y = hh; faceT.renderOrder = 3; bodyG.add(faceT);
-    const faceB = new THREE.Mesh(faceGeo, M.ceramic); faceB.rotation.x = Math.PI / 2; faceB.position.y = -hh; faceB.renderOrder = 3; bodyG.add(faceB);
+    const faceT = new THREE.Mesh(faceGeo, mats.ceramic); faceT.rotation.x = -Math.PI / 2; faceT.position.y = hh; faceT.renderOrder = 3; bodyG.add(faceT);
+    const faceB = new THREE.Mesh(faceGeo, mats.ceramic); faceB.rotation.x = Math.PI / 2; faceB.position.y = -hh; faceB.renderOrder = 3; bodyG.add(faceB);
     [-cx, cx].forEach((x, i) => {
-      const bore = new THREE.Mesh(new THREE.CylinderGeometry(rb, rb, l - 0.02, 20, 1, true), M.bore); bore.position.x = x; bore.renderOrder = 1; bodyG.add(bore);
-      const powder = new THREE.Mesh(new THREE.CylinderGeometry(rb * 0.95, rb * 0.95, lc + rb * 1.6, 16, 1), M.powder); powder.position.set(x, (coilTop + coilBot) / 2, 0); powder.renderOrder = 2; bodyG.add(powder); parts['powder' + i] = powder;
+      const bore = new THREE.Mesh(new THREE.CylinderGeometry(rb, rb, l - 0.02, 20, 1, true), mats.bore); bore.position.x = x; bore.renderOrder = 1; bodyG.add(bore);
+      const powder = new THREE.Mesh(new THREE.CylinderGeometry(rb * 0.95, rb * 0.95, lc + rb * 1.6, 16, 1), mats.powder); powder.position.set(x, (coilTop + coilBot) / 2, 0); powder.renderOrder = 2; bodyG.add(powder); parts['powder' + i] = powder;
     });
     // Vidrados: domo azul-cobalto na ponta, glaze branco arredondado na saída dos terminais
     const capDisk = new THREE.CircleGeometry(Rr * 1.03, 28);
     parts.capT = new THREE.Group(); parts.capT.renderOrder = 4; model.add(parts.capT);
-    const domeT_ = new THREE.Mesh(new THREE.SphereGeometry(Rr * 1.03, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2), M.glazeBlue); domeT_.scale.y = 1.15; parts.capT.add(domeT_);
-    const diskT = new THREE.Mesh(capDisk, M.glazeBlue); diskT.rotation.x = Math.PI / 2; parts.capT.add(diskT);
+    const domeT_ = new THREE.Mesh(new THREE.SphereGeometry(Rr * 1.03, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2), mats.glazeBlue); domeT_.scale.y = 1.15; parts.capT.add(domeT_);
+    const diskT = new THREE.Mesh(capDisk, mats.glazeBlue); diskT.rotation.x = Math.PI / 2; parts.capT.add(diskT);
     parts.capB = new THREE.Group(); parts.capB.renderOrder = 4; model.add(parts.capB);
-    const domeB_ = new THREE.Mesh(new THREE.SphereGeometry(Rr * 1.03, 28, 14, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), M.glazeWhite); domeB_.scale.y = 0.75; parts.capB.add(domeB_);
-    const diskB = new THREE.Mesh(capDisk, M.glazeWhite); diskB.rotation.x = -Math.PI / 2; parts.capB.add(diskB);
+    const domeB_ = new THREE.Mesh(new THREE.SphereGeometry(Rr * 1.03, 28, 14, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), mats.glazeWhite); domeB_.scale.y = 0.75; parts.capB.add(domeB_);
+    const diskB = new THREE.Mesh(capDisk, mats.glazeWhite); diskB.rotation.x = -Math.PI / 2; parts.capB.add(diskB);
     [domeT_, diskT, domeB_, diskB].forEach((o) => { o.renderOrder = 4; });
     // Núcleo: duas hélices de platina (espira não toca espira), rabichos até a solda e ponte no topo
     const core = new THREE.Group(); model.add(core); parts.core = core;
     const turns = Math.max(10, Math.round(lc / (rw * 6.5)));
     [-1, 1].forEach((si, i) => {
       const x = si * cx, phase = si < 0 ? Math.PI : 0, ex = si * (cx + rc);
-      const coil = new THREE.Mesh(tube(new Helix(x, rc, lc, turns, phase), turns * 12, rw, 6), M.platinum); coil.position.y = (coilTop + coilBot) / 2; core.add(coil); parts['coil' + i] = coil;
-      const tail = new THREE.Mesh(new THREE.CylinderGeometry(rw * 0.9, rw * 0.9, coilBot - weldY, 8), M.platinum); tail.position.set(ex, (coilBot + weldY) / 2, 0); core.add(tail);
+      const coil = new THREE.Mesh(tube(new Helix(x, rc, lc, turns, phase), turns * 12, rw, 6), mats.platinum); coil.position.y = (coilTop + coilBot) / 2; core.add(coil); parts['coil' + i] = coil;
+      const tail = new THREE.Mesh(new THREE.CylinderGeometry(rw * 0.9, rw * 0.9, coilBot - weldY, 8), mats.platinum); tail.position.set(ex, (coilBot + weldY) / 2, 0); core.add(tail);
     });
     const bp = [new THREE.Vector3(-cx - rc, coilTop, 0), new THREE.Vector3(-cx - rc, coilTop + rb * 0.45, 0), new THREE.Vector3(0, coilTop + rb * 0.85, 0), new THREE.Vector3(cx + rc, coilTop + rb * 0.45, 0), new THREE.Vector3(cx + rc, coilTop, 0)];
-    parts.bridge = new THREE.Mesh(tube(new THREE.CatmullRomCurve3(bp), 32, rw, 6), M.platinum); core.add(parts.bridge);
+    parts.bridge = new THREE.Mesh(tube(new THREE.CatmullRomCurve3(bp), 32, rw, 6), mats.platinum); core.add(parts.bridge);
     // Terminais: colineares com os rabichos, retos até o joelho e abrindo levemente na ponta
     const leads = new THREE.Group(); model.add(leads); parts.leads = leads;
     [-1, 1].forEach((si) => {
@@ -7013,10 +7082,17 @@ const Viewer = (function () {
       const path = new THREE.CurvePath();
       path.add(new THREE.LineCurve3(new THREE.Vector3(x, weldY, 0), new THREE.Vector3(x, kneeY, 0)));
       path.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(x, kneeY, 0), new THREE.Vector3(x, tipY + (kneeY - tipY) * 0.3, 0), new THREE.Vector3(xt, tipY, 0)));
-      leads.add(new THREE.Mesh(tube(path, 40, rl, 8), M.lead));
-      const weld = new THREE.Mesh(new THREE.SphereGeometry(rl * 1.35, 12, 8), M.lead); weld.position.set(x, weldY, 0); leads.add(weld);
-      const tip = new THREE.Mesh(new THREE.SphereGeometry(rl, 10, 8), M.lead); tip.position.set(xt, tipY, 0); leads.add(tip);
+      leads.add(new THREE.Mesh(tube(path, 40, rl, 8), mats.lead));
+      const weld = new THREE.Mesh(new THREE.SphereGeometry(rl * 1.35, 12, 8), mats.lead); weld.position.set(x, weldY, 0); leads.add(weld);
+      const tip = new THREE.Mesh(new THREE.SphereGeometry(rl, 10, 8), mats.lead); tip.position.set(xt, tipY, 0); leads.add(tip);
     });
+    const dims = { Rr, hh, l, cx, rc, rb, rw, rl, lc, coilTop, coilBot, weldY, ll, domeT, domeB, tipY, top: hh + domeT, bottom: tipY - rl };
+    return { model, parts, dims };
+  }
+
+  function build(sz) {
+    if (model) { scene.remove(model); model.traverse((o) => { if (o.geometry && o !== coin) o.geometry.dispose(); }); }
+    const el = buildElement(sz, M); model = el.model; parts = el.parts; parts.dims = el.dims;
     // Moeda (de pé, virada para a câmera) e régua — modo escala real
     coin = new THREE.Group();
     const edge = new THREE.Mesh(new THREE.CylinderGeometry(COIN_R, COIN_R, COIN_T, 180, 1, true), M.coinEdge);
@@ -7024,11 +7100,87 @@ const Viewer = (function () {
     const back = new THREE.Mesh(new THREE.CircleGeometry(COIN_R, 180), M.coinFace); back.rotation.x = Math.PI / 2; back.position.y = -COIN_T / 2;
     coin.add(edge, face, back); coin.rotation.x = Math.PI / 2; coin.rotation.y = 0; coin.visible = false; model.add(coin);
     ruler = makeRuler(40); ruler.visible = false; model.add(ruler);
-    scene.add(model);
-    parts.dims = { Rr, hh, l, cx, rc, rb, rw, rl, lc, coilTop, coilBot, weldY, ll, domeT, domeB, tipY, top: hh + domeT, bottom: tipY - rl };
+    model.visible = visible; scene.add(model);
     frame(); camDistT = baseDist;
     applyTween(1);
     built = true;
+  }
+
+  /* ---------- Hero do Início: CWW translúcido com espirais acesas + EW micro-aquecedor com partículas térmicas ---------- */
+  let hero = null, heroOn = false, heroCam = null, heroLabelEls = [], heroTap = null;
+  const cCold = new THREE.Color(0x3a6fd8), cHot = new THREE.Color(0xff7a1a), cTmp = new THREE.Color();
+  function heroMaterials() {
+    const c = (m, fn) => { const x = m.clone(); fn(x); return x; };
+    return {
+      ceramic: c(M.ceramic, (x) => { x.opacity = 0.42; x.depthWrite = false; }),
+      glazeBlue: c(M.glazeBlue, (x) => { x.opacity = 0.94; }), glazeWhite: c(M.glazeWhite, (x) => { x.opacity = 0.92; }),
+      platinum: c(M.platinum, (x) => { x.emissive.setHex(0xf0a03c); x.emissiveIntensity = 0.15; }),
+      lead: M.lead, bore: c(M.bore, (x) => { x.opacity = 0.2; }), powder: c(M.powder, (x) => { x.opacity = 0.1; }),
+      ewCore: new THREE.MeshStandardMaterial({ color: 0xe9e4d8, roughness: 0.55, metalness: 0.05, envMapIntensity: 0.8 }),
+      ewCoil: new THREE.MeshStandardMaterial({ color: 0xd8dce4, roughness: 0.3, metalness: 0.9, emissive: 0xff6a1a, emissiveIntensity: 0.3, envMapIntensity: 1.2 }),
+      glass: new THREE.MeshStandardMaterial({ color: 0x9fb6d8, transparent: true, opacity: 0.1, roughness: 0.05, metalness: 0, side: THREE.DoubleSide, depthWrite: false, envMapIntensity: 1.6 }),
+    };
+  }
+  function buildHero() {
+    const HM = heroMaterials(); hero = new THREE.Group(); hero.visible = false; hero.HM = HM; scene.add(hero);
+    const el = buildElement({ d: 2.0, l: 10 }, HM); hero.cww = el; el.model.rotation.z = 0.5; hero.add(el.model);
+    const ew = new THREE.Group(); hero.ew = ew; hero.add(ew);
+    const core = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 9, 32), HM.ewCore); ew.add(core);
+    const capT = new THREE.Mesh(new THREE.SphereGeometry(0.7, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), HM.ewCore); capT.position.y = 4.5; ew.add(capT);
+    const capB = new THREE.Mesh(new THREE.SphereGeometry(0.7, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), HM.ewCore); capB.position.y = -4.5; ew.add(capB);
+    ew.add(new THREE.Mesh(tube(new Helix(0, 0.86, 7.2, 26, 0), 26 * 12, 0.07, 6), HM.ewCoil));
+    [-0.25, 0.25].forEach((x) => { const ld = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.6, 10), HM.lead); ld.position.set(x, 5.8, 0); ew.add(ld); });
+    const glass = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 9.8, 48, 1, true), HM.glass); glass.renderOrder = 5; ew.add(glass);
+    const N = 140, pos = new Float32Array(N * 3), col = new Float32Array(N * 3), spd = [];
+    for (let i = 0; i < N; i++) { const a = Math.random() * Math.PI * 2, r = 1.6 + Math.random() * 1.9; pos[i * 3] = Math.cos(a) * r; pos[i * 3 + 1] = -5 + Math.random() * 10; pos[i * 3 + 2] = Math.sin(a) * r; spd.push(0.15 + Math.random() * 0.35); }
+    const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); pg.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    const pts = new THREE.Points(pg, new THREE.PointsMaterial({ size: 0.18, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false })); pts.renderOrder = 6; ew.add(pts); ew.pts = pts; ew.spd = spd;
+    ew.position.set(11, -4.5, -8); ew.rotation.z = -0.4; ew.scale.setScalar(0.95);
+    heroCam = new THREE.PerspectiveCamera(30, 1, 0.1, 500);
+    heroResize();
+  }
+  function heroResize() {
+    if (!heroCam) return; heroCam.aspect = w / h; heroCam.updateProjectionMatrix();
+    const portrait = w < h, narrow = w / h < 1.5;
+    heroCam.setViewOffset(w, h, portrait ? 0.03 * w : narrow ? -0.25 * w : -0.28 * w, portrait ? 0.19 * h : 0, w, h);
+    heroCam.position.set(0, 1.5, portrait ? 82 : narrow ? 64 : 54); heroCam.lookAt(3, -2.2, 0);
+    if (hero) { hero.ew.position.x = portrait ? 8 : 11; hero.ew.position.y = portrait ? -1 : -4.5; }
+  }
+  function buildHeroLabels() {
+    heroLabelEls.forEach((l) => l.el.remove()); heroLabelEls = [];
+    const add = (key, anchor, side) => { const el = document.createElement('div'); el.className = 'lbl3d ' + side; el.textContent = T(key); labels.appendChild(el); heroLabelEls.push({ el, anchor }); };
+    const dm = hero.cww.dims;
+    add('heroCww', () => hero.cww.model.localToWorld(new THREE.Vector3(dm.Rr, -dm.hh * 0.1, 0)), 'r');
+    add('heroEw', () => hero.ew.localToWorld(new THREE.Vector3(1.1, 1.6, 0)), 'r');
+  }
+  function placeHeroLabels() {
+    const v = new THREE.Vector3();
+    heroLabelEls.forEach(({ el, anchor }) => { v.copy(anchor()).project(heroCam); el.classList.toggle('on', v.z < 1); el.style.left = ((v.x * 0.5 + 0.5) * w) + 'px'; el.style.top = ((-v.y * 0.5 + 0.5) * h) + 'px'; });
+  }
+  function showHero() {
+    if (!renderer) init(); else resize();
+    if (!hero) buildHero();
+    canvas.hidden = false; heroOn = true; hero.visible = true; if (model) model.visible = false;
+    document.body.classList.add('hero-on'); lastFrame = performance.now(); buildHeroLabels();
+  }
+  function hideHero() {
+    heroOn = false; if (hero) hero.visible = false; document.body.classList.remove('hero-on');
+    heroLabelEls.forEach((l) => l.el.remove()); heroLabelEls = [];
+    if (!visible) canvas.hidden = true;
+  }
+  function renderHero(now) {
+    const t = now / 1000, dt = Math.min(0.05, (now - lastFrame) / 1000); lastFrame = now;
+    const cw = hero.cww; cw.model.rotation.y = t * 0.3;
+    const warm = 0.5 + 0.5 * Math.sin(t * 1.35); cw.parts.core.scale.y = 1 + 0.016 * Math.sin(t * 1.35);
+    hero.HM.platinum.emissiveIntensity = 0.12 + 0.3 * warm;
+    const ew = hero.ew; ew.rotation.y = t * 0.35; const heat = 0.5 + 0.5 * Math.sin(t * 0.35);
+    hero.HM.ewCoil.emissive.setRGB(1.0, 0.42 * (1 - heat * 0.5) + 0.1, 0.05); hero.HM.ewCoil.emissiveIntensity = 0.25 + Math.pow(heat, 1.15) * 0.9;
+    ew.pts.material.opacity = 0.4 + heat * 0.5;
+    const pa = ew.pts.geometry.attributes.position.array, ca = ew.pts.geometry.attributes.color.array, spdMul = 0.4 + heat * 2.2;
+    for (let i = 0; i < ew.spd.length; i++) { pa[i * 3 + 1] += ew.spd[i] * 1.3 * spdMul * dt; if (pa[i * 3 + 1] > 5.2) pa[i * 3 + 1] = -5.2; const f = clamp(((pa[i * 3 + 1] + 5.2) / 10.4) * 0.5 + heat * 0.6, 0, 1); cTmp.copy(cCold).lerp(cHot, f); ca[i * 3] = cTmp.r; ca[i * 3 + 1] = cTmp.g; ca[i * 3 + 2] = cTmp.b; }
+    ew.pts.geometry.attributes.position.needsUpdate = true; ew.pts.geometry.attributes.color.needsUpdate = true;
+    hero.updateMatrixWorld(true); placeHeroLabels();
+    renderer.render(scene, heroCam);
   }
 
   // distância-base da câmera: o elemento ocupa ~75% da altura útil (em retrato, a folha de controles cobre a base da tela)
@@ -7068,10 +7220,12 @@ const Viewer = (function () {
     const narrow = w / h < 1.5, portrait = w < h;
     camera.setViewOffset(w, h, portrait ? 0 : narrow ? -0.04 * w : -0.075 * w, portrait ? 0.015 * h : 0, w, h);
     if (built) { const f = camDistT / (baseDist || 1); frame(); camDistT = baseDist * f; }
+    heroResize();
   }
   function controls() {
     const ptrs = new Map();
     canvas.addEventListener('pointerdown', (e) => {
+      if (heroOn) { heroTap = { x: e.clientX, y: e.clientY, t: performance.now() }; return; }
       ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY }); canvas.setPointerCapture(e.pointerId); lastInteract = performance.now();
       if (ptrs.size === 1) { dragging = true; lastX = e.clientX; lastY = e.clientY; yawV = 0; const now = performance.now(); if (now - tapT < 320) { resetView(); } tapT = now; }
       if (ptrs.size === 2) { const a = [...ptrs.values()]; pinchD = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y); }
@@ -7081,7 +7235,10 @@ const Viewer = (function () {
       if (ptrs.size === 1 && dragging && mode !== 'scale') { const dx = e.clientX - lastX, dy = e.clientY - lastY; lastX = e.clientX; lastY = e.clientY; yaw += dx * 0.0065; yawV = dx * 0.0065; pitch = clamp(pitch + dy * 0.005, -1.3, 1.3); }
       else if (ptrs.size === 2) { const a = [...ptrs.values()]; const d2 = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y); if (pinchD > 0) camDistT = clamp(camDistT * (pinchD / d2), baseDist * 0.3, baseDist * 3); pinchD = d2; }
     });
-    const end = (e) => { ptrs.delete(e.pointerId); if (ptrs.size === 0) dragging = false; if (ptrs.size < 2) pinchD = 0; };
+    const end = (e) => {
+      if (heroOn) { if (heroTap && Math.hypot(e.clientX - heroTap.x, e.clientY - heroTap.y) < 12 && performance.now() - heroTap.t < 600) go('viewer'); heroTap = null; return; }
+      ptrs.delete(e.pointerId); if (ptrs.size === 0) dragging = false; if (ptrs.size < 2) pinchD = 0;
+    };
     canvas.addEventListener('pointerup', end); canvas.addEventListener('pointercancel', end);
     canvas.addEventListener('wheel', (e) => { camDistT = clamp(camDistT * (1 + Math.sign(e.deltaY) * 0.1), baseDist * 0.3, baseDist * 3); lastInteract = performance.now(); }, { passive: true });
   }
@@ -7226,12 +7383,14 @@ const Viewer = (function () {
   function show() {
     canvas.hidden = false; visible = true; document.body.classList.add('viewer-on');
     if (!renderer) init(); else resize();
+    if (hero) hero.visible = false; heroOn = false; if (model) model.visible = true;
     setMode('rotate'); yaw = 0.6; pitch = 0.15; camDist = baseDist * 1.25; camDistT = baseDist; lastInteract = performance.now(); lastFrame = performance.now();
     updateTemp();
   }
-  function hide() { visible = false; canvas.hidden = true; document.body.classList.remove('viewer-on'); clearLabels(); }
+  function hide() { visible = false; if (!heroOn) canvas.hidden = true; document.body.classList.remove('viewer-on'); clearLabels(); if (model) model.visible = false; }
   function settle() { if (!built) return; applyTween(1); camDist = camDistT; lookY = lookYT; lookX = lookXT; yawV = 0; }
   function render(now) {
+    if (heroOn && hero) { renderHero(now); return; }
     if (!visible || !built) return;
     const dt = Math.min(0.05, (now - lastFrame) / 1000); lastFrame = now;
     applyTween(1 - Math.pow(0.004, dt));
@@ -7244,14 +7403,14 @@ const Viewer = (function () {
     placeLabels();
     renderer.render(scene, camera);
   }
-  return { show, hide, render, renderPanels, setMode, settle };
+  return { show, hide, render, renderPanels, setMode, settle, showHero, hideHero, heroActive: () => heroOn };
 })();
 
 /* ------------------------------------------------------------
    Laço principal
    ------------------------------------------------------------ */
 function loop(now) {
-  if (current === 'viewer') Viewer.render(now); else Globe.render(now);
+  if (current === 'viewer' || Viewer.heroActive()) Viewer.render(now); else Globe.render(now);
   requestAnimationFrame(loop);
 }
 

@@ -43,3 +43,10 @@ Aba Ambiental (energia solar)
   (geração acumulada conhecida numa data — usada pela simulação), co2FactorKgPerKwh (fator de
   emissão; padrão 0,0385 = média do SIN 2023/MCTI), treeKgPerYear, claims.solarPct/gridPct
   (os percentuais do selo "100% renovável"), loadPeakKw/loadBaseKw (carga simulada).
+
+Nosso time (organograma)
+  As pessoas ficam em SENSOR_DATA.leaders (id, nome, cargo PT/EN, frase, trajetória, hobbies, foto) e
+  o organograma em SENSOR_DATA.org: board = ids da direção (na ordem), areas = áreas com a lista de ids
+  das pessoas de cada uma (vazia = bolinha "em breve"). Fotos: pasta team/ com o nome indicado em
+  "photo" (ex.: team/lucas-pereira.jpg) — sem o arquivo, aparecem as iniciais. Retratos verticais,
+  rosto centralizado no terço superior, pelo menos 600×750 px.
