@@ -137,6 +137,8 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
   z-index: 15;
 }
 #rail.on { opacity: 1; transform: none; pointer-events: auto; }
+#rail:not(.on) { visibility: hidden; transition: opacity .5s var(--ease), transform .5s var(--ease), visibility 0s .5s; }
+#rail:not(.on) button { pointer-events: none; } /* trilho escondido não pode roubar toques (ex.: do Voltar do 3D) */
 #rail button {
   display: flex; align-items: center; gap: 14px;
   min-height: clamp(52px, 6.2vh, 68px);
@@ -511,116 +513,124 @@ body.viewer-on .lbl3d { background: rgba(11, 16, 23, .86); }
 body.welcome-on #s-attract .qr { bottom: clamp(22px, 4vh, 44px); } /* com as boas-vindas, o cartão desce para não disputar a base com o texto */
 
 /* ============================================================
-   Celular (retrato ou telas estreitas): coluna única com rolagem
+   Celular (body.mobile — decidido no JS por tamanho de tela):
+   rolagem NATIVA da página, cabeçalho e abas fixos, conteúdo em
+   coluna única. O globo fica fixo atrás e aparece no alto.
    ============================================================ */
-@media (max-width: 900px), ((orientation: portrait) and (max-width: 1100px)) {
-  :root { --logo-h: 42px; --top-h: 62px; --pad: 16px; --rail-w: 0px; --radius: 12px; }
-  body { font-size: 16px; touch-action: pan-y; }
-  #globe-canvas, #viewer-canvas { touch-action: none; }
-  #top { padding: 0 14px; background: linear-gradient(180deg, rgba(5, 7, 11, .9), rgba(5, 7, 11, 0)); }
-  .ribbon, .prov { display: none !important; }
-  .lang button { padding: 7px 12px; min-width: 44px; font-size: 13px; }
-  /* trilho → faixa horizontal de abas */
-  #rail { left: 0; right: 0; top: var(--top-h); bottom: auto; width: auto; height: 50px; flex-direction: row; justify-content: flex-start; align-items: center; gap: 6px; padding: 0 12px; overflow-x: auto; overflow-y: hidden; transform: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; background: linear-gradient(180deg, rgba(5, 7, 11, .75), rgba(5, 7, 11, 0)); }
-  #rail::-webkit-scrollbar { display: none; }
-  #rail button { flex: none; min-height: 38px; padding: 6px 14px 6px 10px; border: 1px solid var(--line); border-left-width: 1px; border-radius: 999px; font-size: 14px; gap: 8px; background: rgba(11, 16, 23, .7); white-space: nowrap; }
-  #rail button.on { border-color: var(--plat); padding-left: 10px; background: rgba(191, 211, 230, .16); }
-  #rail button .i { width: 18px; height: 18px; }
-  #rail .sep { display: none; }
-  /* telas: rolagem vertical; o preenchimento (sem eventos) deixa o globo arrastável por trás */
-  .screen .content { top: calc(var(--top-h) + 50px); left: 0; right: 0; bottom: 0; display: block; padding: 10px 16px calc(24px + env(safe-area-inset-bottom)); overflow-y: auto; overflow-x: hidden; touch-action: pan-y; pointer-events: none; -webkit-overflow-scrolling: touch; }
-  .screen .content > * { pointer-events: auto; }
-  .screen h2 { font-size: 28px; }
-  .screen .lead { font-size: 16px; }
-  /* início: globo em cima, texto embaixo */
-  #s-home .content { padding-top: 44vh; }
-  #s-home .intro { max-width: none; }
-  #s-home .intro h2 { font-size: 28px; }
-  #s-home .stats { gap: 18px 28px; margin-top: 18px; }
-  .stat .v { font-size: 30px; }
-  .qr.small { position: static; margin-top: 22px; max-width: none; }
-  #s-attract .hero { max-width: none; left: 16px; right: 16px; bottom: 120px; }
-  #s-attract h1 { font-size: 40px; }
-  #s-attract .counter { top: calc(var(--top-h) + 10px); }
-  #s-attract .qr { display: none; }
-  /* história */
-  #s-history .content > .reveal { padding-top: 6px; }
-  .tl .years span { font-size: 12px; }
-  .tl-card { grid-template-columns: 1fr; gap: 10px; min-height: 0; margin-top: 22px; }
-  .tl-card .y { font-size: 54px; }
-  .tl-card .y.txt { font-size: 32px; }
-  .tl-card h3 { font-size: 22px; }
-  .tl-card p { font-size: 16px; }
-  /* nosso time */
-  .team { grid-template-columns: 1fr; gap: 18px; }
-  .team-text h2 { font-size: 30px; }
-  .team-stats { grid-template-columns: 1fr 1fr; gap: 14px; }
-  .tstat .v { font-size: 32px; }
-  .team-photos { max-height: none; aspect-ratio: 16 / 10; }
-  /* presença global: globo em cima, lista por continente embaixo */
-  #s-world .content { padding-top: 38vh; }
-  #s-world .side { width: auto; flex: none; flex-direction: row; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-  #s-world .side .big { font-size: 56px; }
-  #s-world .side .cap { max-width: none; font-size: 15px; margin-top: 0; }
-  #s-world .side .hint { flex-basis: 100%; margin-top: 4px; font-size: 13px; }
-  #s-world .list { flex-direction: column; gap: 14px; padding: 12px 12px 8px; font-size: 14px; }
-  #s-world .grp-stack { gap: 14px; }
-  #s-world .grp .items { columns: 2; }
-  #s-world .list button { padding: 3px 4px; min-height: 30px; }
-  #s-world .list button .flag { width: 20px; }
-  /* mercados e produtos: seletor em faixa, detalhe embaixo */
-  .split { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
-  .picker { flex-direction: row; overflow-x: auto; overflow-y: hidden; gap: 6px; padding: 2px 0 6px; scrollbar-width: none; flex: none; }
-  .picker::-webkit-scrollbar { display: none; }
-  .picker button { flex: none; min-height: 42px; padding: 6px 14px 6px 10px; font-size: 15px; border: 1px solid var(--line); border-radius: 999px; gap: 8px; white-space: nowrap; }
-  .picker button .i { width: 20px; height: 20px; }
-  .picker button .k { display: none; }
-  .detail { border-left: 0; padding-left: 0; overflow: visible; flex: none; }
-  .detail .photo { height: 46vw; min-height: 160px; max-height: 260px; }
-  .detail h3 { font-size: 24px; }
-  .detail .sum { font-size: 16px; }
-  .detail li { font-size: 15px; }
-  /* clientes */
-  .logo-wall { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 92px; gap: 10px; margin-top: 14px; flex: none; }
-  .logo-wall .tile { padding: 10px; }
-  .logo-wall .tile img { max-height: 72%; }
-  /* certificações */
-  .certs { grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
-  .cert { min-height: 0; padding: 16px; }
-  .cert .std { font-size: 28px; }
-  .cert .seal { height: 56px; }
-  .compliance { margin-top: 14px; }
-  /* ambiental */
-  #s-env .content { padding-top: 10px; }
-  .env-head .lead { font-size: 14px; }
-  .env-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; flex: none; }
-  .env-flowcard .flow { height: 62vw; max-height: 300px; flex: none; }
-  .env-kpis { grid-template-columns: 1fr 1fr; grid-auto-rows: auto; gap: 10px; }
-  .tile { padding: 12px; min-height: 92px; }
-  .tile .v .n { font-size: 28px; }
-  #env-chart { height: 190px; flex: none; }
-  .env-green { min-height: 360px; }
-  .env-green .pct { font-size: 64px; }
-  .env-foot { font-size: 11px; margin: 10px 0 0; }
-  /* visualizador 3D: controles como folha inferior */
-  #s-viewer .content { padding: 8px 12px; overflow: visible; pointer-events: none; }
-  #s-viewer .vtop { gap: 10px; }
-  #s-viewer .vtop h2 { font-size: 20px; }
-  #s-viewer .vtop .sub { display: none; }
-  .back { padding: 8px 12px 8px 10px; min-height: 40px; font-size: 14px; }
-  .modes { left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); transform: none; overflow-x: auto; justify-content: flex-start; gap: 4px; padding: 5px; scrollbar-width: none; }
-  .modes::-webkit-scrollbar { display: none; }
-  .modes button { padding: 10px 14px; min-height: 42px; font-size: 14px; }
-  .vpanel { left: 10px; right: 10px; top: auto; bottom: calc(66px + env(safe-area-inset-bottom)); width: auto; max-height: 34vh; overflow-y: auto; padding: 12px 14px; transform: translateY(12px); }
-  #s-viewer .vtop h2 { font-size: 17px; line-height: 1.15; }
-  .vpanel h4 { font-size: 15px; }
-  .readout .t { font-size: 34px; }
-  #rt-chart { height: 90px; }
-  .lbl3d.l, .lbl3d.r { --gap: 22px; }
-  .lbl3d { font-size: 12px; padding: 4px 8px; }
-  /* painel administrativo e avisos */
-  .admin { right: 12px; left: 12px; width: auto; }
-}
+/* quem rola é a JANELA (viewport): html com overflow-y auto e body com overflow visible — se o body
+   tivesse overflow próprio ele viraria um contêiner de rolagem interno, sem barra e com scrollY sempre 0 */
+body.mobile { --logo-h: 42px; --top-h: 62px; --pad: 16px; --rail-w: 0px; --radius: 12px; --rail-h: 50px;
+  height: auto; min-height: 100%; overflow: visible; touch-action: pan-y; font-size: 16px; }
+html:has(body.mobile) { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
+body.mobile #globe-canvas { touch-action: pan-y; }           /* arrastar na horizontal gira; na vertical rola a página */
+body.mobile #viewer-canvas { touch-action: none; }
+body.mobile #app { position: relative; inset: auto; min-height: 100vh; min-height: 100dvh; }
+body.mobile #stage { position: relative; inset: auto; min-height: 100vh; min-height: 100dvh; }
+body.mobile .screen { position: absolute; inset: 0; }
+body.mobile .screen:not(.active) { height: 0; overflow: hidden; bottom: auto; } /* tela inativa não estende a rolagem da página */
+body.mobile .screen.active { position: relative; inset: auto; min-height: 100vh; min-height: 100dvh; }
+body.mobile .screen .content { position: relative; inset: auto; display: block; min-height: 100vh; min-height: 100dvh;
+  padding: calc(var(--top-h) + var(--rail-h) + 8px) 16px calc(28px + env(safe-area-inset-bottom)); overflow: visible; pointer-events: none; }
+body.mobile .screen .content > * { pointer-events: auto; }
+body.mobile #top { position: fixed; padding: 0 14px; background: rgba(5, 7, 11, .96); }
+body.mobile .ribbon, body.mobile .prov { display: none !important; }
+body.mobile .lang button { padding: 7px 12px; min-width: 44px; font-size: 13px; }
+/* trilho → faixa horizontal de abas, fixa abaixo do cabeçalho */
+body.mobile #rail { position: fixed; left: 0; right: 0; top: var(--top-h); bottom: auto; width: auto; height: var(--rail-h); flex-direction: row; justify-content: flex-start; align-items: center; gap: 6px; padding: 0 12px; overflow-x: auto; overflow-y: hidden; transform: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; touch-action: pan-x; background: linear-gradient(180deg, rgba(5, 7, 11, .96) 72%, rgba(5, 7, 11, 0)); }
+body.mobile #rail::-webkit-scrollbar { display: none; }
+body.mobile #rail button { flex: none; min-height: 38px; padding: 6px 14px 6px 10px; border: 1px solid var(--line); border-left-width: 1px; border-radius: 999px; font-size: 14px; gap: 8px; background: rgba(11, 16, 23, .8); white-space: nowrap; }
+body.mobile #rail button.on { border-color: var(--plat); padding-left: 10px; background: rgba(191, 211, 230, .16); }
+body.mobile #rail button .i { width: 18px; height: 18px; }
+body.mobile #rail .sep { display: none; }
+body.mobile .screen h2 { font-size: 28px; }
+body.mobile .screen .lead { font-size: 16px; }
+/* início: globo no alto, texto embaixo */
+body.mobile #s-home .content { padding-top: 46vh; }
+body.mobile #s-home .intro { max-width: none; }
+body.mobile #s-home .intro h2 { font-size: 28px; }
+body.mobile #s-home .stats { gap: 18px 28px; margin-top: 18px; }
+body.mobile .stat .v { font-size: 30px; }
+body.mobile .qr.small { position: static; margin-top: 22px; max-width: none; }
+body.mobile #s-attract .hero { max-width: none; left: 16px; right: 16px; bottom: 120px; }
+body.mobile #s-attract h1 { font-size: 40px; }
+body.mobile #s-attract .counter { top: calc(var(--top-h) + 10px); }
+body.mobile #s-attract .qr { display: none; }
+/* história */
+body.mobile .tl .years span { font-size: 12px; }
+body.mobile .tl-card { grid-template-columns: 1fr; gap: 10px; min-height: 0; margin-top: 22px; }
+body.mobile .tl-card .y { font-size: 54px; }
+body.mobile .tl-card .y.txt { font-size: 32px; }
+body.mobile .tl-card h3 { font-size: 22px; }
+body.mobile .tl-card p { font-size: 16px; }
+/* nosso time */
+body.mobile .team { grid-template-columns: 1fr; gap: 18px; }
+body.mobile .team-text h2 { font-size: 30px; }
+body.mobile .team-stats { grid-template-columns: 1fr 1fr; gap: 14px; }
+body.mobile .tstat .v { font-size: 32px; }
+body.mobile .team-photos { max-height: none; aspect-ratio: 16 / 10; }
+/* presença global: globo no alto, lista por continente embaixo */
+body.mobile #s-world .content { padding-top: 40vh; }
+body.mobile #s-world .side { width: auto; flex: none; flex-direction: row; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+body.mobile #s-world .side .big { font-size: 56px; }
+body.mobile #s-world .side .cap { max-width: none; font-size: 15px; margin-top: 0; }
+body.mobile #s-world .side .hint { flex-basis: 100%; margin-top: 4px; font-size: 13px; }
+body.mobile #s-world .list { flex-direction: column; gap: 14px; padding: 12px 12px 8px; font-size: 14px; backdrop-filter: none; background: rgba(5, 7, 11, .82); }
+body.mobile #s-world .grp-stack { gap: 14px; }
+body.mobile #s-world .grp .items { columns: 2; }
+body.mobile #s-world .list button { padding: 3px 4px; min-height: 30px; }
+body.mobile #s-world .list button .flag { width: 20px; }
+/* mercados e produtos: seletor em faixa, detalhe embaixo */
+body.mobile .split { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+body.mobile .picker { flex-direction: row; overflow-x: auto; overflow-y: hidden; gap: 6px; padding: 2px 0 6px; scrollbar-width: none; flex: none; touch-action: pan-x; }
+body.mobile .picker::-webkit-scrollbar { display: none; }
+body.mobile .picker button { flex: none; min-height: 42px; padding: 6px 14px 6px 10px; font-size: 15px; border: 1px solid var(--line); border-radius: 999px; gap: 8px; white-space: nowrap; }
+body.mobile .picker button .i { width: 20px; height: 20px; }
+body.mobile .picker button .k { display: none; }
+body.mobile .detail { border-left: 0; padding-left: 0; overflow: visible; flex: none; }
+body.mobile .detail .photo { height: 46vw; min-height: 160px; max-height: 260px; }
+body.mobile .detail h3 { font-size: 24px; }
+body.mobile .detail .sum { font-size: 16px; }
+body.mobile .detail li { font-size: 15px; }
+/* clientes */
+body.mobile .logo-wall { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 92px; gap: 10px; margin-top: 14px; flex: none; }
+body.mobile .logo-wall .tile { padding: 10px; }
+body.mobile .logo-wall .tile img { max-height: 72%; }
+/* certificações */
+body.mobile .certs { grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
+body.mobile .cert { min-height: 0; padding: 16px; }
+body.mobile .cert .std { font-size: 28px; }
+body.mobile .cert .seal { height: 56px; }
+body.mobile .compliance { margin-top: 14px; }
+/* ambiental */
+body.mobile .env-head .lead { font-size: 14px; }
+body.mobile .env-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; flex: none; }
+body.mobile .env-flowcard .flow { height: 62vw; max-height: 300px; flex: none; }
+body.mobile .env-kpis { grid-template-columns: 1fr 1fr; grid-auto-rows: auto; gap: 10px; }
+body.mobile .tile { padding: 12px; min-height: 92px; }
+body.mobile .tile .v .n { font-size: 28px; }
+body.mobile #env-chart { height: 190px; flex: none; }
+body.mobile .env-green { min-height: 360px; }
+body.mobile .env-green .pct { font-size: 64px; }
+body.mobile .env-foot { font-size: 11px; margin: 10px 0 0; }
+/* visualizador 3D: tela fixa (sem rolagem), controles como folha inferior */
+body.mobile #s-viewer.active { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; }
+body.mobile #s-viewer .content { position: absolute; inset: 0; min-height: 0; padding: calc(var(--top-h) + 6px) 12px 0; overflow: visible; pointer-events: none; }
+body.mobile #s-viewer .vtop { gap: 10px; }
+body.mobile #s-viewer .vtop h2 { font-size: 17px; line-height: 1.15; }
+body.mobile #s-viewer .vtop .sub { display: none; }
+body.mobile .back { padding: 8px 12px 8px 10px; min-height: 40px; font-size: 14px; }
+body.mobile .modes { left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); transform: none; overflow-x: auto; justify-content: flex-start; gap: 4px; padding: 5px; scrollbar-width: none; touch-action: pan-x; }
+body.mobile .modes::-webkit-scrollbar { display: none; }
+body.mobile .modes button { padding: 10px 14px; min-height: 42px; font-size: 14px; }
+body.mobile .vpanel { left: 10px; right: 10px; top: auto; bottom: calc(66px + env(safe-area-inset-bottom)); width: auto; max-height: 34vh; overflow-y: auto; padding: 12px 14px; transform: translateY(12px); touch-action: pan-y; }
+body.mobile .vpanel h4 { font-size: 15px; }
+body.mobile .readout .t { font-size: 34px; }
+body.mobile #rt-chart { height: 90px; }
+body.mobile .lbl3d.l, body.mobile .lbl3d.r { --gap: 22px; }
+body.mobile .lbl3d { font-size: 12px; padding: 4px 8px; }
+/* painel administrativo e avisos */
+body.mobile .admin { position: fixed; right: 12px; left: 12px; width: auto; }
+body.mobile .toast { bottom: 18px; }
 
 </style>
 </head>
@@ -855,7 +865,7 @@ body.welcome-on #s-attract .qr { bottom: clamp(22px, 4vh, 44px); } /* com as boa
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-2101</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.09-2154</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -5525,8 +5535,15 @@ const RAIL = [
 let current = 'attract';
 let lastTouch = performance.now();
 // Modo celular: layout em coluna com rolagem, sem atração/voz/vídeo/inatividade (o quiosque é 1920×1080 paisagem)
-const MQ_MOBILE = '(max-width: 900px), ((orientation: portrait) and (max-width: 1100px))';
-const IS_MOBILE = window.matchMedia(MQ_MOBILE).matches;
+// Decisão por tamanho físico de tela (não por media query aninhada, que navegadores antigos ignoram).
+// ?m=1 força o modo celular e ?m=0 força o modo quiosque, para diagnóstico.
+const FORCE_M = new URLSearchParams(location.search).get('m');
+const IS_MOBILE = FORCE_M === '1' ? true : FORCE_M === '0' ? false : (() => {
+  // telefone (lado menor ≤ 600 px CSS, em qualquer orientação), janela estreita, ou qualquer tela em pé até 1100 px
+  const sw = screen.width || window.innerWidth, sh = screen.height || window.innerHeight;
+  const minSide = Math.min(sw, sh), iw = window.innerWidth, ih = window.innerHeight;
+  return minSide <= 600 || iw <= 760 || (ih > iw && iw <= 1100);
+})();
 if (IS_MOBILE) document.body.classList.add('mobile');
 
 function go(name) {
@@ -5549,7 +5566,7 @@ function go(name) {
   if (name === 'world') World.enter();
   if (name === 'env') Energy.enter(); else if (prev === 'env') Energy.leave();
   if (name === 'team') Team.enter(); else if (prev === 'team') Team.leave();
-  if (IS_MOBILE) { const c = $('#s-' + name + ' .content'); if (c) c.scrollTop = 0; const rb = $('#rail button.on'); if (rb && rb.scrollIntoView) rb.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); }
+  if (IS_MOBILE) { window.scrollTo(0, 0); const rb = $('#rail button.on'); if (rb) { const r = $('#rail'); r.scrollTo({ left: rb.offsetLeft - (r.clientWidth - rb.offsetWidth) / 2, behavior: 'smooth' }); } }
 }
 
 function buildRail() {
@@ -5631,7 +5648,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.09-2101';
+const BUILD = '2026.11.09-2154';
 const Updater = {
   pending: null, failures: 0,
   start() {
