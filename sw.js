@@ -1,9 +1,9 @@
-/* Service worker do app de demonstração — versão 2026.11.10-0609
+/* Service worker do app de demonstração — versão 2026.11.10-1142
    - App (index.html, fontes, ícones): rede primeiro, cache como reserva → abre offline.
    - Vídeos e áudio (/videos/, /audio/): cache primeiro, baixados uma única vez, com suporte a
      pedidos parciais (Range) para o <video> conseguir buscar/avançar a partir do cache.
    - version.json e config.json: sempre da rede (nunca cacheados). */
-const VERSION = '2026.11.10-0609';
+const VERSION = '2026.11.10-1142';
 const CACHE = 'sensor-showcase-' + VERSION;
 const MEDIA = 'sensor-showcase-media';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];

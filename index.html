@@ -152,6 +152,8 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 #rail button.on .i { opacity: 1; }
 #rail button:active { background: rgba(191, 211, 230, .12); }
 #rail .sep { height: 1px; background: var(--line); margin: 10px 0; }
+#rail button.wchip { color: var(--glow); }
+#rail button.wchip .i { opacity: .9; }
 
 /* ---------- telas ---------- */
 #stage { position: absolute; inset: 0; }
@@ -208,7 +210,9 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 .hero-hint .ring::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; border: 1px solid var(--plat); opacity: .5; animation: ringOut 2.6s ease-out infinite; }
 body.hero-on .lbl3d { pointer-events: none; }
 body.mobile.hero-on #viewer-canvas { touch-action: pan-y; }
-#s-home .stats { display: flex; gap: clamp(28px, 4vw, 72px); margin-top: clamp(22px, 3vh, 40px); flex-wrap: wrap; }
+#s-home .stats { display: flex; gap: clamp(28px, 4vw, 72px); margin-top: clamp(22px, 3vh, 40px); flex-wrap: wrap; align-items: flex-end; }
+#s-home .stat.wide { flex-basis: 100%; }
+#s-home .stat.wide .v { font-size: clamp(34px, 3.6vw, 60px); color: var(--plat-2); }
 .stat .v { font-size: clamp(28px, 2.8vw, 46px); font-weight: 600; font-stretch: 108%; font-variant-numeric: tabular-nums; line-height: 1; }
 .stat .k { color: var(--text-3); margin-top: 8px; font-size: clamp(13px, 1vw, 16px); }
 
@@ -235,6 +239,11 @@ body.mobile.hero-on #viewer-canvas { touch-action: pan-y; }
 .tl-nav button, .btn { border: 1px solid var(--line-2); border-radius: 999px; padding: 12px 22px; font-weight: 500; color: var(--text); min-height: 48px; transition: background .2s, border-color .2s; }
 .tl-nav button:active, .btn:active { background: rgba(191, 211, 230, .14); }
 .btn.primary { background: var(--plat); color: var(--bg); border-color: var(--plat); font-weight: 600; }
+.tl-nav button.vid, .btn.vid { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; color: var(--glow); border-color: rgba(255, 210, 122, .45); }
+.tl-nav button.vid svg, .btn.vid svg { flex: none; }
+.env-head { position: relative; }
+.env-head #env-video { position: absolute; right: 0; top: 2px; margin-left: 0; }
+.env-head #env-video[hidden] { display: none; }
 .btn.primary:active { background: var(--plat-2); }
 
 /* ---------- presença global ---------- */
@@ -275,6 +284,19 @@ body.mobile.hero-on #viewer-canvas { touch-action: pan-y; }
 .detail .photo { position: relative; flex: none; width: 100%; height: clamp(170px, 34vh, 400px); border-radius: var(--radius); overflow: hidden; margin-bottom: clamp(14px, 2.2vh, 24px); background: var(--surface); box-shadow: 0 18px 50px rgba(0, 0, 0, .45); isolation: isolate; }
 .detail .photo .ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.08); transition: opacity 1.3s var(--ease); }
 .detail .photo .ph.on { opacity: 1; animation: kenburns 7s linear forwards; }
+.detail .photo.prod { background: radial-gradient(ellipse at 50% 60%, rgba(191, 211, 230, .16), rgba(16, 22, 31, .9) 70%); height: clamp(140px, 23vh, 270px); }
+.detail .photo .ph-3d { position: absolute; right: 16px; bottom: 14px; z-index: 2; display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; min-height: 44px; box-shadow: 0 10px 30px rgba(0, 0, 0, .45); }
+.detail .photo .ph-3d svg { width: 18px; height: 18px; }
+.detail .photo.prod.contain .ph { object-fit: contain; padding: clamp(14px, 2vw, 32px); animation: none; transform: none; filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .55)); }
+.detail .photo.prod.tall .ph { object-fit: contain; padding: 10px; animation: none; transform: rotate(90deg) scale(1.9); transform-origin: center; filter: drop-shadow(0 14px 24px rgba(0, 0, 0, .55)); }
+.detail .photo.prod.cover { height: clamp(170px, 32vh, 380px); }
+.detail .photo.prod::after { background: linear-gradient(180deg, rgba(5, 7, 11, 0) 70%, rgba(5, 7, 11, .45) 100%); }
+.pillars { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(10px, 1.2vw, 18px); margin: clamp(10px, 1.6vh, 18px) 0 6px; }
+.pillar { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(16, 22, 31, .72); padding: clamp(12px, 1.3vw, 20px); }
+.pillar .pi { display: inline-flex; width: clamp(34px, 2.8vw, 44px); height: clamp(34px, 2.8vw, 44px); color: var(--plat); margin-bottom: 8px; }
+.pillar .pi svg { width: 100%; height: 100%; }
+.pillar b { display: block; font-size: clamp(15px, 1.2vw, 19px); margin-bottom: 4px; }
+.pillar p { color: var(--text-2); font-size: clamp(13px, 1vw, 16px); line-height: 1.4; margin: 0; }
 @keyframes kenburns { from { transform: scale(1.08) translate(1.2%, .6%); } to { transform: scale(1) translate(0, 0); } }
 .detail .photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 7, 11, 0) 55%, rgba(5, 7, 11, .55) 100%), linear-gradient(90deg, rgba(5, 7, 11, .25), rgba(5, 7, 11, 0) 40%); pointer-events: none; }
 .detail .photo .badge { position: absolute; left: 16px; bottom: 14px; width: clamp(40px, 3.6vw, 56px); height: clamp(40px, 3.6vw, 56px); border-radius: 14px; background: rgba(11, 16, 23, .7); border: 1px solid var(--line-2); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; color: var(--plat-2); z-index: 1; }
@@ -384,6 +406,8 @@ input[type=range]::-moz-range-thumb { width: 30px; height: 30px; border-radius: 
 /* ---------- boas-vindas (config remota) ---------- */
 .ribbon { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 46vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(13px, 1.05vw, 17px); color: var(--glow); border: 1px solid rgba(255, 210, 122, .45); background: rgba(5, 7, 11, .55); padding: 6px 16px; border-radius: 999px; font-family: 'Noto Sans JP', var(--font); }
 .ribbon[hidden] { display: none; }
+button.ribbon { cursor: pointer; pointer-events: auto; }
+button.ribbon:active { background: rgba(255, 210, 122, .18); }
 .welcome { position: absolute; left: calc(var(--pad) - 8px); padding-left: 8px; bottom: clamp(44px, 7vh, 90px); max-width: calc(50vw + 8px); max-height: calc(100vh - var(--top-h) - 9vh); overflow: hidden; font-family: 'Noto Sans JP', var(--font); }
 .welcome[hidden] { display: none; }
 body.welcome-on #s-attract .hero, body.welcome-on #s-attract .counter { display: none; }
@@ -709,6 +733,36 @@ body.mobile.hero-on .lbl3d { display: none; }
 body.mobile .tl .years span:not(.on) { visibility: hidden; }
 body.mobile .brand-rep { margin-top: 12px; }
 
+/* ---- Quem somos: missão, visão e valores ---- */
+#s-about .content { padding-top: 1.6vh; }
+.about-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: clamp(18px, 2.4vw, 40px); margin-top: clamp(14px, 2.2vh, 26px); align-items: stretch; min-height: 0; }
+.about-col { display: flex; flex-direction: column; gap: clamp(14px, 2vh, 24px); min-height: 0; }
+.about-card { display: grid; grid-template-columns: clamp(150px, 15vw, 240px) 1fr; gap: clamp(14px, 1.6vw, 26px); border: 1px solid var(--line); border-radius: var(--radius); background: rgba(16, 22, 31, .66); overflow: hidden; flex: 1; min-height: 0; }
+.about-ph { background: var(--surface) center / cover no-repeat; min-height: 150px; }
+.about-ph[hidden] { display: none; }
+.about-txt { padding: clamp(14px, 1.8vh, 24px) clamp(14px, 1.6vw, 26px) clamp(14px, 1.8vh, 24px) 0; display: flex; flex-direction: column; justify-content: center; }
+.about-txt h3 { font-size: clamp(18px, 1.6vw, 26px); margin-bottom: 8px; }
+.about-txt p { color: var(--text-2); font-size: clamp(13px, 1.05vw, 17px); line-height: 1.5; margin: 0; }
+.mvv { display: flex; flex-direction: column; gap: clamp(12px, 1.8vh, 20px); min-height: 0; }
+.mvv-item { flex: 1; border: 1px solid rgba(191, 211, 230, .22); border-radius: var(--radius); background: linear-gradient(135deg, rgba(191, 211, 230, .10), rgba(16, 22, 31, .72) 60%); padding: clamp(14px, 1.8vh, 24px) clamp(16px, 1.6vw, 28px); display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 16px; align-items: center; }
+.mvv-item .mi { grid-row: 1 / 3; width: clamp(40px, 3.6vw, 60px); height: clamp(40px, 3.6vw, 60px); color: var(--plat); display: inline-flex; }
+.mvv-item .mi svg { width: 100%; height: 100%; }
+.mvv-item h4 { font-size: clamp(12px, 1vw, 15px); letter-spacing: .14em; text-transform: uppercase; color: var(--plat-2); font-weight: 600; margin: 0 0 4px; }
+.mvv-item p { color: var(--text); font-size: clamp(14px, 1.15vw, 19px); line-height: 1.4; margin: 0; }
+body.mobile .about-grid { display: flex; flex-direction: column; gap: 14px; }
+body.mobile .about-card { grid-template-columns: 1fr; }
+body.mobile .about-ph { height: 150px; }
+body.mobile .about-txt { padding: 14px; }
+body.mobile .mvv-item { grid-template-columns: 1fr; }
+body.mobile .mvv-item .mi { grid-row: auto; margin-bottom: 8px; }
+body.mobile .pillars { grid-template-columns: 1fr; }
+body.mobile .tl-nav { flex-wrap: wrap; }
+body.mobile .tl-nav button.vid { margin-left: 0; width: 100%; justify-content: center; }
+body.mobile .env-head #env-video { position: static; margin-top: 10px; }
+body.mobile #s-home .stat.wide .v { font-size: 34px; }
+body.mobile .detail .photo.prod.tall .ph { transform: rotate(90deg) scale(1.6); }
+body.mobile #s-env .content, body.mobile #s-about .content { padding-top: calc(var(--top-h) + var(--rail-h) + 8px); }
+
 </style>
 </head>
 <body>
@@ -723,7 +777,7 @@ body.mobile .brand-rep { margin-top: 12px; }
       <img class="brand-logo" src="logo.png" alt="Sensor Technology" draggable="false" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
       <span class="brand-fallback" hidden><span class="brand-mark"></span><span class="brand-name">Sensor Technology</span></span>
     </button>
-    <div id="ribbon" class="ribbon" hidden></div>
+    <button type="button" id="ribbon" class="ribbon" hidden></button>
     <div class="top-right">
       <div id="prov" class="prov" hidden data-i18n="prov"></div>
       <div class="lang" role="group" aria-label="Idioma">
@@ -768,6 +822,7 @@ body.mobile .brand-rep { margin-top: 12px; }
           <h2 id="home-title"></h2>
           <p class="lead" id="home-text"></p>
           <div class="stats">
+            <div class="stat wide"><div class="v" id="stat-since">0</div><div class="k" data-i18n="statSince"></div></div>
             <div class="stat"><div class="v" id="stat-countries">57</div><div class="k" data-i18n="statCountries"></div></div>
             <div class="stat"><div class="v" id="stat-year">0</div><div class="k" id="stat-year-k"></div></div>
             <div class="stat"><div class="v" id="stat-people">100</div><div class="k" data-i18n="statPeople"></div></div>
@@ -798,6 +853,32 @@ body.mobile .brand-rep { margin-top: 12px; }
           <div class="tl-nav">
             <button type="button" id="tl-prev" data-i18n="prev"></button>
             <button type="button" id="tl-next" data-i18n="next"></button>
+            <button type="button" id="tl-video" class="vid" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span data-i18n="watchVideo"></span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="s-about" class="screen" data-screen="about">
+      <div class="content">
+        <div class="reveal about-wrap">
+          <h2 data-i18n="aboutTitle"></h2>
+          <div class="about-grid">
+            <div class="about-col">
+              <article class="about-card">
+                <div class="about-ph" id="about-ph-who"></div>
+                <div class="about-txt"><h3 data-i18n="whoWeAre"></h3><p id="about-who"></p></div>
+              </article>
+              <article class="about-card">
+                <div class="about-ph" id="about-ph-what"></div>
+                <div class="about-txt"><h3 data-i18n="whatWeDo"></h3><p id="about-what"></p></div>
+              </article>
+            </div>
+            <div class="mvv">
+              <div class="mvv-item"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3"/></svg></span><h4 data-i18n="mission"></h4><p id="about-mission"></p></div>
+              <div class="mvv-item"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span><h4 data-i18n="vision"></h4><p id="about-vision"></p></div>
+              <div class="mvv-item"><span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-5-3-8-6-8-10a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 4-3 7-8 10z"/></svg></span><h4 data-i18n="values"></h4><p id="about-values"></p></div>
+            </div>
           </div>
         </div>
       </div>
@@ -869,6 +950,7 @@ body.mobile .brand-rep { margin-top: 12px; }
       <div class="content">
         <div class="env-head">
           <h2 data-i18n="envTitle"></h2>
+          <button type="button" id="env-video" class="btn vid" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span></span></button>
           <p class="lead" id="env-lead"></p>
         </div>
         <div class="env-grid">
@@ -952,7 +1034,7 @@ body.mobile .brand-rep { margin-top: 12px; }
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-0609</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-1142</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -5211,8 +5293,14 @@ const SENSOR_DATA = {
     country: { pt: 'Brasil', en: 'Brazil' },
     origin: { lat: -23.686, lon: -46.623 },   // fábrica em Diadema: origem dos arcos do globo
     annualProduction: 500000,                 // sensores por ano (contador ao vivo)
+    producedBase: 15000000,                   // sensores já produzidos desde 1989 na data abaixo (contador acumulado; CONFIRMAR)
+    producedAsOf: '2026-11-01',               // a partir daí soma annualProduction pro rata
     employees: 100,
     website: 'sensor-technology.com.br',
+  },
+  media: {
+    institutional: { src: 'videos/institucional-us-2022.mp4', title: { pt: 'Vídeo institucional', en: 'Corporate video' } },
+    solar: { src: 'videos/painel-solar-2025.mp4', title: { pt: 'Nossa usina solar', en: 'Our solar plant' } },
   },
 
   // Textos da tela de atração e do início
@@ -5270,8 +5358,8 @@ const SENSOR_DATA = {
               en: 'ISO/IEC 17025 accreditation of the calibration laboratory (CAL 0405): measurements with internationally recognised traceability.' } },
     { year: 2011,
       title: { pt: 'Independência: nasce a Sensor Technology Ltda.', en: 'Independence: Sensor Technology Ltda. is born' },
-      text: { pt: 'Concluído o MBO (management buyout) do grupo Heraeus: Rui Pereira e Luis Bombonatti, executivos da casa, assumem a empresa em partes iguais. Nasce a Sensor Technology Ltda., independente, com a mesma equipe, os mesmos processos e todo o know-how acumulado.',
-              en: 'The management buyout from the Heraeus Group is completed: Rui Pereira and Luis Bombonatti, executives of the house, take over the company in equal shares. Sensor Technology Ltda. is born — independent, with the same team, the same processes and all the accumulated know-how.' } },
+      text: { pt: 'Concluído o MBO (management buyout) do grupo Heraeus: Rui Pereira e Luis Bombonatti, executivos da casa, assumem a empresa. Nasce a Sensor Technology Ltda., independente, com a mesma equipe, os mesmos processos e todo o know-how acumulado.',
+              en: 'The management buyout from the Heraeus Group is completed: Rui Pereira and Luis Bombonatti, executives of the house, take over the company. Sensor Technology Ltda. is born — independent, with the same team, the same processes and all the accumulated know-how.' } },
     { year: 2018,
       title: { pt: 'Sensores de ranhura e elemento EW', en: 'Slot sensors and the EW element' },
       text: { pt: 'Lançamento dos sensores tipo ranhura (slot) para grandes geradores e motores elétricos, com até 3 m de comprimento, e do elemento EW — micro-aquecedor e sensor de precisão para medidores de vazão de ar e gases.',
@@ -5300,6 +5388,9 @@ const SENSOR_DATA = {
     { name: 'Voith', logo: 'clients/voith.svg', w: 80 },
     { name: 'WIKA', logo: 'clients/wika.svg', w: 66 },
     { name: 'Endress+Hauser', logo: 'clients/endress-hauser.svg', w: 96 },
+    { name: 'JUMO', logo: 'clients/jumo.svg', w: 58 },
+    { name: 'H. Heinz Meßwiderstände', logo: 'clients/heinz.png', w: 78 },
+    { name: 'CORREGE', logo: 'clients/correge.svg', w: 90 },
     { name: 'TE Connectivity', logo: 'clients/te-connectivity.svg', w: 86 },
     { name: 'DwyerOmega', logo: 'clients/dwyeromega.png', w: 98 },
     { name: 'Pyromation', logo: 'clients/pyromation.png', w: 92 },
@@ -5315,21 +5406,21 @@ const SENSOR_DATA = {
   clientsPlaceholders: 12,
 
   markets: [
-    { id: 'hvac', photos: ['markets/hvac-probes.webp'], icon: 'hvac',
+    { id: 'hvac', photos: [], icon: 'hvac', // foto removida a pedido (10/11) — aguardando a foto certa
       name: { pt: 'HVAC e refrigeração', en: 'HVAC and refrigeration' },
       summary: { pt: 'Controle fino de temperatura em sistemas de climatização e frio industrial, onde estabilidade ao longo de anos vale mais que velocidade.',
                  en: 'Fine temperature control in air-conditioning and industrial cooling, where stability over years matters more than speed.' },
       apps: { pt: ['Chillers e bombas de calor', 'Câmaras frias e cadeia do frio', 'Ar-condicionado de precisão', 'Trocadores de calor'],
               en: ['Chillers and heat pumps', 'Cold rooms and cold chain', 'Precision air conditioning', 'Heat exchangers'] },
       products: ['cww', 'assemblies'] },
-    { id: 'auto', photos: ['markets/auto-assembly.webp', 'markets/auto-electric.webp', 'markets/auto-train.webp'], icon: 'auto',
+    { id: 'auto', photos: ['markets/ppt-auto.webp', 'markets/auto-electric.webp', 'markets/auto-train.webp'], icon: 'auto',
       name: { pt: 'Automotivo e mobilidade', en: 'Automotive and mobility' },
       summary: { pt: 'Sensores que suportam vibração, ciclos térmicos severos e altas temperaturas em veículos e bancos de prova.',
                  en: 'Sensors that withstand vibration, severe thermal cycling and high temperatures in vehicles and test rigs.' },
       apps: { pt: ['Temperatura de gases de escape', 'Gestão térmica de baterias', 'Bancos de teste de motores', 'Climatização veicular'],
               en: ['Exhaust gas temperature', 'Battery thermal management', 'Engine test benches', 'Vehicle climate control'] },
       products: ['cww', 'thinfilm'] },
-    { id: 'industry', photos: ['markets/industry-chemical.webp', 'markets/energy-generator.webp'], icon: 'industry',
+    { id: 'industry', photos: ['markets/ppt-chem.webp', 'markets/industry-chemical.webp'], icon: 'industry',
       name: { pt: 'Processos industriais', en: 'Industrial processes' },
       summary: { pt: 'Medição confiável em plantas contínuas: o sensor certo evita paradas, refugo e desvios de qualidade.',
                  en: 'Reliable measurement in continuous plants: the right sensor prevents downtime, scrap and quality drift.' },
@@ -5343,14 +5434,14 @@ const SENSOR_DATA = {
       apps: { pt: ['Fornos e cooktops', 'Lava-louças e lavadoras', 'Caldeiras e aquecedores de água', 'Cafeteiras e equipamentos de cozinha'],
               en: ['Ovens and cooktops', 'Dishwashers and washing machines', 'Boilers and water heaters', 'Coffee machines and kitchen equipment'] },
       products: ['cww', 'thinfilm'] },
-    { id: 'energy', photos: ['markets/energy-hydro.webp', 'markets/energy-solar.webp', 'markets/energy-generator.webp'], icon: 'energy',
+    { id: 'energy', photos: ['markets/ppt-hydro.webp', 'markets/energy-hydro.webp', 'markets/energy-solar.webp'], icon: 'energy',
       name: { pt: 'Energia', en: 'Energy' },
       summary: { pt: 'Monitoramento térmico de ativos caros e de longa vida, de transformadores a baterias estacionárias.',
                  en: 'Thermal monitoring of expensive, long-lived assets, from transformers to stationary batteries.' },
       apps: { pt: ['Transformadores e subestações', 'Usinas solares e eólicas', 'Geração térmica', 'Armazenamento em baterias'],
               en: ['Transformers and substations', 'Solar and wind plants', 'Thermal generation', 'Battery storage'] },
       products: ['cww', 'assemblies'] },
-    { id: 'food', photos: ['markets/food-elements.webp'], icon: 'food',
+    { id: 'food', photos: [], icon: 'food', // foto removida a pedido (10/11) — aguardando a foto certa
       name: { pt: 'Alimentos e bebidas', en: 'Food and beverage' },
       summary: { pt: 'Temperatura é segurança alimentar: processos térmicos documentados do cozimento ao frio.',
                  en: 'Temperature is food safety: documented thermal processes from cooking to chilling.' },
@@ -5371,6 +5462,13 @@ const SENSOR_DATA = {
       apps: { pt: ['Padrões de temperatura', 'Laboratórios acreditados', 'Instrumentação de referência', 'Validação de processos'],
               en: ['Temperature standards', 'Accredited laboratories', 'Reference instrumentation', 'Process validation'] },
       products: ['cww', 'calibration'] },
+    { id: 'aero', photos: ['markets/ppt-aero.webp'], icon: 'aero',
+      name: { pt: 'Aeroespacial, defesa e ciências da vida', en: 'Aerospace, defence and life sciences' },
+      summary: { pt: 'Onde a especificação manda: elementos com α = 3900 ppm/K para a especificação aeroespacial, documentação completa e rastreabilidade de lote.',
+                 en: 'Where the specification rules: elements with α = 3900 ppm/K to the aerospace specification, full documentation and batch traceability.' },
+      apps: { pt: ['Instrumentação aeronáutica e satélites', 'Bancos de ensaio e qualificação', 'Equipamentos de defesa', 'Ciências da vida e laboratórios'],
+              en: ['Aircraft instrumentation and satellites', 'Test and qualification rigs', 'Defence equipment', 'Life sciences and laboratories'] },
+      products: ['cww', 'assemblies', 'calibration'] },
   ],
 
   certifications: [
@@ -5399,44 +5497,55 @@ const SENSOR_DATA = {
   compliance: ['RoHS', 'REACH'],
 
   products: [
-    { id: 'cww', icon: 'cww', has3d: true,
+    { id: 'cww', icon: 'cww', has3d: 'cww', photo: 'products/cww.webp',
       name: { pt: 'Elementos CWW de platina', en: 'CWW platinum elements' },
       kind: { pt: 'Fabricação própria · Pt100 · Pt200 · Pt500 · Pt1000', en: 'Made in-house · Pt100 · Pt200 · Pt500 · Pt1000' },
-      summary: { pt: 'Fio de platina enrolado em corpo de alumina e selado em vidro. A construção mais estável para medir temperatura em ambiente industrial: de −200 °C a +850 °C, com deriva mínima ao longo dos anos.',
-                 en: 'Platinum wire wound into an alumina body and glass-sealed. The most stable construction for industrial temperature measurement: from −200 °C to +850 °C, with minimal drift over the years.' },
-      bullets: { pt: ['Faixa de −200 °C a +850 °C', 'Tolerâncias conforme IEC 60751 (classes A, B e 1/3 B)', 'Diâmetros de 1,6 a 3,0 mm, comprimentos sob consulta', 'Resistente a vibração e a ciclos térmicos'],
-                 en: ['Range from −200 °C to +850 °C', 'Tolerances to IEC 60751 (classes A, B and 1/3 B)', 'Diameters from 1.6 to 3.0 mm, lengths on request', 'Resistant to vibration and thermal cycling'] },
-      confirm: true },
-    { id: 'heaters', icon: 'heater',
-      name: { pt: 'Micro-aquecedores de platina', en: 'Platinum micro-heaters' },
-      kind: { pt: 'Fabricação própria', en: 'Made in-house' },
-      summary: { pt: 'Elementos de aquecimento de platina para pontos de calor controlado: sensores de gás, analisadores e microdispositivos.',
-                 en: 'Platinum heating elements for controlled hot spots: gas sensors, analysers and micro-devices.' },
-      bullets: { pt: ['Aquecimento e medição no mesmo elemento', 'Resposta rápida e baixa massa térmica', 'Desenvolvimento sob especificação'],
-                 en: ['Heating and sensing in one element', 'Fast response and low thermal mass', 'Developed to specification'] },
-      confirm: true },
-    { id: 'assemblies', icon: 'probe',
+      summary: { pt: 'Sensores de temperatura de platina wire-wound com tecnologia CWW (Ceramic Wire Wound): a espiral de platina livre dentro de um corpo de alumina de alta pureza, selada com vidro-cerâmico nas duas pontas. Padrão ou totalmente sob medida, para os desafios de medição mais exigentes — com precisão, confiabilidade e desempenho constante.',
+                 en: 'Platinum wire-wound temperature sensors built with CWW (Ceramic Wire Wound) technology: a free platinum coil inside a high-purity alumina body, sealed with glass-ceramic at both ends. Standard or fully customized, for the most demanding measurement challenges — with precision, reliability and consistent performance.' },
+      bullets: { pt: ['R₀ de 100 Ω como padrão; 25, 50, 200, 500 e 1000 Ω sob demanda', 'Faixa de −196 °C a +850 °C (a partir de −270 °C sob demanda)', 'α = 3850 ppm/K; 3900 (especificação aeroespacial) e 3916 sob demanda', 'Diâmetros de 0,4 a 4,5 mm, simples ou duplo', 'Classes IEC 60751 e JIS C 1604:1997 (e JIS antiga); classes especiais de W0,3 a W0,03'],
+                 en: ['R₀ of 100 Ω as standard; 25, 50, 200, 500 and 1000 Ω on demand', 'Range from −196 °C to +850 °C (from −270 °C on demand)', 'α = 3850 ppm/K; 3900 (aerospace specification) and 3916 on demand', 'Diameters from 0.4 to 4.5 mm, single or dual', 'IEC 60751 and JIS C 1604:1997 (and old JIS) classes; special classes from W0.3 to W0.03'] } },
+    { id: 'heaters', icon: 'heater', has3d: 'ew', photo: 'products/heaters.webp',
+      name: { pt: 'Micro-aquecedores EW', en: 'EW micro-heaters' },
+      kind: { pt: 'Fabricação própria · medidores de vazão mássica térmica', en: 'Made in-house · thermal mass flow meters' },
+      summary: { pt: 'Espiral de platina enrolada externamente sobre um núcleo de alumina de alta pureza e revestida de vidro. O mesmo elemento aquece e mede: é o coração dos medidores de vazão mássica térmica, com versões sob medida para cada aplicação.',
+                 en: 'A platinum coil wound externally around a high-purity alumina core and glass-coated. The same element heats and measures: the heart of thermal mass flow meters, with tailored versions for each application.' },
+      bullets: { pt: ['Desempenho excelente e histerese muito baixa, mesmo em condições severas', 'Valores de resistência (ôhmicos) sob medida', 'Grande flexibilidade dimensional para os requisitos de cada aplicação', 'Aquecedor e sensor de platina no mesmo elemento, a 2 ou 4 fios'],
+                 en: ['Excellent performance and very low hysteresis, even under demanding conditions', 'Tailored resistance (ohmic) values', 'High dimensional flexibility for application-specific requirements', 'Heater and platinum sensor in one element, 2- or 4-wire'] } },
+    { id: 'slot', icon: 'slot', photo: 'products/slot.webp',
+      name: { pt: 'Sensores de ranhura (slot)', en: 'Slot sensors' },
+      kind: { pt: 'Fabricação própria · até 3 m de comprimento', en: 'Made in-house · up to 3 m long' },
+      summary: { pt: 'Sensores de temperatura de platina para instalação nas ranhuras do estator de geradores hidrelétricos, aerogeradores e motores elétricos de todos os tipos e portes.',
+                 en: 'Platinum temperature sensors for installation in the stator slots of hydroelectric generators, wind turbine generators and electric motors of all types and sizes.' },
+      bullets: { pt: ['Monitoramento preciso da temperatura do enrolamento', 'Proteção do equipamento, eficiência operacional e longevidade do ativo', 'Projetados para confiabilidade e desempenho de longo prazo em ambientes severos', 'Dimensões e terminações conforme o projeto do estator'],
+                 en: ['Accurate winding-temperature monitoring', 'Equipment protection, operational efficiency and asset longevity', 'Engineered for reliability and long-term performance in demanding environments', 'Dimensions and terminations to the stator design'] } },
+    { id: 'sp01', icon: 'sp01', photo: 'products/sp01.webp', photoFit: 'tall',
+      name: { pt: 'Termômetro de referência SP-01', en: 'SP-01 reference thermometer' },
+      kind: { pt: 'Fabricação própria · padrão secundário de platina', en: 'Made in-house · secondary platinum standard' },
+      summary: { pt: 'Termômetro de resistência de platina para laboratório. Elemento de platina pura fisicamente envelhecido e isolação de alta confiabilidade: estabilidade excepcional em toda a faixa de temperatura.',
+                 en: 'A platinum resistance thermometer designed for laboratory use. A physically aged pure-platinum sensing element and highly reliable insulation: outstanding stability across the whole temperature range.' },
+      bullets: { pt: ['A espiral se expande e contrai livremente nos capilares da cerâmica: sem tensão mecânica, sem deformação', 'Estabilidade e exatidão para uso como padrão secundário', 'Produzido desde 2005 (antes SP-H01)', 'Calibrado no nosso laboratório acreditado ISO/IEC 17025'],
+                 en: ['The coil expands and contracts freely inside the ceramic bores: no mechanical stress, no deformation', 'Stability and accuracy for use as a secondary standard', 'Produced since 2005 (formerly SP-H01)', 'Calibrated in our ISO/IEC 17025 accredited laboratory'] } },
+    { id: 'assemblies', icon: 'probe', photo: 'products/assemblies.webp',
       name: { pt: 'Conjuntos e sondas montadas', en: 'Assemblies and probes' },
-      kind: { pt: 'Fabricação própria', en: 'Made in-house' },
-      summary: { pt: 'O elemento CWW montado do jeito que a aplicação pede: bainha, cabo, conector e isolação, pronto para instalar.',
-                 en: 'The CWW element built the way the application needs: sheath, cable, connector and insulation, ready to install.' },
-      bullets: { pt: ['Ligação a 2, 3 ou 4 fios', 'Bainhas em aço inox e outras ligas', 'Sensores de ranhura (slot) para geradores e motores, com até 3 m', 'Cabos, conectores e terminações sob desenho'],
-                 en: ['2-, 3- or 4-wire connection', 'Stainless-steel and other alloy sheaths', 'Slot sensors for generators and motors, up to 3 m long', 'Cables, connectors and terminations to drawing'] } },
-    { id: 'calibration', icon: 'calib',
+      kind: { pt: 'Fabricação própria · do protótipo ao volume', en: 'Made in-house · from prototype to volume' },
+      summary: { pt: 'Para cada aplicação, a solução certa: montagem completa de sensores com ampla variedade de materiais, desenhos e especificações — de configurações simples a soluções complexas sob medida.',
+                 en: 'For every application, the right solution: comprehensive sensor assembly with a wide range of materials, designs and specifications — from simple configurations to highly complex custom solutions.' },
+      bullets: { pt: ['Ligação a 2, 3 ou 4 fios', 'Bainhas em aço inox e outras ligas; cabos, conectores e terminações sob desenho', 'Do protótipo único à produção em volume, com preço competitivo', 'Qualidade de fabricante de elemento: o sensor nasce aqui'],
+                 en: ['2-, 3- or 4-wire connection', 'Stainless-steel and other alloy sheaths; cables, connectors and terminations to drawing', 'From a single prototype to high-volume runs, at competitive pricing', 'Element-maker quality: the sensor is born here'] } },
+    { id: 'calibration', icon: 'calib', photo: 'products/calibration.webp', photoFit: 'cover',
       name: { pt: 'Calibração acreditada', en: 'Accredited calibration' },
       kind: { pt: 'Serviço · ISO/IEC 17025 · CAL 0405', en: 'Service · ISO/IEC 17025 · CAL 0405' },
-      summary: { pt: 'Laboratório acreditado para calibrar sensores e termômetros, com certificado rastreável para o seu produto ou o seu processo.',
-                 en: 'Accredited laboratory for calibrating sensors and thermometers, with a traceable certificate for your product or your process.' },
-      bullets: { pt: ['Certificado de calibração rastreável', 'Sensores de platina, termopares e termômetros', 'Termômetro de referência de platina SP-01, de fabricação própria', 'Lotes e amostras de produção'],
-                 en: ['Traceable calibration certificate', 'Platinum sensors, thermocouples and thermometers', 'SP-01 platinum reference thermometer, made in-house', 'Production batches and samples'] } },
-    { id: 'tcwire', icon: 'wire', brand: { name: 'SAFINA', logo: 'brands/safina.svg', note: { pt: 'Representante SAFINA no Brasil', en: 'SAFINA representative in Brazil' } },
+      summary: { pt: 'Laboratório acreditado pela Cgcre/Inmetro para calibração em temperatura, operando sob sistemas certificados ISO 9001, ISO/IEC 17025 e ISO 14001. Consulte o nosso escopo acreditado.',
+                 en: 'Laboratory accredited by Cgcre/Inmetro for temperature calibration, operating under ISO 9001, ISO/IEC 17025 and ISO 14001 certified systems. Please consult our accredited scope.' },
+      bullets: { pt: ['Termômetros de resistência de platina: −196 °C a +850 °C', 'Termopares: −196 °C a +1100 °C', 'Câmaras térmicas: estabilidade, uniformidade e desvio de controle', 'Transmissores, indicadores, controladores e registradores; cabos de compensação e extensão'],
+                 en: ['Platinum resistance thermometers: −196 °C to +850 °C', 'Thermocouples: −196 °C to +1100 °C', 'Thermal chambers: stability, uniformity and control deviation', 'Transmitters, indicators, controllers and recorders; compensating and extension cables'] } },
+    { id: 'tcwire', icon: 'wire', photo: 'products/tcwire.webp', brand: { name: 'SAFINA', logo: 'brands/safina.svg', note: { pt: 'Representante SAFINA no Brasil', en: 'SAFINA representative in Brazil' } },
       name: { pt: 'Fios de termopar de metais nobres', en: 'Noble-metal thermocouple wires' },
       kind: { pt: 'Distribuição · desde 2019', en: 'Distribution · since 2019' },
-      summary: { pt: 'Fios de platina e platina-ródio para termopares dos tipos R, S e B, fornecidos no Brasil e no exterior em representação da SAFINA, refinadora e fabricante de metais preciosos da República Tcheca.',
-                 en: 'Platinum and platinum-rhodium wires for type R, S and B thermocouples, supplied in Brazil and abroad representing SAFINA, a precious-metals refiner and manufacturer from the Czech Republic.' },
-      bullets: { pt: ['Tipos R (Pt-13%Rh/Pt), S (Pt-10%Rh/Pt) e B (Pt-30%Rh/Pt-6%Rh)', 'Tolerâncias conforme IEC 60584', 'Diâmetros e comprimentos sob consulta, com certificado de lote'],
-                 en: ['Types R (Pt-13%Rh/Pt), S (Pt-10%Rh/Pt) and B (Pt-30%Rh/Pt-6%Rh)', 'Tolerances to IEC 60584', 'Diameters and lengths on request, with batch certificate'] },
-      confirm: true },
+      summary: { pt: 'Fornecedor tradicional de fios de termopar de metais nobres — platina e platina-ródio para os tipos R, S e B — no Brasil e no exterior, em representação da SAFINA, refinadora e fabricante de metais preciosos da República Tcheca.',
+                 en: 'A long-established supplier of precious-metal thermocouple wires — platinum and platinum-rhodium for types R, S and B — in Brazil and abroad, representing SAFINA, a precious-metals refiner and manufacturer from the Czech Republic.' },
+      bullets: { pt: ['Tipos R (Pt-13%Rh/Pt), S (Pt-10%Rh/Pt) e B (Pt-30%Rh/Pt-6%Rh)', 'Tolerâncias conforme IEC 60584', 'Além dos diâmetros mais usados, diâmetros especiais e classes de tolerância especiais sob consulta', 'Certificado de lote'],
+                 en: ['Types R (Pt-13%Rh/Pt), S (Pt-10%Rh/Pt) and B (Pt-30%Rh/Pt-6%Rh)', 'Tolerances to IEC 60584', 'Beyond the most common diameters, custom diameters and special tolerance classes on request', 'Batch certificate'] } },
     { id: 'thinfilm', icon: 'chip',
       name: { pt: 'Sensores thin-film de platina', en: 'Platinum thin-film sensors' },
       kind: { pt: 'Distribuição', en: 'Distribution' },
@@ -5444,7 +5553,41 @@ const SENSOR_DATA = {
                  en: 'Platinum thin-film elements for fast-response, high-volume applications, complementing the CWW line.' },
       bullets: { pt: ['Pt100 a Pt1000 em formatos compactos', 'Resposta rápida', 'Pronta entrega para volumes de série'],
                  en: ['Pt100 to Pt1000 in compact formats', 'Fast response', 'Stock availability for series volumes'] } },
+    { id: 'design', icon: 'design', photo: 'products/design.webp', photoFit: 'cover',
+      name: { pt: 'Engenharia de aplicação e design', en: 'Application engineering and design' },
+      kind: { pt: 'Serviço · desenvolvimento sob medida', en: 'Service · custom development' },
+      summary: { pt: 'Nossa equipe de Engenharia de Produto e Aplicações apoia o cliente no desenvolvimento de elementos RTD, micro-aquecedores, sensores de ranhura e componentes semi-montados sob medida para cada aplicação.',
+                 en: 'Our Product Engineering and Applications team supports customers in developing custom RTD sensing elements, micro-heaters, slot sensors and semi-assembled components, tailored to each application.' },
+      bullets: { pt: ['Do conceito ao desenho: especificação, protótipo e validação junto com o cliente', 'Para indústrias de processo: suporte técnico e engenharia para implantação, automação e otimização de linhas e postos de trabalho', 'Inspeção de entrada dos tubos cerâmicos por DOMS (sistema digital de medição óptica)', 'Fio de platina inspecionado em microscópio eletrônico antes de entrar na produção'],
+                 en: ['From concept to drawing: specification, prototype and validation together with the customer', 'For process industries: technical support and engineering for the implementation, automation and optimization of lines and workstations', 'Incoming inspection of ceramic tubes by DOMS (Digital Optical Measurement System)', 'Platinum wire inspected under an electron microscope before it enters production'] } },
+    { id: 'partner', icon: 'partner', layout: 'pillars',
+      name: { pt: 'Por que ser nosso parceiro', en: 'Why partner with us' },
+      kind: { pt: 'Quatro razões que nossos clientes confirmam há décadas', en: 'Four reasons our customers have confirmed for decades' },
+      summary: { pt: 'Do primeiro desenho à produção em escala, o parceiro certo faz diferença em cada etapa.',
+                 en: 'From the first drawing to full-scale production, the right partner makes a difference at every stage.' },
+      bullets: { pt: [], en: [] },
+      pillars: [
+        { icon: 'trust', title: { pt: 'Confiança duradoura', en: 'Enduring trust' }, text: { pt: 'Há décadas, clientes no mundo inteiro depositam sua confiança na Sensor Technology.', en: 'For decades, customers around the world have placed their confidence in Sensor Technology.' } },
+        { icon: 'tailored', title: { pt: 'Soluções sob medida', en: 'Tailored solutions' }, text: { pt: 'Desenvolvemos e entregamos soluções personalizadas para os requisitos de cada cliente.', en: 'We develop and deliver customized solutions designed for each customer\'s unique requirements.' } },
+        { icon: 'leader', title: { pt: 'Liderança de mercado', en: 'Market leadership' }, text: { pt: 'Líder global na fabricação de sensores de temperatura de platina CWW, presente em mais de 50 países.', en: 'A global leader in platinum CWW temperature sensors, serving customers in more than 50 countries.' } },
+        { icon: 'support', title: { pt: 'Suporte completo', en: 'Comprehensive support' }, text: { pt: 'Acompanhamos o parceiro em todas as etapas: do projeto e da engenharia à produção em escala.', en: 'We support our partners at every stage, from initial design and engineering to full-scale production.' } },
+      ] },
   ],
+
+  // Quem somos — textos da apresentação institucional (missão, visão e valores)
+  about: {
+    who: { pt: 'Fundada em 1989, a Sensor Technology construiu uma reputação de excelência em qualidade, atendimento de classe mundial e conhecimento de indústria, com mais de 35 anos de experiência em processos industriais, automação e controle. Nosso portfólio reúne produtos e serviços para as mais diversas aplicações, com soluções confiáveis e inovadoras para clientes no mundo inteiro.',
+           en: 'Founded in 1989, Sensor Technology has built a reputation for excellence in quality, world-class customer service and industry expertise, backed by more than 35 years of experience in industrial processes, automation and control. Our portfolio includes a comprehensive range of products and services tailored to diverse applications, delivering reliable and innovative solutions to customers around the world.' },
+    what: { pt: 'Líder global em sensores de temperatura de platina com tecnologia CWW (Ceramic Wire Wound), a Sensor Technology aplica décadas de experiência para entregar soluções inovadoras e de alto desempenho em mais de 50 países. Também distribuímos sensores de platina thin-film, produtos de quartzo e fios de termopar, com a mesma exigência de qualidade e valor.',
+            en: 'As a global leader in platinum temperature sensors using CWW (Ceramic Wire Wound) technology, Sensor Technology leverages decades of expertise to deliver innovative, high-performance solutions in more than 50 countries. We also distribute platinum thin-film temperature sensors, quartz products and thermocouple wires, with the same demand for quality and value.' },
+    mission: { pt: 'Destacar-se no mercado global de tecnologia integrando soluções inovadoras para os nossos clientes.',
+               en: 'To stand out in the global technology market by integrating innovative solutions for our customers.' },
+    vision: { pt: 'Ser uma empresa líder no mercado global, reconhecida pelos clientes como a melhor opção em inovação, qualidade de produtos, soluções tecnológicas e serviços.',
+              en: 'To be a leading company in the global market, recognized by our customers as the best option for innovation, product quality, technological solutions and services.' },
+    values: { pt: 'Conduta ética, transparência, responsabilidade social e respeito a clientes, fornecedores, pessoas e meio ambiente em todos os aspectos do negócio — sustentados por trabalho em equipe orientado a resultados e por uma visão de longo prazo.',
+              en: 'Ethical conduct, transparency, social responsibility and respect for customers, suppliers, people and the environment in every aspect of our business — upheld through results-driven teamwork and a forward-looking vision that ensures long-term sustainability.' },
+    photos: { who: 'about/factory.webp', what: 'about/lab.webp' },
+  },
 
   // Direção — perfis no estilo "management team" (fotos: team/<arquivo>; sem o arquivo aparecem as iniciais)
   leaders: [
@@ -5546,6 +5689,10 @@ const I18N = {
     qrTitle: 'Leve no celular', qrText: 'Aponte a câmera para abrir esta apresentação no seu telefone.', qrHello: 'Bem-vindo! Navegue pelas seções acima.', desktopHint: 'Dica: desative “Site para computador” no menu do navegador para ver a versão para celular.',
     navHome: 'Início', navHistory: 'História', navWorld: 'Presença global', navMarkets: 'Mercados e aplicações',
     navClients: 'Clientes', navCerts: 'Certificações', navProducts: 'Produtos', navTeam: 'Nosso time', navEnv: 'Ambiental',
+    navWelcome: 'Boas-vindas', navAbout: 'Quem somos',
+    aboutTitle: 'Quem somos', whoWeAre: 'Quem somos', whatWeDo: 'O que fazemos', mission: 'Missão', vision: 'Visão', values: 'Valores',
+    producedCap: 'sensores produzidos desde 1989 — e subindo', statSince: 'sensores desde 1989',
+    watchVideo: 'Assistir ao vídeo institucional', watchSolar: 'Ver o vídeo da usina solar', tapBack: 'Toque para voltar',
     sinceAt: 'Na Sensor desde {y}',
     teamTitle: 'Nosso time', teamMgmt: 'Direção', teamProd: 'Produção', teamAreas: 'Áreas', teamBase: 'A nossa base', orgSoon: 'equipe · em breve', teamMgmtLead: 'Quem conduz a Sensor Technology.', hobbies: 'Fora do trabalho', photoHint: 'foto', brandRep: 'Marca representada',
     envTitle: 'Energia limpa, medida em tempo real', envLead: 'A fábrica de Diadema gera a própria energia com {kwp} kWp de painéis fotovoltaicos no telhado ({modules} módulos). O que não vem do sol vem da rede brasileira, de matriz predominantemente hídrica.',
@@ -5592,6 +5739,10 @@ const I18N = {
     qrTitle: 'Take it with you', qrText: 'Point your camera to open this presentation on your phone.', qrHello: 'Welcome! Browse the sections above.', desktopHint: 'Tip: turn off “Desktop site” in the browser menu to get the phone version.',
     navHome: 'Home', navHistory: 'History', navWorld: 'Global presence', navMarkets: 'Markets and applications',
     navClients: 'Clients', navCerts: 'Certifications', navProducts: 'Products', navTeam: 'Our team', navEnv: 'Environment',
+    navWelcome: 'Welcome', navAbout: 'About us',
+    aboutTitle: 'About us', whoWeAre: 'Who we are', whatWeDo: 'What we do', mission: 'Mission', vision: 'Vision', values: 'Values',
+    producedCap: 'sensors made since 1989 — and counting', statSince: 'sensors since 1989',
+    watchVideo: 'Watch the corporate video', watchSolar: 'Watch the solar plant video', tapBack: 'Tap to return',
     sinceAt: 'At Sensor since {y}',
     teamTitle: 'Our team', teamMgmt: 'Management', teamProd: 'Production', teamAreas: 'Areas', teamBase: 'Our base', orgSoon: 'team · coming soon', teamMgmtLead: 'The people who lead Sensor Technology.', hobbies: 'Outside work', photoHint: 'photo', brandRep: 'Represented brand',
     envTitle: 'Clean energy, measured in real time', envLead: 'The Diadema plant generates its own power with {kwp} kWp of rooftop photovoltaic panels ({modules} modules). What does not come from the sun comes from the Brazilian grid, which is predominantly hydroelectric.',
@@ -5639,6 +5790,21 @@ const I18N = {
    ------------------------------------------------------------ */
 const P = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const ICONS = {
+  welcome: P('<path d="M7 11V6.5a1.5 1.5 0 0 1 3 0V11"/><path d="M10 10V4.5a1.5 1.5 0 0 1 3 0V10"/><path d="M13 10.5V6a1.5 1.5 0 0 1 3 0v6.5"/><path d="M16 12.5V9a1.5 1.5 0 0 1 3 0v5.5A6.5 6.5 0 0 1 12.5 21h-1a6.5 6.5 0 0 1-5.6-3.2L3.6 14a1.6 1.6 0 0 1 2.7-1.7L7 13.5"/>'),
+  about: P('<path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M9 21v-5h6v5"/><path d="M9 11h.01M15 11h.01M12 11h.01"/>'),
+  aero: P('<path d="M12 2c3 3 4 7 4 11l3 3v3l-4-2-1 3h-4l-1-3-4 2v-3l3-3c0-4 1-8 4-11z"/><circle cx="12" cy="10" r="1.5"/>'),
+  slot: P('<rect x="3" y="7" width="18" height="10" rx="1.5"/><path d="M7 7v10M11 7v10M15 7v10"/><path d="M19 12h3"/>'),
+  sp01: P('<path d="M10 3h4v10.5a4 4 0 1 1-4 0z"/><path d="M12 9v6"/><circle cx="12" cy="17" r="1.2"/>'),
+  design: P('<path d="M3 21 14.5 9.5"/><path d="m12 7 5 5"/><path d="m15 4 5 5-9 9H6v-5z"/><path d="M17 2l5 5"/>'),
+  partner: P('<path d="M8 12.5 4.5 9a2.5 2.5 0 0 1 0-3.5h0a2.5 2.5 0 0 1 3.5 0L12 9.5l4-4a2.5 2.5 0 0 1 3.5 0h0a2.5 2.5 0 0 1 0 3.5L16 12.5"/><path d="m8 12.5 4 4 4-4"/><path d="M10 14.5 12 16.5"/><path d="M12 16.5v3"/>'),
+  trust: P('<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/>'),
+  tailored: P('<path d="M4 20l6-6"/><path d="m14 4 6 6-9 9H5v-6z"/><path d="M13 7l4 4"/>'),
+  leader: P('<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/><path d="m9 9 3-2 3 2"/>'),
+  support: P('<path d="M4 13a8 8 0 0 1 16 0"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/><path d="M19 19a3 3 0 0 1-3 3h-2"/>'),
+  target: P('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3"/>'),
+  eye: P('<path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+  hands: P('<path d="M12 21c-5-3-8-6-8-10a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 4-3 7-8 10z"/>'),
+  play: P('<path d="M8 5v14l11-7z"/>'),
   home: P('<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/>'),
   history: P('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
   world: P('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>'),
@@ -5691,9 +5857,9 @@ const exportCountries = D.countries.map((a2) => countryByA2.get(a2)).filter(Bool
 /* ------------------------------------------------------------
    Estado, navegação e quiosque
    ------------------------------------------------------------ */
-const SCREENS = ['attract', 'home', 'history', 'team', 'world', 'markets', 'clients', 'certs', 'env', 'products', 'viewer'];
+const SCREENS = ['attract', 'home', 'history', 'about', 'team', 'world', 'markets', 'clients', 'certs', 'env', 'products', 'viewer'];
 const RAIL = [
-  ['home', 'navHome'], ['history', 'navHistory'], ['team', 'navTeam'], ['world', 'navWorld'], ['markets', 'navMarkets'],
+  ['attract', 'navWelcome'], ['home', 'navHome'], ['history', 'navHistory'], ['about', 'navAbout'], ['team', 'navTeam'], ['world', 'navWorld'], ['markets', 'navMarkets'],
   ['clients', 'navClients'], ['certs', 'navCerts'], ['env', 'navEnv'], ['products', 'navProducts'],
 ];
 let current = 'attract';
@@ -5739,21 +5905,30 @@ function go(name) {
   if (name === 'world') World.enter();
   if (name === 'env') Energy.enter(); else if (prev === 'env') Energy.leave();
   if (name === 'team') Team.enter(); else if (prev === 'team') Team.leave();
+  if (prev === 'attract' && name !== 'attract') Videos.stop(false);
   if (IS_MOBILE) { window.scrollTo(0, 0); const rb = $('#rail button.on'); if (rb) { const r = $('#rail'); r.scrollTo({ left: rb.offsetLeft - (r.clientWidth - rb.offsetWidth) / 2, behavior: 'smooth' }); } }
 }
 
+// Volta à tela de boas-vindas e repete a saudação por voz (toque no trilho ou na faixa do cabeçalho)
+function goWelcome() {
+  go('attract');
+  if (Welcome.active) setTimeout(() => Welcome.speak(false), 350);
+}
 function buildRail() {
   const rail = $('#rail');
   rail.innerHTML = '';
-  RAIL.filter(([s]) => !HIDDEN.has(s)).forEach(([s, k], idx) => {
+  const items = RAIL.filter(([s]) => !HIDDEN.has(s) && (s !== 'attract' || (Welcome.active && !IS_MOBILE)));
+  items.forEach(([s, k]) => {
     const b = document.createElement('button');
     b.type = 'button';
     b.dataset.screen = s;
-    b.innerHTML = `<span class="i">${ICONS[s]}</span><span data-i18n="${k}"></span>`;
-    b.addEventListener('click', () => go(s));
+    b.innerHTML = `<span class="i">${ICONS[s === 'attract' ? 'welcome' : s]}</span><span data-i18n="${k}"></span>`;
+    b.addEventListener('click', () => (s === 'attract' ? goWelcome() : go(s)));
+    if (s === 'attract') b.classList.add('wchip');
     rail.appendChild(b);
-    if (idx === 0) { const sep = document.createElement('div'); sep.className = 'sep'; rail.appendChild(sep); }
+    if (s === 'home') { const sep = document.createElement('div'); sep.className = 'sep'; rail.appendChild(sep); }
   });
+  if (typeof applyI18n === 'function' && D) $$('#rail [data-i18n]').forEach((el) => { el.textContent = T(el.dataset.i18n); });
 }
 
 function applyI18n() {
@@ -5763,7 +5938,7 @@ function applyI18n() {
   const y = new Date().getFullYear();
   $('#attract-title').textContent = L(D.attract.title);
   $('#attract-text').textContent = L(D.attract.text);
-  $('#counter-cap').textContent = T('counterCap', { year: y });
+  $('#counter-cap').textContent = D.company.producedBase ? T('producedCap') : T('counterCap', { year: y });
   $('#home-eyebrow').textContent = L(D.home.eyebrow || '');
   $('#home-title').textContent = L(D.home.title);
   $('#home-text').textContent = L(D.home.text);
@@ -5773,7 +5948,8 @@ function applyI18n() {
   $('#stat-people').textContent = fmtInt(D.company.employees);
   $('#viewer-sub').textContent = T('viewerSub');
   $('#admin-idle').textContent = D.kiosk.idleSeconds + ' ' + T('seconds');
-  History.render(); World.render(); Markets.render(); Clients.render(); Certs.render(); Products.render(); Viewer.renderPanels(); Team.render(); Energy.render();
+  History.render(); About.render(); World.render(); Markets.render(); Clients.render(); Certs.render(); Products.render(); Viewer.renderPanels(); Team.render(); Energy.render();
+  const sb = $('#env-video'); if (sb) { sb.hidden = !(D.media && D.media.solar); $('span', sb).textContent = T('watchSolar'); sb.onclick = () => Videos.playManual(D.media.solar); }
 }
 
 let userChoseLang = false;
@@ -5823,7 +5999,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.10-0609';
+const BUILD = '2026.11.10-1142';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -5924,6 +6100,7 @@ const Welcome = {
     Globe.spotlight(this.active ? this.spotList() : []);
     this.render();
     if (this.active && (!was || !hadVoice)) { this.lastSpoke = 0; if (current === 'attract') this.onAttract(); }
+    if (was !== this.active) { buildRail(); $$('#rail button').forEach((b) => b.classList.toggle('on', b.dataset.screen === current)); }
     if (!this.active && this.audio) { try { this.audio.pause(); } catch (e) {} }
   },
   guestName(g) {
@@ -6060,17 +6237,19 @@ const Videos = {
     if (idle < 15 || since < this.every) return;
     this.play(this.items[(this.idx = (this.idx + 1) % this.items.length)]);
   },
-  play(item) {
+  manual: false,
+  play(item, opts) {
     const layer = $('#video-layer'), v = $('#video-el');
-    this.playing = true; clearTimeout(this.hideT);
+    this.playing = true; this.manual = !!(opts && opts.manual); clearTimeout(this.hideT);
+    try { if (Welcome.audio && !Welcome.audio.paused) Welcome.audio.pause(); if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
     const title = L(item.title || '');
     $('#vcap-title').textContent = title; $('#video-layer .vcap').hidden = !title;
-    $('#video-hint').textContent = T('tap');
+    $('#video-hint').textContent = this.manual ? T('tapBack') : T('tap');
     v.muted = this.muted || item.muted === true; v.volume = item.volume == null ? this.volume : Math.min(1, Math.max(0, +item.volume || 0));
     v.loop = false; v.src = item.src;
     layer.hidden = false; layer.classList.remove('on'); void layer.offsetWidth; layer.classList.add('on');
     document.body.classList.add('video-on');
-    $('#globe-canvas').classList.add('hidden');
+    if (!this.manual) $('#globe-canvas').classList.add('hidden');
     const end = () => Videos.stop(true);
     v.onended = end; v.onerror = end;
     v.play().catch((err) => {
@@ -6081,14 +6260,15 @@ const Videos = {
   },
   stop(backToGlobe) {
     if (!this.playing) return;
-    this.playing = false; this.lastEnd = performance.now(); clearTimeout(this.guard);
+    const wasManual = this.manual; this.playing = false; this.manual = false; this.lastEnd = performance.now(); clearTimeout(this.guard);
     const layer = $('#video-layer'), v = $('#video-el');
     try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {}
     document.body.classList.remove('video-on');
     layer.classList.remove('on');
     clearTimeout(this.hideT); this.hideT = setTimeout(() => { if (!Videos.playing) layer.hidden = true; }, backToGlobe ? 700 : 0);
-    if (backToGlobe && current === 'attract') $('#globe-canvas').classList.remove('hidden');
+    if (backToGlobe && current === 'attract' && !wasManual) $('#globe-canvas').classList.remove('hidden');
   },
+  playManual(media) { if (!media || !media.src) return; this.play({ src: media.src, title: media.title, maxSeconds: 900 }, { manual: true }); },
   async prefetch() {
     if (!this.enabled || location.protocol === 'file:' || !navigator.onLine) return;
     for (const it of this.items) {
@@ -6112,11 +6292,16 @@ function productionNow() {
   const y1 = new Date(now.getFullYear() + 1, 0, 1).getTime();
   return D.company.annualProduction * ((now.getTime() - y0) / (y1 - y0));
 }
+function producedNow() {
+  const c = D.company; if (!c.producedBase) return productionNow();
+  const t0 = new Date(c.producedAsOf + 'T00:00:00').getTime();
+  return c.producedBase + c.annualProduction * Math.max(0, (Date.now() - t0) / (365.25 * 86400000));
+}
 const Attract = {
   anim: 0, timer: 0,
   enter() {
     const el = $('#counter-num');
-    const target = productionNow();
+    const target = producedNow();
     const t0 = performance.now();
     cancelAnimationFrame(this.anim);
     const step = () => {
@@ -6129,15 +6314,17 @@ const Attract = {
     Videos.onAttract();
     Welcome.onAttract();
   },
-  tick() { clearInterval(this.timer); this.timer = setInterval(() => { $('#counter-num').textContent = fmtInt(productionNow()); }, 1000); },
+  tick() { clearInterval(this.timer); this.timer = setInterval(() => { $('#counter-num').textContent = fmtInt(producedNow()); }, 1000); },
   leave() { cancelAnimationFrame(this.anim); clearInterval(this.timer); Videos.stop(false); },
 };
 const Home = {
+  timer: 0,
   enter() {
-    const el = $('#stat-year'); const target = productionNow(); const t0 = performance.now();
-    const step = () => { const t = Math.min(1, (performance.now() - t0) / 1600); el.textContent = fmtInt(lerp(0, target, ease(t))); if (t < 1 && current === 'home') requestAnimationFrame(step); };
+    const el = $('#stat-year'), el2 = $('#stat-since'); const target = productionNow(), target2 = producedNow(); const t0 = performance.now();
+    const step = () => { const t = Math.min(1, (performance.now() - t0) / 1600); el.textContent = fmtInt(lerp(0, target, ease(t))); el2.textContent = fmtInt(lerp(0, target2, ease(t))); if (t < 1 && current === 'home') requestAnimationFrame(step); else if (current === 'home') Home.tick(); };
     requestAnimationFrame(step);
   },
+  tick() { clearInterval(this.timer); this.timer = setInterval(() => { if (current !== 'home') { clearInterval(Home.timer); return; } $('#stat-since').textContent = fmtInt(producedNow()); $('#stat-year').textContent = fmtInt(productionNow()); }, 1000); },
 };
 
 /* ------------------------------------------------------------
@@ -6155,6 +6342,7 @@ const History = {
       nodes.appendChild(n);
       const y = document.createElement('span'); y.textContent = h.year && !h.label ? h.year : L(h.label) || h.year; years.appendChild(y);
     });
+    const vb = $('#tl-video'); if (vb) { vb.hidden = !(D.media && D.media.institutional); vb.onclick = () => Videos.playManual(D.media.institutional); }
     $('#tl-prev').onclick = () => History.set((History.i - 1 + H.length) % H.length, true);
     $('#tl-next').onclick = () => History.set((History.i + 1) % H.length, true);
     this.set(this.i, false);
@@ -6255,10 +6443,31 @@ const Products = {
   detail(p, el) {
     el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap');
     const brand = p.brand ? `<div class="brand-rep"><img src="${p.brand.logo}" alt="${p.brand.name}" draggable="false" onerror="this.replaceWith(Object.assign(document.createElement('b'),{textContent:'${p.brand.name}'}))"><span><small>${T('brandRep')}</small>${L(p.brand.note)}</span></div>` : '';
-    el.innerHTML = `<div class="i-big">${ICONS[p.icon] || ''}</div><h3>${L(p.name)}</h3><div class="kind">${L(p.kind)}</div><p class="sum">${L(p.summary)}</p>${brand}
-      <ul>${(p.bullets[LANG] || p.bullets.pt).map((a) => `<li>${a}</li>`).join('')}</ul>
-      <div class="foot">${p.has3d ? `<button type="button" class="btn primary" id="btn-3d">${T('explore3d')}</button>` : ''}${p.confirm && D.provisional ? `<span class="tag" style="color:var(--glow);border-color:rgba(255,210,122,.4)">${T('confirmFlag')}</span>` : ''}</div>`;
-    const b = $('#btn-3d', el); if (b) b.addEventListener('click', () => go('viewer'));
+    const v3 = p.has3d === true ? 'cww' : p.has3d;
+    const can3d = v3 && Viewer.supports(v3);
+    const btn3d = can3d ? `<button type="button" class="btn primary ph-3d" id="btn-3d">${ICONS.cww}<span>${T('explore3d')}</span></button>` : '';
+    const photo = p.photo ? `<div class="photo prod ${p.photoFit || 'contain'}"><img class="ph on" src="${p.photo}" alt="" draggable="false" decoding="async"><span class="badge">${ICONS[p.icon] || ''}</span>${btn3d}</div>` : `<div class="i-big">${ICONS[p.icon] || ''}</div>`;
+    const pillars = p.layout === 'pillars' && p.pillars ? `<div class="pillars">${p.pillars.map((pl) => `<div class="pillar"><span class="pi">${ICONS[pl.icon] || ''}</span><b>${L(pl.title)}</b><p>${L(pl.text)}</p></div>`).join('')}</div>` : '';
+    const bullets = (p.bullets[LANG] || p.bullets.pt);
+    el.innerHTML = `${photo}<h3>${L(p.name)}</h3><div class="kind">${L(p.kind)}</div><p class="sum">${L(p.summary)}</p>${brand}${pillars}
+      ${bullets.length ? `<ul>${bullets.map((a) => `<li>${a}</li>`).join('')}</ul>` : ''}
+      <div class="foot">${can3d && !p.photo ? `<button type="button" class="btn primary" id="btn-3d">${T('explore3d')}</button>` : ''}${p.confirm && D.provisional ? `<span class="tag" style="color:var(--glow);border-color:rgba(255,210,122,.4)">${T('confirmFlag')}</span>` : ''}</div>`;
+    const b = $('#btn-3d', el); if (b) b.addEventListener('click', () => { Viewer.select(v3); go('viewer'); });
+  },
+};
+
+/* ------------------------------------------------------------
+   Quem somos — missão, visão e valores
+   ------------------------------------------------------------ */
+const About = {
+  render() {
+    const a = D.about; if (!a) return;
+    $('#about-who').textContent = L(a.who); $('#about-what').textContent = L(a.what);
+    $('#about-mission').textContent = L(a.mission); $('#about-vision').textContent = L(a.vision); $('#about-values').textContent = L(a.values);
+    const ph = a.photos || {};
+    const w = $('#about-ph-who'), x = $('#about-ph-what');
+    if (w) { w.style.backgroundImage = ph.who ? `url(${ph.who})` : ''; w.hidden = !ph.who; }
+    if (x) { x.style.backgroundImage = ph.what ? `url(${ph.what})` : ''; x.hidden = !ph.what; }
   },
 };
 
@@ -6271,7 +6480,7 @@ const Clients = {
     const list = D.clients.length ? D.clients : Array.from({ length: D.clientsPlaceholders || 12 }, () => null);
     const n = list.length;
     let cols = n <= 4 ? n : 4;
-    if (n > 4) { const opts = [4, 5, 6].map((c) => ({ c, rest: (c - (n % c)) % c, rows: Math.ceil(n / c) })).filter((o) => o.rows <= 4); opts.sort((a, b) => a.rest - b.rest || a.c - b.c); cols = (opts[0] || { c: 6 }).c; }
+    if (n > 4) { const opts = [4, 5, 6, 7].map((c) => ({ c, rest: (c - (n % c)) % c, rows: Math.ceil(n / c) })).filter((o) => o.rows <= 4); opts.sort((a, b) => a.rest - b.rest || a.c - b.c); cols = (opts[0] || { c: 6 }).c; }
     w.style.gridTemplateColumns = IS_MOBILE ? '' : `repeat(${cols}, 1fr)`;
     list.forEach((c, k) => {
       const t = document.createElement('div'); t.className = 'tile'; t.style.setProperty('--k', k);
@@ -6831,7 +7040,7 @@ const Globe = (function () {
     tmp.project(camera);
     const sx = (tmp.x * 0.5 + 0.5) * w, sy = (-tmp.y * 0.5 + 0.5) * h;
     const el = ensureLabel();
-    const vis = facing > 0.15 && mode !== 'viewer' && !['markets', 'clients', 'certs', 'products', 'history', 'env', 'team'].includes(mode);
+    const vis = facing > 0.15 && mode !== 'viewer' && !['markets', 'clients', 'certs', 'products', 'history', 'env', 'team', 'about'].includes(mode);
     el.classList.toggle('on', vis);
     el.style.left = clamp(sx, 90, w - 90) + 'px'; el.style.top = clamp(sy - 34, IS_MOBILE ? 136 : 96, h - 40) + 'px';
     active.material.opacity = vis ? 0.75 + 0.25 * Math.sin(now * 0.006) : 0;
@@ -7433,7 +7642,10 @@ const Viewer = (function () {
     placeLabels();
     renderer.render(scene, camera);
   }
-  return { show, hide, render, renderPanels, setMode, settle, showHero, hideHero, heroActive: () => heroOn };
+  let kind = 'cww';
+  function supports(k) { return k === 'cww'; }
+  function select(k) { if (supports(k)) kind = k; }
+  return { show, hide, render, renderPanels, setMode, settle, showHero, hideHero, heroActive: () => heroOn, supports, select, kind: () => kind };
 })();
 
 /* ------------------------------------------------------------
@@ -7452,7 +7664,8 @@ go(IS_MOBILE ? 'home' : 'attract');
 if (IS_MOBILE && new URLSearchParams(location.search).get('qr')) setTimeout(() => toast(T('qrHello')), 1200);
 if (DESKTOP_SITE_ON_PHONE) setTimeout(() => toast(T('desktopHint'), 8000), 2600);
 requestAnimationFrame(loop);
-$('#video-layer').addEventListener('pointerup', () => { Videos.stop(false); go('home'); });
+$('#video-layer').addEventListener('pointerup', () => { const manual = Videos.manual; Videos.stop(false); if (!manual) go('home'); });
+$('#ribbon').addEventListener('click', goWelcome);
 $('#w-voice').addEventListener('click', () => Welcome.speak(false));
 document.addEventListener('pointerdown', () => Welcome.unlock(), { passive: true });
 try { if (window.fully && typeof fully.bind === 'function') fully.bind('onMotion', 'window.SensorApp && window.SensorApp.Welcome.onMotion();'); } catch (e) {}
