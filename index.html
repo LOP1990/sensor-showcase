@@ -845,6 +845,17 @@ body.mobile .tour-start .btn.primary { padding: 12px 18px; }
 .qr[hidden] { display: none !important; }
 @media (min-height: 940px) { .about-grid { align-items: stretch; } .about-col .about-card { flex: 1; } }
 
+/* ---- orelhinha da apresentação guiada (todas as telas, exceto atração e 3D) ---- */
+.tour-tab { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); z-index: 39; display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 16px 8px; border-radius: 14px 14px 0 0; border: 1px solid var(--line-2); border-bottom: 0;
+  background: rgba(9, 13, 20, .55); color: var(--text-2); font-size: clamp(12px, .95vw, 14px); font-weight: 500;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); opacity: .8; transition: opacity .25s, transform .25s, background .25s; }
+.tour-tab svg { width: 16px; height: 16px; }
+.tour-tab .pl { width: 14px; height: 14px; color: var(--plat-2); }
+.tour-tab:active { opacity: 1; background: rgba(191, 211, 230, .16); transform: translateX(-50%) translateY(-2px); }
+.tour-tab[hidden], body.tour-on .tour-tab, body.video-on .tour-tab { display: none; }
+body.mobile .tour-tab { bottom: env(safe-area-inset-bottom); font-size: 12px; padding: 5px 14px 7px; }
+
 </style>
 </head>
 <body>
@@ -1120,7 +1131,7 @@ body.mobile .tour-start .btn.primary { padding: 12px 18px; }
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-1339</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-1407</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -1139,6 +1150,7 @@ body.mobile .tour-start .btn.primary { padding: 12px 18px; }
   </div>
   <audio id="welcome-audio" preload="auto"></audio>
   <audio id="tour-audio" preload="auto"></audio>
+  <button type="button" id="tour-tab" class="tour-tab" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg><span data-i18n="tourStart"></span><svg class="pl" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
   <div id="tour" class="tour" hidden>
     <div class="tbar">
       <div class="tctl">
@@ -5991,8 +6003,7 @@ function go(name) {
   if (HIDDEN.has(name)) name = 'home';
   if (!SCREENS.includes(name)) return;
   const prev = current;
-  if (typeof Tour !== 'undefined' && Tour.on && Tour.playing && !Tour.navigating && name !== prev) Tour.pause();
-  if (typeof Tour !== 'undefined' && Tour.on && name === 'attract' && !Tour.navigating) Tour.stop();
+  if (typeof Tour !== 'undefined' && !Tour.navigating) { if (name === 'attract') { if (Tour.on) Tour.stop(); } else if (name !== prev) Tour.onUserNav(name); }
   current = name;
   SCREENS.forEach((s) => $('#s-' + s).classList.toggle('active', s === name));
   $$('#rail button').forEach((b) => b.classList.toggle('on', b.dataset.screen === name));
@@ -6013,6 +6024,7 @@ function go(name) {
   if (name === 'env') Energy.enter(); else if (prev === 'env') Energy.leave();
   if (name === 'team') Team.enter(); else if (prev === 'team') Team.leave();
   if (prev === 'attract' && name !== 'attract') { Videos.stop(false); Welcome.stopVoice(); }
+  const tt = $('#tour-tab'); if (tt) tt.hidden = !(typeof Tour !== 'undefined' && Tour.available()) || name === 'attract' || name === 'viewer';
   if (IS_MOBILE) { window.scrollTo(0, 0); const rb = $('#rail button.on'); if (rb) { const r = $('#rail'); r.scrollTo({ left: rb.offsetLeft - (r.clientWidth - rb.offsetWidth) / 2, behavior: 'smooth' }); } }
 }
 
@@ -6106,7 +6118,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.10-1339';
+const BUILD = '2026.11.10-1407';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -6167,6 +6179,7 @@ const RemoteConfig = {
     const prev = this.cfg; this.cfg = cfg;
     if (!userChoseLang && cfg.defaultLang && I18N[cfg.defaultLang] && cfg.defaultLang !== LANG) setLang(cfg.defaultLang);
     Welcome.apply(cfg.welcome || {});
+    Motion.apply(Welcome.cfg.voice || {});
     Videos.apply(cfg.videos || {});
     const cf = Array.isArray(cfg.clientsFirst) ? cfg.clientsFirst : [];
     if (cf.join('|') !== (Clients.first || []).join('|')) { Clients.first = cf; Clients.render(); }
@@ -6198,7 +6211,19 @@ const Welcome = {
     this.guests().forEach((g) => { if (g.country && !seen.has(g.country)) seen.set(g.country, { a2: g.country, label: [g.countryNative, this.countryName(g.country)].filter(Boolean).join(' · ') }); });
     return [...seen.values()];
   },
+  // schedule: [{ from, until, guests: [nomes], languages, linePt, voice: {...} }] sobrepõe a config no(s) dia(s) indicado(s)
+  resolve(w) {
+    if (!w || !Array.isArray(w.schedule) || !w.schedule.length) return w;
+    const t = new Date(); const d = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+    const e = w.schedule.find((x) => x && (!x.from || d >= x.from) && (!x.until || d <= x.until));
+    if (!e) return w;
+    const out = Object.assign({}, w, e); delete out.schedule;
+    if (Array.isArray(e.guests) && e.guests.length && typeof e.guests[0] === 'string') { const want = e.guests.map((n) => String(n).toLowerCase()); out.guests = (w.guests || []).filter((g) => g && want.includes(String(g.name || '').toLowerCase())).sort((a, b) => want.indexOf(String(a.name).toLowerCase()) - want.indexOf(String(b.name).toLowerCase())); }
+    if (e.voice) out.voice = Object.assign({}, w.voice || {}, e.voice);
+    return out;
+  },
   apply(w) {
+    w = this.resolve(w);
     const was = this.active;
     const hadVoice = !!(this.cfg.voice && (this.cfg.voice.audio || this.cfg.voice.text));
     this.cfg = w || {}; this.active = this.isActive(w);
@@ -6395,6 +6420,40 @@ const Videos = {
   },
 };
 
+/* Movimento pela câmera frontal (getUserMedia): alguém passando na recepção dispara a saudação.
+   Liga no quiosque (Fully) ou com config.json → welcome.voice.cameraMotion: "always"; "off" desliga. */
+const Motion = {
+  stream: null, video: null, ctx: null, prev: null, hits: 0, timer: 0, cfg: {},
+  apply(voice) {
+    const mode = (voice && voice.cameraMotion) || 'kiosk';
+    const want = !IS_MOBILE && mode !== 'off' && (mode === 'always' || !!window.fully);
+    this.cfg = { threshold: +((voice && voice.motionThreshold) || 28), area: +((voice && voice.motionArea) || 0.06) };
+    if (want && !this.stream && !this.starting) this.start(); else if (!want && this.stream) this.stop();
+  },
+  start() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    this.starting = true;
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 160 }, height: { ideal: 120 }, frameRate: { ideal: 5, max: 10 } }, audio: false }).then((st) => {
+      this.starting = false; this.stream = st;
+      const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.srcObject = st; v.play().catch(() => {}); this.video = v;
+      const c = document.createElement('canvas'); c.width = 48; c.height = 36; this.ctx = c.getContext('2d', { willReadFrequently: true });
+      clearInterval(this.timer); this.timer = setInterval(() => Motion.tick(), 400);
+    }).catch(() => { this.starting = false; });
+  },
+  stop() { clearInterval(this.timer); try { (this.stream.getTracks() || []).forEach((t) => t.stop()); } catch (e) {} this.stream = null; this.video = null; this.prev = null; },
+  tick() {
+    if (!this.video || this.video.readyState < 2) return;
+    const W = 48, H = 36, n = W * H; this.ctx.drawImage(this.video, 0, 0, W, H);
+    const d = this.ctx.getImageData(0, 0, W, H).data, cur = new Uint8Array(n);
+    for (let i = 0; i < n; i++) cur[i] = (d[i * 4] * 3 + d[i * 4 + 1] * 6 + d[i * 4 + 2]) / 10;
+    if (this.prev) {
+      let changed = 0; for (let i = 0; i < n; i++) if (Math.abs(cur[i] - this.prev[i]) > this.cfg.threshold) changed++;
+      if (changed / n > this.cfg.area) { if (++this.hits >= 2) { this.hits = 0; this.lastMotion = performance.now(); Welcome.onMotion(); } } else this.hits = Math.max(0, this.hits - 1);
+    }
+    this.prev = cur;
+  },
+};
+
 function toast(msg, ms = 2200) {
   const t = $('#toast'); t.textContent = msg; t.classList.add('on');
   clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('on'), ms);
@@ -6475,7 +6534,7 @@ const History = {
     const card = $('#tl-card'); card.classList.remove('swap'); void card.offsetWidth; card.classList.add('swap');
     $('#tl-title').textContent = L(h.title); $('#tl-text').textContent = L(h.text);
     $('#tl-flag').hidden = !(h.confirm && D.provisional);
-    if (user) this.arm();
+    if (user) { this.arm(); if (typeof Tour !== 'undefined') Tour.onUserNav('history', { index: i }); }
   },
   enter() { this.set(0, false); this.arm(); },
   leave() { clearInterval(this.timer); },
@@ -6531,7 +6590,7 @@ function renderPicker(pickerEl, detailEl, items, renderDetail, state) {
     const b = document.createElement('button'); b.type = 'button';
     b.innerHTML = `<span class="i">${ICONS[it.icon] || ''}</span><span>${L(it.name)}</span>`;
     b.classList.toggle('on', i === state.i);
-    b.addEventListener('click', () => { state.i = i; $$('button', pickerEl).forEach((x, k) => x.classList.toggle('on', k === i)); renderDetail(it, detailEl); });
+    b.addEventListener('click', () => { state.i = i; $$('button', pickerEl).forEach((x, k) => x.classList.toggle('on', k === i)); renderDetail(it, detailEl); if (pickerEl.id === 'products-picker' && typeof Tour !== 'undefined') Tour.onUserNav('products', { product: it.id }); });
     pickerEl.appendChild(b);
   });
   renderDetail(items[state.i], detailEl);
@@ -7820,6 +7879,45 @@ const Tour = {
     this.goStep(this.i, wasPlaying || !this.ended);
   },
 
+  // ---- o visitante navegou por conta própria: a apresentação acompanha ----
+  stepFor(screen, extra) {
+    const S = this.steps(); extra = extra || {};
+    if (screen === 'products' && extra.product) {
+      const k = S.findIndex((s) => s.screen === 'products' && s.product === extra.product); if (k >= 0) return k;
+      for (let j = 0; j < S.length; j++) { const ci = (S[j].cues || []).findIndex((c) => c.product === extra.product); if (ci >= 0) { extra.cue = ci; return j; } }
+      return -2; // produto sem narração própria: não muda de passo
+    }
+    if (screen === 'history' && extra.index != null) {
+      const H = D.history; let best = -1, bestIdx = -1;
+      S.forEach((s, k) => { if (s.screen !== 'history' || s.history == null) return; const idx = s.history < 0 ? H.length + s.history : s.history; if (idx <= extra.index && idx > bestIdx) { bestIdx = idx; best = k; } });
+      if (best >= 0) return best;
+    }
+    return S.findIndex((s) => s.screen === screen);
+  },
+  onUserNav(screen, extra) {
+    if (!this.on || this.navigating || !this.available()) return;
+    extra = extra || {}; const k = this.stepFor(screen, extra);
+    if (k === -2) return;
+    if (k < 0) { if (this.playing) this.pause(); return; }
+    const cur = this.steps()[this.i];
+    const same = k === this.i || (cur && cur.screen === screen && !(extra && (extra.product || extra.index != null)));
+    if (same) return;
+    const keepPlaying = this.playing; this.gen++; this.i = k; this.ended = false; this.fired = new Set(); this.stopAudio();
+    // produto narrado no meio do passo: começa a narração nesse trecho e dá as deixas anteriores por disparadas
+    if (extra.cue != null) { const cues = this.steps()[k].cues || []; this.startAt = cues[extra.cue].at; cues.forEach((c, ci) => { if (ci <= extra.cue) this.fired.add(ci); }); }
+    // a tela já foi trocada pelo visitante: só sincroniza seleções internas (produto, marco) e a barra
+    const step = this.steps()[k]; this.navigating = true;
+    try { if (step.screen === 'history' && step.history != null && !(extra && extra.index != null)) { const H = D.history; History.set(step.history < 0 ? H.length + step.history : step.history, false); History.leave(); } if (step.screen === 'products' && step.product && !(extra && extra.product)) this.pick('#products-picker', D.products, step.product); if (step.screen === 'history') History.leave(); } finally { this.navigating = false; }
+    this.renderBar();
+    if (keepPlaying) this.play(); else { this.playing = false; this.renderControls(); }
+  },
+  // orelhinha: abre a barra no passo da tela atual, pausada, esperando o play
+  open() {
+    if (!this.available()) return;
+    if (!this.on) { this.lang = TOUR_LANG_NAMES[this.lang] ? this.lang : (TOUR.default || 'en'); this.on = true; this.ended = false; document.body.classList.add('tour-on'); $('#tour').hidden = false; this.buildBar(); }
+    const k = Math.max(0, this.stepFor(current, { product: current === 'products' ? (D.products[Products.st.i] || {}).id : undefined }));
+    this.goStep(k, false);
+  },
   // ---- navegação do roteiro ----
   apply(step, cue) {
     const c = cue || step;
@@ -7842,7 +7940,7 @@ const Tour = {
   },
   goStep(i, autoplay) {
     const S = this.steps(); if (!S.length) return;
-    this.i = clamp(i, 0, S.length - 1); this.ended = false; this.fired = new Set(); this.gen++;
+    this.i = clamp(i, 0, S.length - 1); this.ended = false; this.fired = new Set(); this.gen++; this.startAt = 0;
     const step = S[this.i];
     this.stopAudio();
     this.apply(step);
@@ -7870,7 +7968,8 @@ const Tour = {
     const g = this.gen;
     a.onended = () => { if (Tour.gen === g && Tour.playing && Tour.mode === 'audio') Tour.afterStep(); };
     a.onerror = () => { if (Tour.gen === g && Tour.mode === 'audio') Tour.synth(step); };
-    a.play().then(() => { if (Tour.gen !== g) return; this.mode = 'audio'; this.tick(); }).catch((err) => {
+    const startAt = this.startAt || 0; this.startAt = 0;
+    a.play().then(() => { if (Tour.gen !== g) return; this.mode = 'audio'; if (startAt > 0) { const seek = () => { try { if (a.duration) a.currentTime = startAt * a.duration; } catch (e) {} }; if (a.duration) seek(); else a.addEventListener('loadedmetadata', seek, { once: true }); } this.tick(); }).catch((err) => {
       if (Tour.gen !== g) return;
       if (err && err.name === 'NotAllowedError') { this.pause(); toast(T('tapToPlay')); return; }
       this.synth(step);
@@ -7999,6 +8098,7 @@ $('#ribbon').addEventListener('click', goWelcome);
   $('#tour-prev').addEventListener('click', () => Tour.prev());
   $('#tour-next').addEventListener('click', () => Tour.next());
   $('#tour-close').addEventListener('click', () => Tour.stop());
+  const tab = $('#tour-tab'); if (tab) tab.addEventListener('click', () => Tour.open());
 })();
 $('#w-voice').addEventListener('click', () => Welcome.speak(false));
 document.addEventListener('pointerdown', () => Welcome.unlock(), { passive: true });
@@ -8006,7 +8106,7 @@ try { if (window.fully && typeof fully.bind === 'function') fully.bind('onMotion
 RemoteConfig.start();
 Updater.start();
 Energy.start();
-window.SensorApp = { go, setLang, Viewer, Globe, Welcome, Videos, RemoteConfig, Energy, Tour, data: D, build: BUILD, checkUpdate: () => Updater.check() };
+window.SensorApp = { go, setLang, Viewer, Globe, Welcome, Videos, RemoteConfig, Energy, Tour, Motion, data: D, build: BUILD, checkUpdate: () => Updater.check() };
 })();
 
 </script>

@@ -65,10 +65,52 @@
       "audio": "audio/welcome.mp3",
       "text": "若月様、竹下様、ようこそお越しくださいました。センサー・テクノロジー一同、オージージーの皆様を心より歓迎いたします。遠いブラジルまでお越しいただき、誠にありがとうございます。どうぞごゆっくりお過ごしください。",
       "lang": "ja-JP",
-      "everyMinutes": 10,
+      "everyMinutes": 3,
       "buttonLabel": "Begrüßung · 音声メッセージ · Play greeting",
-      "motionMinutes": 3
-    }
+      "motionMinutes": 2,
+      "seconds": 42,
+      "cameraMotion": "kiosk"
+    },
+    "schedule": [
+      {
+        "from": "2026-11-10",
+        "until": "2026-11-10",
+        "guests": [
+          "Keiju Wakatsuki",
+          "Shun Takeshita"
+        ],
+        "languages": [
+          "ja",
+          "en"
+        ],
+        "linePt": "Boas-vindas aos nossos parceiros do Japão",
+        "voice": {
+          "audio": "audio/welcome-ja.mp3",
+          "seconds": 22,
+          "buttonLabel": "音声メッセージ · Play greeting"
+        }
+      },
+      {
+        "from": "2026-11-11",
+        "until": "2026-11-13",
+        "guests": [
+          "Jörn Lützen",
+          "Keiju Wakatsuki",
+          "Shun Takeshita"
+        ],
+        "languages": [
+          "ja",
+          "de",
+          "en"
+        ],
+        "linePt": "Boas-vindas aos nossos parceiros do Japão e da Suíça",
+        "voice": {
+          "audio": "audio/welcome.mp3",
+          "seconds": 42,
+          "buttonLabel": "Begrüßung · 音声メッセージ · Play greeting"
+        }
+      }
+    ]
   },
   "videos": {
     "enabled": true,

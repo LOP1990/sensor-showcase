@@ -74,3 +74,28 @@ Ajustes de 10/11 (visita OGG + IST)
   - Sair da tela de boas-vindas (ou iniciar a apresentação guiada) interrompe a saudação por voz.
   - Vídeos: a primeira reprodução vem direto da rede (começa na hora) enquanto o service worker grava o
     arquivo no cache; das próximas vezes toca do cache. O 3D fica parado enquanto o vídeo toca.
+
+Saudação por movimento (alguém passando na recepção)
+  O app fala a saudação na tela de boas-vindas: a cada welcome.voice.everyMinutes (agora 3 min),
+  quando o Fully avisa movimento (evento onMotion, cooldown welcome.voice.motionMinutes = 2 min) e,
+  como segunda via, pela própria câmera frontal (getUserMedia) com detecção de movimento no app.
+  No Fully Kiosk Browser (precisa do PLUS):
+    Settings → Motion Detection → Enable Visual Motion Detection: ON, câmera frontal, sensibilidade
+      ~90; "Turn Screen On / Exit Screensaver on Motion": ON.
+    Settings → Advanced Web Settings → Enable JavaScript Interface: ON (é o que liga o onMotion e o
+      fully.playSound ao app).
+    Settings → Web Content Settings → Enable Camera Access (getUserMedia): ON, e no Android dê a
+      permissão de câmera ao Fully — é a segunda via; se a detecção do próprio Fully estiver usando a
+      câmera, a segunda via simplesmente não liga (a do Fully já basta).
+  config.json → welcome.voice.cameraMotion: "kiosk" (padrão: só dentro do Fully), "always" ou "off".
+
+Agenda das boas-vindas (config.json → welcome.schedule)
+  Cada item { from, until, guests: [nomes], languages, linePt, voice } vale nos dias indicados e
+  sobrepõe o bloco welcome: 10/11 só os convidados do Japão (ja/en, áudio welcome-ja.mp3);
+  11 a 13/11 Dr. Lützen + Japão (ja/de/en, áudio welcome.mp3). Fora desses dias vale o bloco geral.
+
+Apresentação guiada — orelhinha e navegação
+  Em todas as telas (menos atração e 3D) há uma aba discreta no pé da tela: toque para abrir a barra
+  no passo da tela atual, já pausada, e dê o play. Durante a narração, tocar em outra seção, em um
+  produto ou em um marco da história leva a apresentação junto (e, nos produtos narrados no meio de
+  um passo, a voz começa direto naquele trecho). Pausado, a navegação acompanha mas não fala.
