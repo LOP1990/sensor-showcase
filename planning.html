@@ -1,0 +1,1189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#05070B">
+<link rel="icon" href="icons/icon-192.png">
+<title>Sensor Technology · Planning and control</title>
+<!-- versão 2026.11.10-2053 -->
+<style>
+@font-face { font-family: 'Archivo'; font-style: normal; font-display: swap; font-weight: 100 900; font-stretch: 62% 125%; src: url(fonts/Archivo-var.woff2) format('woff2'); }
+@font-face { font-family: 'Noto Sans JP'; font-weight: 700; font-display: swap; src: url(fonts/NotoSansJP-bold.woff2) format('woff2'); unicode-range: U+3000-30FF, U+4E00-9FFF, U+FF00-FFEF; }
+@font-face { font-family: 'Noto Sans JP'; font-weight: 450; font-display: swap; src: url(fonts/NotoSansJP-text.woff2) format('woff2'); unicode-range: U+3000-30FF, U+4E00-9FFF, U+FF00-FFEF; }
+/* ============================================================
+   Sensor Technology · páginas de operações (planejamento, parceiros)
+   Mesmos tokens do app; tudo em rem — a raiz acompanha o tamanho da tela (do celular ao painel 4K).
+   ============================================================ */
+:root {
+  color-scheme: dark;
+  --bg: #05070B; --bg-2: #0B1017; --surface: #10161F; --surface-2: #151D28;
+  --line: rgba(191, 211, 230, .14); --line-2: rgba(191, 211, 230, .28);
+  --text: #EFECE6; --text-2: #B3BDCA; --text-3: #8792A8;
+  --plat: #BFD3E6; --plat-2: #E8F1FB; --glow: #FFD27A;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  --r1: #cde2fb; --r2: #86b6ef; --r3: #3987e5; --r4: #256abf; --r5: #184f95;
+  --font: 'Archivo', 'Noto Sans JP', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+html { font-size: clamp(13px, min(1.11vw, 1.98vh), 46px); -webkit-text-size-adjust: 100%; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 1rem; line-height: 1.5; overflow: hidden; overscroll-behavior: none; }
+html[lang="ja"] body { line-break: strict; overflow-wrap: anywhere; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; touch-action: manipulation; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--plat); outline-offset: 3px; border-radius: 4px; }
+p, h1, h2, h3, ul, ol, figure { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+
+/* ---------- gráficos ---------- */
+.viz { position: relative; min-height: 0; }
+.viz svg { display: block; width: 100%; height: 100%; overflow: visible; font-family: inherit; }
+.viz svg [tabindex]:focus { outline: none; }
+.viz svg [tabindex]:focus-visible { stroke: var(--plat); stroke-width: 1.5; }
+.viz-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
+.viz-tip { position: fixed; z-index: 90; pointer-events: none; max-width: 22rem; padding: .55rem .75rem; border-radius: .5rem; background: #1B2532; border: 1px solid var(--line-2); box-shadow: 0 .6rem 1.8rem rgba(0, 0, 0, .5); font-size: .78rem; line-height: 1.35; color: var(--text-2); }
+.viz-tip[hidden] { display: none; }
+.viz-tip-t { color: var(--text-2); margin-bottom: .25rem; }
+.viz-tip-r { display: flex; align-items: baseline; gap: .45rem; white-space: nowrap; }
+.viz-tip-r b { color: var(--text); font-weight: 600; font-size: .95rem; font-variant-numeric: tabular-nums; }
+.viz-key { flex: none; width: .9rem; height: 2px; border-radius: 2px; align-self: center; }
+
+.segbar-bar { display: flex; gap: 2px; height: 1.75rem; max-height: 28px; min-height: 22px; border-radius: 6px; }
+.segbar-seg { min-width: 2px; border-radius: 4px; display: flex; align-items: center; padding: 0 .5rem; overflow: visible; font-size: .8rem; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.segbar-seg span[hidden] { display: none; }
+.segbar-legend { display: flex; flex-wrap: wrap; gap: .35rem 1.4rem; margin-top: .7rem; font-size: .8rem; color: var(--text-2); }
+.segbar-legend > span { display: inline-flex; align-items: center; gap: .5rem; }
+.segbar-legend i { width: .75rem; height: .75rem; border-radius: 2px; flex: none; }
+
+.meters { display: grid; gap: .55rem; }
+.meter-row { display: grid; grid-template-columns: minmax(8rem, 38%) 1fr auto; align-items: center; gap: .9rem; font-size: .85rem; color: var(--text-2); }
+.meter-track { height: .5rem; border-radius: 99px; background: rgba(57, 135, 229, .22); overflow: hidden; }
+.meter-track i { display: block; height: 100%; border-radius: 99px; background: var(--s1); transform-origin: left center; }
+.meter-val { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; min-width: 2.4rem; text-align: right; }
+
+/* ---------- peças comuns ---------- */
+.stat { display: grid; gap: .1rem; }
+.stat b { font-size: 2rem; line-height: 1.05; font-weight: 600; font-stretch: 105%; letter-spacing: -.01em; color: var(--text); }
+.stat span { font-size: .85rem; color: var(--text-2); max-width: 17rem; }
+.note { font-size: .78rem; color: var(--text-3); }
+.btn { display: inline-flex; align-items: center; gap: .6rem; min-height: 2.9rem; padding: .7rem 1.35rem; border-radius: 999px; border: 1px solid var(--line-2); font-weight: 500; color: var(--text); text-decoration: none; transition: background .2s, border-color .2s; }
+.btn:hover { background: rgba(191, 211, 230, .08); }
+.btn:active { background: rgba(191, 211, 230, .16); }
+.btn.primary { background: var(--plat); border-color: var(--plat); color: var(--bg); font-weight: 600; }
+.btn.primary:hover { background: var(--plat-2); }
+.btn svg { width: 1.15rem; height: 1.15rem; flex: none; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+
+/* ============================================================
+   Apresentação "Planejamento e controle" — layout do deck
+   ============================================================ */
+.deck { position: fixed; inset: 0; display: grid; grid-template-rows: auto 1fr auto; background:
+  radial-gradient(90rem 50rem at 85% -10%, rgba(57, 135, 229, .10), transparent 60%),
+  radial-gradient(70rem 40rem at -10% 110%, rgba(191, 211, 230, .06), transparent 60%), var(--bg); }
+
+/* topo */
+.top { display: flex; align-items: center; gap: 1.2rem; padding: .9rem 2.4rem .6rem; min-height: 4rem; }
+.top img { height: 2.5rem; width: auto; display: block; }
+.top .name { color: var(--text-2); font-size: .95rem; padding-left: 1.2rem; border-left: 1px solid var(--line-2); white-space: nowrap; }
+.top .sp { flex: 1; }
+.langs { display: flex; gap: .25rem; }
+.langs button { min-width: 2.7rem; min-height: 2.3rem; padding: .25rem .7rem; border-radius: 999px; border: 1px solid transparent; color: var(--text-3); font-size: .85rem; font-weight: 500; }
+.langs button.on { color: var(--text); border-color: var(--line-2); background: rgba(191, 211, 230, .08); }
+.top .x { display: inline-flex; align-items: center; gap: .5rem; min-height: 2.3rem; padding: .25rem .95rem; border-radius: 999px; border: 1px solid var(--line-2); font-size: .85rem; color: var(--text-2); text-decoration: none; }
+.top .x svg { width: 1rem; height: 1rem; }
+
+/* palco e slides */
+.stage { position: relative; min-height: 0; }
+.slide { position: absolute; inset: 0; padding: 1.2rem 2.4rem 1rem; display: grid; grid-template-columns: minmax(0, 43fr) minmax(0, 57fr); gap: 3.2rem; align-items: center;
+  opacity: 0; visibility: hidden; transform: translateX(2.2rem); transition: opacity .45s var(--ease), transform .55s var(--ease), visibility 0s .45s; }
+.slide.on { opacity: 1; visibility: visible; transform: none; transition: opacity .45s var(--ease), transform .55s var(--ease), visibility 0s; }
+.slide.before { transform: translateX(-2.2rem); }
+.txt { display: grid; gap: 1.25rem; align-content: center; min-width: 0; }
+.txt h1 { font-size: 2.65rem; line-height: 1.08; font-weight: 600; font-stretch: 108%; letter-spacing: -.015em; text-wrap: balance; }
+html[lang="ja"] .txt h1 { font-size: 2.2rem; line-height: 1.3; letter-spacing: 0; font-stretch: 100%; word-break: auto-phrase; }
+html[lang="de"] .txt h1 { font-size: 2.45rem; }
+.txt .lead { font-size: 1.12rem; line-height: 1.55; color: var(--text-2); max-width: 36em; text-wrap: pretty; }
+html[lang="ja"] .txt .lead { font-size: 1.02rem; line-height: 1.8; }
+.fig { display: grid; gap: 1rem; min-width: 0; min-height: 0; align-content: center; height: 100%; }
+.fig .viz { height: 24rem; }
+.slide[data-id="market"] .fig .viz { height: 19rem; }
+.slide[data-id="spool"] .fig .viz { height: 18.5rem; }
+.slide[data-id="control"] .fig .viz { height: 22rem; max-width: 40rem; }
+.fig .cap { font-size: .9rem; color: var(--text-2); }
+.stats { display: flex; flex-wrap: wrap; gap: 1.1rem 2.4rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.stats.col { display: grid; gap: 1rem; }
+.stats.two { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem 2rem; }
+
+/* capa */
+.slide.cover { grid-template-columns: minmax(0, 1fr); align-content: center; gap: 2.6rem; padding-left: 5.5rem; padding-right: 5.5rem; }
+.slide.cover h1 { font-size: 4.3rem; line-height: 1.02; font-stretch: 112%; max-width: 15em; }
+html[lang="ja"] .slide.cover h1 { font-size: 3.1rem; line-height: 1.25; max-width: 20em; }
+html[lang="de"] .slide.cover h1, html[lang="pt"] .slide.cover h1 { font-size: 3.9rem; max-width: 18em; }
+.slide.cover .lead { font-size: 1.3rem; max-width: 40em; }
+.tl { position: relative; height: 7.6rem; margin-top: .4rem; max-width: 70rem; }
+.tl-axis { position: absolute; left: 0; right: 0; top: 3.9rem; height: 1px; background: var(--line-2); }
+.tl-tick { position: absolute; top: 3.9rem; width: 1px; height: .5rem; background: var(--line-2); }
+.tl-tick span { position: absolute; top: .75rem; left: 0; transform: translateX(-50%); font-size: .78rem; color: var(--text-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tl-tick:first-of-type span { transform: none; }
+.tl-unit { position: absolute; right: 0; top: 4.65rem; font-size: .78rem; color: var(--text-3); }
+.tl-bar { position: absolute; left: 0; top: 3.15rem; height: 1.5rem; max-height: 24px; border-radius: 0 4px 4px 0; background: var(--s1); transform-origin: left center; }
+.tl-m { position: absolute; top: 0; font-size: .95rem; font-weight: 600; white-space: nowrap; }
+.tl-m i { position: absolute; left: 0; top: 1.9rem; width: 2px; height: 3.3rem; background: var(--text-3); }
+.tl-m.order i { background: var(--glow); }
+.tl-m.order { transform: translateX(-100%); padding-right: .7rem; }
+.tl-m.order i { left: auto; right: 0; }
+.tl-m.ship { padding-left: .9rem; }
+.tl-m.ship i { width: .8rem; height: .8rem; border-radius: 50%; top: 3.5rem; left: -.4rem; background: var(--text); box-shadow: 0 0 0 2px var(--bg); }
+.tl-m.start { padding-left: .7rem; }
+.slide.cover .note { font-size: .95rem; color: var(--text-2); max-width: 46em; }
+
+/* regra, fórmula, etapas */
+.rule { display: grid; gap: .5rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.rule h3 { font-size: .95rem; font-weight: 600; color: var(--text); }
+.rule p { font-size: .92rem; color: var(--text-2); }
+.rule ul { display: flex; flex-wrap: wrap; gap: .5rem 1.6rem; font-size: .92rem; color: var(--text-2); }
+.rule li b { color: var(--text); font-weight: 600; }
+.formula { font-size: 1.05rem; color: var(--text); padding: .9rem 1.1rem; border-left: 2px solid var(--plat); background: rgba(191, 211, 230, .05); border-radius: 0 .5rem .5rem 0; }
+.hero-n { font-size: 6.2rem; line-height: .95; font-weight: 600; font-stretch: 112%; letter-spacing: -.03em; }
+.hero-l { font-size: 1.02rem; color: var(--text-2); max-width: 24em; }
+.steps { display: flex; align-items: stretch; gap: 0; counter-reset: st; }
+.steps li { flex: 1 1 0; min-width: 0; position: relative; padding: .7rem .9rem .7rem 0; font-size: .86rem; line-height: 1.3; color: var(--text); border-top: 2px solid var(--s1); margin-right: .9rem; }
+.steps li::before { counter-increment: st; content: counter(st); display: block; font-size: .78rem; color: var(--text-3); font-variant-numeric: tabular-nums; margin-bottom: .2rem; }
+.steps li:last-child { margin-right: 0; }
+.steps.big li { font-size: 1.05rem; padding: 1rem 1rem 1rem 0; }
+.steps.big li::before { font-size: 1.6rem; color: var(--text); font-weight: 600; margin-bottom: .5rem; }
+
+/* tabela ABC */
+.abc-t { display: grid; grid-template-columns: auto 1fr auto; gap: .45rem 1.2rem; align-items: baseline; padding-top: 1.1rem; border-top: 1px solid var(--line); font-size: .98rem; color: var(--text-2); }
+.abc-t b { color: var(--text); font-weight: 600; font-size: 1.25rem; }
+.abc-t .v { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+
+/* classes (esquema) */
+.flow3 { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.25fr) auto minmax(0, 1.3fr); gap: 1rem; align-items: center; }
+.flow3 .box { border: 1px solid var(--line-2); border-radius: .6rem; padding: 1.2rem 1.25rem; font-size: 1.08rem; font-weight: 600; line-height: 1.3; background: rgba(16, 22, 31, .7); }
+.flow3 .box small { display: block; margin-top: .55rem; color: var(--text-2); font-size: .88rem; font-weight: 400; line-height: 1.4; }
+.flow3 .arr { width: 1.4rem; height: 1.4rem; color: var(--text-3); }
+.cls { display: grid; gap: 2px; }
+.cls li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .8rem; padding: .78rem 1rem; font-size: 1.08rem; font-weight: 600; border-radius: 4px; font-variant-numeric: tabular-nums; }
+.cls li small { font-weight: 500; opacity: .85; font-size: .88rem; }
+.cls h3, .ord h3 { font-size: .9rem; font-weight: 500; color: var(--text-2); margin-bottom: .6rem; }
+.ord { display: grid; gap: .4rem; }
+.ord li { display: grid; grid-template-columns: auto 1fr; gap: .7rem; align-items: center; font-size: .85rem; color: var(--text-2); padding: .5rem .8rem; border: 1px solid var(--line); border-radius: .45rem; }
+.ord li i { width: .55rem; height: .55rem; border-radius: 50%; background: var(--plat); }
+
+/* produtividade: um apontamento, quatro usos */
+.rec { font-size: 1.15rem; font-weight: 500; color: var(--text); padding: 1.15rem 1.35rem; border: 1px solid var(--line-2); border-radius: .6rem; background: rgba(16, 22, 31, .7); }
+.uses { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2.2rem; }
+.uses li { padding: 1.3rem 0; border-top: 1px solid var(--line); display: grid; gap: .2rem; }
+.uses li b { font-size: 1.35rem; font-weight: 600; }
+.uses li span { font-size: 1rem; color: var(--text-2); }
+.link-v { width: 1px; height: 2rem; background: var(--line-2); margin: 0 auto; }
+
+/* carreira */
+.ladder { display: grid; gap: .5rem; }
+.ladder { gap: .85rem; }
+.ladder li { display: grid; grid-template-columns: minmax(9rem, 14rem) 1fr auto; gap: 1rem; align-items: center; font-size: 1.02rem; color: var(--text-2); }
+.ladder li .bar { height: .75rem; border-radius: 0 4px 4px 0; background: var(--s1); min-width: 3px; transform-origin: left center; }
+.ladder li b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; min-width: 5.5rem; text-align: right; }
+.track { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .8rem; padding-bottom: 1rem; margin-bottom: .4rem; border-bottom: 1px solid var(--line); font-size: .88rem; color: var(--text-2); }
+.track b { color: var(--text-3); font-weight: 500; margin-right: .4rem; }
+.track span { padding: .35rem .8rem; border: 1px solid var(--line-2); border-radius: 999px; color: var(--text); }
+
+/* fornecedores */
+.scale { display: grid; grid-template-columns: 45fr 30fr 15fr 10fr; gap: 2px; }
+.scale div { padding: .55rem .7rem; border-radius: 4px; font-size: .82rem; font-weight: 600; display: grid; gap: .1rem; }
+.scale div small { font-weight: 500; font-size: .74rem; opacity: .85; }
+.fig h3 { font-size: .95rem; font-weight: 600; color: var(--text); }
+.grp { display: grid; gap: .7rem; }
+
+/* customização */
+.chips { display: grid; gap: 0; }
+.chips li { display: flex; align-items: center; gap: .9rem; padding: 1.05rem 0; border-top: 1px solid var(--line); font-size: 1.2rem; }
+.chips li:last-child { border-bottom: 1px solid var(--line); }
+.chips svg { width: 1.2rem; height: 1.2rem; color: var(--plat); flex: none; }
+
+/* slide largo (texto em cima, figura embaixo) */
+.slide.wide { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; align-content: center; gap: 2.4rem; padding-left: 4rem; padding-right: 4rem; }
+.slide.wide .txt { max-width: 60rem; }
+.slide.center { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; align-content: center; gap: 2.2rem; }
+.slide.center .txt { justify-items: center; }
+.cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.4rem 2rem; }
+.cta > div { display: grid; gap: .5rem; justify-items: center; }
+.cta .btn { font-size: 1.1rem; padding: .95rem 1.8rem; min-height: 3.4rem; }
+.cta small { font-size: .82rem; color: var(--text-3); }
+
+/* rodapé de navegação */
+.nav { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 1.4rem; padding: .7rem 2.4rem 1rem; }
+.nav .arrow { width: 3.1rem; height: 3.1rem; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; color: var(--text); }
+.nav .arrow:disabled { opacity: .3; cursor: default; }
+.nav .arrow svg { width: 1.3rem; height: 1.3rem; }
+.nav .arrow.next { background: var(--plat); border-color: var(--plat); color: var(--bg); }
+.prog { display: grid; gap: .45rem; min-width: 0; }
+.prog .ticks { display: flex; gap: 3px; }
+.prog .ticks button { flex: 1 1 0; height: 1.6rem; position: relative; }
+.prog .ticks button::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 3px; margin-top: -1.5px; border-radius: 2px; background: var(--line-2); transition: background .3s; }
+.prog .ticks button.done::after { background: rgba(191, 211, 230, .55); }
+.prog .ticks button.on::after { background: var(--plat-2); height: 5px; margin-top: -2.5px; }
+.prog .ticks button.gap { margin-left: .5rem; }
+.prog .lbl { font-size: .82rem; color: var(--text-3); display: flex; gap: .8rem; justify-content: space-between; }
+.prog .lbl b { color: var(--text-2); font-weight: 500; }
+.count { font-size: .9rem; color: var(--text-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---------- celular: página em rolagem, um slide abaixo do outro ---------- */
+@media (max-width: 760px), (orientation: portrait) and (max-width: 1100px) {
+  html { font-size: 16px; }
+  body { overflow: auto; }
+  .deck { position: static; display: block; min-height: 100%; }
+  .top { position: sticky; top: 0; z-index: 5; background: rgba(5, 7, 11, .92); backdrop-filter: blur(8px); padding: .6rem 1rem; gap: .6rem; flex-wrap: wrap; }
+  .top img { height: 2rem; }
+  .top .name { display: none; }
+  .langs button { min-width: 2.4rem; padding: .2rem .5rem; }
+  .stage { position: static; }
+  .slide, .slide.wide, .slide.cover, .slide.center { position: static; opacity: 1; visibility: visible; transform: none; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: none; gap: 1.6rem; padding: 2.6rem 1.15rem; border-bottom: 1px solid var(--line); }
+  .txt h1, html[lang] .txt h1 { font-size: 1.75rem; }
+  .slide.cover h1, html[lang] .slide.cover h1 { font-size: 2.2rem; }
+  .slide.cover .lead { font-size: 1.05rem; }
+  .txt .lead, html[lang] .txt .lead { font-size: 1rem; }
+  .fig { height: auto; }
+  .fig .viz { height: 17rem; max-height: none; }
+  .hero-n { font-size: 4.2rem; }
+  .steps, .steps.big { display: grid; gap: .2rem; }
+  .steps li, .steps.big li { margin-right: 0; border-top: 0; border-left: 2px solid var(--s1); padding: .5rem 0 .5rem .9rem; display: flex; gap: .7rem; align-items: baseline; font-size: .95rem; }
+  .steps li::before, .steps.big li::before { font-size: .85rem; font-weight: 500; color: var(--text-3); margin: 0; }
+  .flow3 { grid-template-columns: minmax(0, 1fr); }
+  .flow3 .arr { transform: rotate(90deg); margin: 0 auto; }
+  .uses { grid-template-columns: 1fr; }
+  .stats.two { grid-template-columns: 1fr; }
+  .ladder li { grid-template-columns: minmax(0, 1fr) auto; }
+  .ladder li .bar { grid-column: 1 / -1; order: 3; }
+  .tl { height: 8.4rem; }
+  .tl-unit { display: none; }
+  .tl-m.ship { max-width: 5.2rem; }
+  .tl-m { font-size: .8rem; white-space: normal; max-width: 6.5rem; line-height: 1.2; }
+  .nav { display: none; }
+  .slide.center { text-align: left; justify-items: start; }
+  .slide.center .txt { justify-items: start; }
+  .cta { justify-content: flex-start; }
+  .cta > div { justify-items: start; }
+}
+
+</style>
+</head>
+<body>
+<div id="deck" class="deck"></div>
+<script>
+/* ============================================================
+   Sensor Technology · gráficos (SVG puro, sem bibliotecas)
+   Regras: marcas finas, eixo único, grade em fio contínuo, texto sempre nas cores de texto,
+   dica (tooltip) em todos os gráficos, tabela equivalente para leitores de tela.
+   ============================================================ */
+const Viz = (() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const C = {
+    s1: '#3987e5', s2: '#d95926', s3: '#199e70', s4: '#c98500',
+    ramp: ['#cde2fb', '#86b6ef', '#3987e5', '#256abf', '#184f95'],
+    mute: '#3a4658', grid: 'rgba(191,211,230,.13)', axis: 'rgba(191,211,230,.30)',
+    text: '#EFECE6', text2: '#B3BDCA', text3: '#8792A8', surface: '#05070B', glow: '#FFD27A',
+    good: '#0ca30c', warn: '#fab219', bad: '#d03b3b',
+  };
+  let LOCALE = 'en-US';
+  const setLocale = (l) => { LOCALE = l; };
+  const nf = (d) => new Intl.NumberFormat(LOCALE, { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 });
+  const fmt = (v, d) => nf(d).format(v);
+  const rem = () => parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  const reduced = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function el(name, attrs, parent, text) {
+    const n = document.createElementNS(NS, name);
+    if (attrs) for (const k in attrs) if (attrs[k] != null) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  function h(tag, cls, parent, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+
+  /* ---------- dica (uma só para a página) ---------- */
+  let tip;
+  function tipEl() {
+    if (!tip) { tip = h('div', 'viz-tip', document.body); tip.setAttribute('role', 'status'); tip.hidden = true; }
+    return tip;
+  }
+  // rows: [[rótulo, valor, cor?]]; title opcional. Tudo via textContent.
+  function showTip(x, y, title, rows) {
+    const t = tipEl(); t.textContent = '';
+    if (title) h('div', 'viz-tip-t', t, title);
+    (rows || []).forEach(([label, value, color]) => {
+      const r = h('div', 'viz-tip-r', t);
+      if (color) { const k = h('i', 'viz-key', r); k.style.background = color; }
+      h('b', '', r, value); h('span', '', r, label);
+    });
+    t.hidden = false;
+    const z = (parseFloat(document.documentElement.style.zoom) || 1);
+    const vw = window.innerWidth / z, vh = window.innerHeight / z;
+    const w = t.offsetWidth, hh = t.offsetHeight, pad = 12;
+    let left = x / z + 14, top = y / z - hh - 12;
+    if (left + w + pad > vw) left = x / z - w - 14;
+    if (left < pad) left = pad;
+    if (top < pad) top = y / z + 18;
+    if (top + hh + pad > vh) top = vh - hh - pad;
+    t.style.left = left + 'px'; t.style.top = top + 'px';
+  }
+  function hideTip() { if (tip) tip.hidden = true; }
+  // liga a dica a um elemento (mouse, toque e foco)
+  function bindTip(node, title, rows) {
+    const on = (e) => { const p = e.touches ? e.touches[0] : e; let x = p.clientX, y = p.clientY; if (x == null) { const b = node.getBoundingClientRect(); x = b.left + b.width / 2; y = b.top; } showTip(x, y, typeof title === 'function' ? title() : title, typeof rows === 'function' ? rows() : rows); };
+    node.addEventListener('pointerenter', on); node.addEventListener('pointermove', on);
+    node.addEventListener('pointerleave', hideTip); node.addEventListener('focus', on); node.addEventListener('blur', hideTip);
+    node.addEventListener('pointerdown', on);
+  }
+  document.addEventListener('scroll', hideTip, true);
+
+  /* ---------- tabela equivalente (leitor de tela) ---------- */
+  function table(host, caption, head, rows) {
+    const t = h('table', '', h('div', 'viz-sr', host)); // a tabela vai dentro de um bloco recortado (tabela não respeita width/overflow)
+    h('caption', '', t, caption || '');
+    const tr = h('tr', '', h('thead', '', t)); head.forEach((x) => h('th', '', tr, x));
+    const tb = h('tbody', '', t);
+    rows.forEach((r) => { const rr = h('tr', '', tb); r.forEach((x) => h('td', '', rr, String(x))); });
+  }
+
+  /* ---------- base: mede o contêiner, cria o SVG e redesenha no resize ---------- */
+  function mount(host, draw) {
+    host.classList.add('viz');
+    let raf = 0, last = '';
+    const render = (animate) => {
+      const w = host.clientWidth, hgt = host.clientHeight;
+      if (w < 40 || hgt < 40) return;
+      const key = w + 'x' + hgt + '@' + rem() + LOCALE;
+      if (!animate && key === last) return;
+      last = key;
+      host.textContent = '';
+      const svg = el('svg', { viewBox: `0 0 ${w} ${hgt}`, width: w, height: hgt, role: 'img' }, host);
+      draw({ svg, w, h: hgt, r: rem(), animate: !!animate && !reduced(), host });
+    };
+    if (window.ResizeObserver) new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => render(false)); }).observe(host);
+    host._render = render;
+    render(false);
+    return { render, replay: () => render(true) };
+  }
+  const ticks = (max, n) => {
+    const raw = max / (n || 4), p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+    const step = (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p; const out = [];
+    for (let v = 0; v <= max + 1e-9; v += step) out.push(+v.toFixed(6));
+    return out;
+  };
+  function grow(node, attr, from, to, ms, delay) {
+    if (!node.animate) { node.setAttribute(attr, to); return; }
+    const a = el('animate', { attributeName: attr, from, to, dur: (ms || 700) + 'ms', begin: 'indefinite', fill: 'freeze', calcMode: 'spline', keySplines: '.2 .7 .2 1', keyTimes: '0;1' }, node);
+    node.setAttribute(attr, from);
+    setTimeout(() => { try { a.beginElement(); } catch (e) { node.setAttribute(attr, to); } }, delay || 0);
+    setTimeout(() => node.setAttribute(attr, to), (delay || 0) + (ms || 700) + 60);
+  }
+  function fadeIn(node, ms, delay) {
+    if (!node.animate) return;
+    node.animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms || 500, delay: delay || 0, fill: 'both', easing: 'ease-out' });
+  }
+
+  /* ---------- colunas (histograma / séries curtas) ----------
+     o: { labels[], values[], unit:'%', dec, title(i)→str, rowLabel, xTitle, yMax, color, colors[i], marks:[{at, text}], labelEvery, valueLabels:'all'|[i…]|null,
+          caption, head:[x,y] } */
+  function columns(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7), n = o.values.length;
+      const m = { l: r * 2.4, r: r * 0.6, t: r * (o.marks ? 2.2 : 1.2), b: r * (o.xTitle ? 2.9 : 1.8) };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b;
+      const max = o.yMax || Math.max.apply(null, o.values) * 1.12;
+      const tk = ticks(max, 4), top = Math.max(max, tk[tk.length - 1]);
+      const y = (v) => m.t + ph - (v / top) * ph, band = pw / n, bw = Math.min(24 * (r / 16), band - 2, band * 0.72);
+      const g = el('g', { 'font-size': fs, 'font-family': 'inherit' }, svg);
+      tk.forEach((v) => {
+        el('line', { x1: m.l, x2: w - m.r, y1: y(v), y2: y(v), stroke: v === 0 ? C.axis : C.grid, 'stroke-width': 1 }, g);
+        el('text', { x: m.l - r * 0.4, y: y(v) + fs * 0.35, 'text-anchor': 'end', fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, fmt(v, 0) + (o.unit || ''));
+      });
+      const every = o.labelEvery || (band < fs * 2.2 ? Math.ceil(fs * 2.2 / band) : 1);
+      o.values.forEach((v, i) => {
+        const x = m.l + band * i + (band - bw) / 2, yy = y(v), hh = Math.max(0, m.t + ph - yy), rad = Math.min(4, bw / 2, hh);
+        const col = (o.colors && o.colors[i]) || o.color || C.s1;
+        const path = (top_) => `M${x},${m.t + ph}V${top_ + rad}q0,-${rad} ${rad},-${rad}h${bw - 2 * rad}q${rad},0 ${rad},${rad}V${m.t + ph}Z`;
+        const p = el('path', { d: path(yy), fill: col }, g);
+        if (animate && hh > 1 && p.animate) { p.style.transformBox = 'fill-box'; p.style.transformOrigin = '50% 100%';
+          p.animate([{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: 650, delay: 120 + i * 28, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' }); }
+        if (i % every === 0 || i === n - 1) el('text', { x: x + bw / 2, y: m.t + ph + fs * 1.5, 'text-anchor': 'middle', fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, o.labels[i]);
+        const showVal = o.valueLabels === 'all' || (Array.isArray(o.valueLabels) && o.valueLabels.includes(i));
+        if (showVal) { const t = el('text', { x: x + bw / 2, y: yy - fs * 0.55, 'text-anchor': 'middle', fill: C.text, 'font-weight': 600, style: 'font-variant-numeric: tabular-nums' }, g, fmt(v, o.dec || 0) + (o.unit || '')); if (animate) fadeIn(t, 400, 500 + i * 28); }
+        const hit = el('rect', { x: m.l + band * i, y: m.t, width: band, height: ph, fill: 'transparent', tabindex: 0, 'aria-label': (o.title ? o.title(i) : o.labels[i]) + ': ' + fmt(v, o.dec || 0) + (o.unit || '') }, g);
+        hit.addEventListener('pointerenter', () => p.setAttribute('opacity', .78)); hit.addEventListener('pointerleave', () => p.removeAttribute('opacity'));
+        bindTip(hit, o.title ? o.title(i) : o.labels[i], [[o.rowLabel || '', fmt(v, o.dec || 0) + (o.unit || ''), col]]);
+      });
+      (o.marks || []).forEach((mk) => {
+        const idx = o.labels.indexOf(String(mk.at)); if (idx < 0) return;
+        const x = m.l + band * idx + band / 2;
+        el('line', { x1: x, x2: x, y1: m.t - r * 0.25, y2: m.t + ph, stroke: C.glow, 'stroke-width': 1.5 }, g);
+        const anchor = x + 6 + String(mk.text).length * fs * 0.58 > w - 2 ? 'end' : 'start';
+        el('text', { x: x + (anchor === 'end' ? -6 : 6), y: m.t - r * 0.5, 'text-anchor': anchor, fill: C.text, 'font-weight': 600 }, g, mk.text);
+      });
+      if (o.xTitle) el('text', { x: m.l + pw / 2, y: H - fs * 0.35, 'text-anchor': 'middle', fill: C.text3 }, g, o.xTitle);
+      svg.setAttribute('aria-label', o.caption || '');
+      table(host, o.caption, o.head || ['', ''], o.values.map((v, i) => [o.title ? o.title(i) : o.labels[i], fmt(v, o.dec || 0) + (o.unit || '')]));
+    });
+  }
+
+  /* ---------- curva ABC: barras (participação) + linha (acumulado), um eixo só (%) ----------
+     o: { shares[], A, B, zone:{A,B,C}, tipItem(i), lblShare, lblCum, caption } */
+  function pareto(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7), n = o.shares.length;
+      const m = { l: r * 2.6, r: r * 0.8, t: r * 1.9, b: r * 1.4 };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b, band = pw / n, bw = Math.max(2, Math.min(24, band - 2));
+      const y = (v) => m.t + ph - (v / 100) * ph, xC = (i) => m.l + band * i + band / 2;
+      const g = el('g', { 'font-size': fs }, svg);
+      const zones = [[0, o.A, o.zone.A, 'rgba(57,135,229,.13)'], [o.A, o.A + o.B, o.zone.B, 'rgba(57,135,229,.065)'], [o.A + o.B, n, o.zone.C, 'transparent']];
+      zones.forEach(([a, b, label, fill]) => {
+        el('rect', { x: m.l + band * a, y: m.t, width: band * (b - a), height: ph, fill }, g);
+        el('text', { x: m.l + band * a + r * 0.4, y: m.t - r * 0.55, fill: C.text2, 'font-weight': 600 }, g, label);
+        if (a > 0) el('line', { x1: m.l + band * a, x2: m.l + band * a, y1: m.t - r * 1.2, y2: m.t + ph, stroke: C.axis, 'stroke-width': 1 }, g);
+      });
+      [0, 25, 50, 75, 100].forEach((v) => {
+        el('line', { x1: m.l, x2: w - m.r, y1: y(v), y2: y(v), stroke: v === 0 ? C.axis : C.grid, 'stroke-width': 1 }, g);
+        el('text', { x: m.l - r * 0.4, y: y(v) + fs * 0.35, 'text-anchor': 'end', fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, v + '%');
+      });
+      let cum = 0; const pts = [];
+      o.shares.forEach((v, i) => {
+        cum += v; pts.push([xC(i), y(Math.min(100, cum))]);
+        const x = m.l + band * i + (band - bw) / 2, yy = y(v), hh = m.t + ph - yy, rad = Math.min(4, bw / 2, hh);
+        const d = hh < 0.6 ? `M${x},${m.t + ph - 1}h${bw}v1h-${bw}Z` : `M${x},${m.t + ph}V${yy + rad}q0,-${rad} ${rad},-${rad}h${bw - 2 * rad}q${rad},0 ${rad},${rad}V${m.t + ph}Z`;
+        const p = el('path', { d, fill: C.s1 }, g);
+        if (animate && p.animate) p.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 100 + i * 12, fill: 'both' });
+        const c = Math.min(100, cum);
+        const hit = el('rect', { x: m.l + band * i, y: m.t, width: band, height: ph, fill: 'transparent', tabindex: i < 12 ? 0 : -1, 'aria-label': o.tipItem(i) }, g);
+        bindTip(hit, o.tipItem(i), [[o.lblShare, fmt(v, 1) + '%', C.s1], [o.lblCum, fmt(c, 1) + '%', C.text]]);
+      });
+      const line = el('path', { d: 'M' + pts.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join('L'), fill: 'none', stroke: C.text, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, g);
+      if (animate && line.getTotalLength) { const L = line.getTotalLength(); line.style.strokeDasharray = L; line.animate && line.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 1100, delay: 350, easing: 'ease-out', fill: 'both' }).finished.then(() => { line.style.strokeDasharray = ''; }).catch(() => {}); }
+      // marcadores nos cortes A e B, com rótulo direto
+      [[o.A - 1, o.cumA], [o.A + o.B - 1, o.cumB]].forEach(([i, v], k) => {
+        const [px, py] = pts[i];
+        el('circle', { cx: px, cy: py, r: 5, fill: C.text, stroke: C.surface, 'stroke-width': 2 }, g);
+        const t = el('text', { x: px + 10, y: py + fs * 1.25, fill: C.text, 'font-weight': 600, style: 'font-variant-numeric: tabular-nums' }, g, fmt(v, 0) + '%');
+        if (animate) fadeIn(t, 400, 900 + k * 200);
+      });
+      // legenda (2 séries)
+      const lg = el('g', { transform: `translate(${w - m.r}, ${m.t + ph * 0.56})` }, g);
+      const l1 = el('text', { x: 0, y: 0, 'text-anchor': 'end', fill: C.text2 }, lg, o.lblCum);
+      el('line', { x1: -(l1.getComputedTextLength ? l1.getComputedTextLength() : 120) - 26, x2: -(l1.getComputedTextLength ? l1.getComputedTextLength() : 120) - 8, y1: -fs * 0.32, y2: -fs * 0.32, stroke: C.text, 'stroke-width': 2, 'stroke-linecap': 'round' }, lg);
+      const l2 = el('text', { x: 0, y: fs * 1.6, 'text-anchor': 'end', fill: C.text2 }, lg, o.lblShare);
+      el('rect', { x: -(l2.getComputedTextLength ? l2.getComputedTextLength() : 120) - 22, y: fs * 1.6 - fs * 0.78, width: 12, height: fs * 0.8, rx: 2, fill: C.s1 }, lg);
+      svg.setAttribute('aria-label', o.caption || '');
+      let c2 = 0; table(host, o.caption, ['#', o.lblShare, o.lblCum], o.shares.map((v, i) => { c2 += v; return [i + 1, fmt(v, 2) + '%', fmt(Math.min(100, c2), 1) + '%']; }));
+    });
+  }
+
+  /* ---------- série mensal longa: área (mensal) + linha (média móvel de 12 meses), um eixo (índice) ----------
+     o: { idx[], roll[], first:'YYYY-MM', lblMonth, lblRoll, fmtMonth(date)→str, caption } */
+  function longSeries(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7), n = o.idx.length;
+      const narrow = w < 560;
+      const m = { l: r * 0.4, r: r * 0.4, t: r * (narrow ? 3.1 : 1.6), b: r * 1.7 };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b;
+      const x = (i) => m.l + (i / (n - 1)) * pw, y = (v) => m.t + ph - (v / 105) * ph;
+      const [y0, m0] = o.first.split('-').map(Number);
+      const g = el('g', { 'font-size': fs }, svg);
+      el('line', { x1: m.l, x2: w - m.r, y1: y(0), y2: y(0), stroke: C.axis, 'stroke-width': 1 }, g);
+      for (let i = 0; i < n; i++) { const mo = (m0 - 1 + i) % 12, yr = y0 + Math.floor((m0 - 1 + i) / 12);
+        if (mo === 0 && (yr % 2 === 1 || pw / (n / 12) > fs * 3.2)) { el('line', { x1: x(i), x2: x(i), y1: m.t, y2: y(0), stroke: C.grid, 'stroke-width': 1 }, g); el('text', { x: x(i) + 4, y: y(0) + fs * 1.45, fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, String(yr)); } }
+      const area = 'M' + o.idx.map((v, i) => x(i).toFixed(1) + ',' + y(v).toFixed(1)).join('L') + `L${x(n - 1)},${y(0)}L${x(0)},${y(0)}Z`;
+      const a = el('path', { d: area, fill: C.s1, opacity: .16 }, g);
+      const thin = el('path', { d: 'M' + o.idx.map((v, i) => x(i).toFixed(1) + ',' + y(v).toFixed(1)).join('L'), fill: 'none', stroke: C.s1, 'stroke-width': 1, opacity: .55, 'stroke-linejoin': 'round' }, g);
+      const rp = o.roll.map((v, i) => v == null ? null : [x(i), y(v)]).filter(Boolean);
+      const line = el('path', { d: 'M' + rp.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join('L'), fill: 'none', stroke: C.text, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, g);
+      if (animate) { fadeIn(a, 700, 100); fadeIn(thin, 700, 100); if (line.getTotalLength && line.animate) { const L = line.getTotalLength(); line.style.strokeDasharray = L; line.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 1500, delay: 300, easing: 'ease-out', fill: 'both' }).finished.then(() => { line.style.strokeDasharray = ''; }).catch(() => {}); } }
+      const last = rp[rp.length - 1]; el('circle', { cx: last[0], cy: last[1], r: 5, fill: C.text, stroke: C.surface, 'stroke-width': 2 }, g);
+      // legenda no alto
+      const lg = el('g', { transform: `translate(${m.l}, ${m.t - r * 0.7})` }, g);
+      const y1 = narrow ? -fs * 1.55 : 0;
+      el('line', { x1: 0, x2: 18, y1: y1 - fs * 0.32, y2: y1 - fs * 0.32, stroke: C.text, 'stroke-width': 2, 'stroke-linecap': 'round' }, lg);
+      const t1 = el('text', { x: 26, y: y1, fill: C.text2 }, lg, o.lblRoll);
+      const off = narrow ? 0 : 26 + (t1.getComputedTextLength ? t1.getComputedTextLength() : 160) + 28;
+      el('rect', { x: off + (narrow ? 3 : 0), y: -fs * 0.78, width: 12, height: fs * 0.8, rx: 2, fill: C.s1, opacity: .5 }, lg);
+      el('text', { x: off + (narrow ? 26 : 20), y: 0, fill: C.text2 }, lg, o.lblMonth);
+      // mira + dica
+      const cross = el('line', { y1: m.t, y2: y(0), stroke: C.axis, 'stroke-width': 1, visibility: 'hidden' }, g);
+      const dot = el('circle', { r: 5, fill: C.text, stroke: C.surface, 'stroke-width': 2, visibility: 'hidden' }, g);
+      const hit = el('rect', { x: m.l, y: m.t, width: pw, height: ph, fill: 'transparent', tabindex: 0, 'aria-label': o.caption || '' }, g);
+      const move = (e) => { const b = svg.getBoundingClientRect(); const px = ((e.clientX - b.left) / b.width) * w; const i = Math.max(0, Math.min(n - 1, Math.round(((px - m.l) / pw) * (n - 1))));
+        cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('visibility', 'visible');
+        if (o.roll[i] != null) { dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(o.roll[i])); dot.setAttribute('visibility', 'visible'); } else dot.setAttribute('visibility', 'hidden');
+        const d = new Date(y0, m0 - 1 + i, 1);
+        showTip(e.clientX, e.clientY, o.fmtMonth(d), [[o.lblRoll, o.roll[i] == null ? '–' : fmt(o.roll[i], 0), C.text], [o.lblMonth, fmt(o.idx[i], 0), C.s1]]); };
+      hit.addEventListener('pointermove', move); hit.addEventListener('pointerdown', move);
+      hit.addEventListener('pointerleave', () => { cross.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden'); hideTip(); });
+      svg.setAttribute('aria-label', o.caption || '');
+      const rows = []; for (let i = 11; i < n; i += 12) { const d = new Date(y0, m0 - 1 + i, 1); rows.push([o.fmtMonth(d), fmt(o.idx[i], 0), o.roll[i] == null ? '–' : fmt(o.roll[i], 0)]); }
+      table(host, o.caption, ['', o.lblMonth, o.lblRoll], rows);
+    });
+  }
+
+  /* ---------- pontos por grupo (carretéis por lote), eixo único (índice, 100 = média) ----------
+     o: { points:[{lot, sp, idx, n}], lots:[{lot, idx, n}], lblLot(l), tipTitle(p), lblIdx, lblPcs, lblAvg, lblLotAvg, yMin, yMax, caption } */
+  function strip(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7), lots = o.lots.map((l) => l.lot), n = lots.length;
+      const m = { l: r * 2.6, r: r * 0.8, t: r * 1.5, b: r * 1.9 };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b, band = pw / n;
+      const lo = o.yMin || 70, hi = o.yMax || 125, y = (v) => m.t + ph - ((Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * ph;
+      const g = el('g', { 'font-size': fs }, svg);
+      for (let v = Math.ceil(lo / 10) * 10; v <= hi; v += 10) {
+        el('line', { x1: m.l, x2: w - m.r, y1: y(v), y2: y(v), stroke: v === 100 ? C.axis : C.grid, 'stroke-width': v === 100 ? 1.5 : 1 }, g);
+        el('text', { x: m.l - r * 0.4, y: y(v) + fs * 0.35, 'text-anchor': 'end', fill: v === 100 ? C.text : C.text3, 'font-weight': v === 100 ? 600 : 400, style: 'font-variant-numeric: tabular-nums' }, g, String(v));
+      }
+      const maxN = Math.max.apply(null, o.points.map((p) => p.n || 1));
+      lots.forEach((lot, li) => {
+        const cx = m.l + band * li + band / 2;
+        if (li > 0) el('line', { x1: m.l + band * li, x2: m.l + band * li, y1: m.t, y2: m.t + ph, stroke: C.grid, 'stroke-width': 1 }, g);
+        el('text', { x: cx, y: m.t + ph + fs * 1.6, 'text-anchor': 'middle', fill: C.text3 }, g, o.lblLot(lot));
+        const L = o.lots[li];
+        const tick = el('line', { x1: cx - band * 0.34, x2: cx + band * 0.34, y1: y(L.idx), y2: y(L.idx), stroke: C.text, 'stroke-width': 2, 'stroke-linecap': 'round' }, g);
+        if (animate) fadeIn(tick, 400, 700 + li * 60);
+        const ps = o.points.filter((p) => p.lot === lot);
+        ps.forEach((p, k) => {
+          const off = ps.length > 1 ? ((k / (ps.length - 1)) - 0.5) * band * 0.56 : 0;
+          const rad = p.sz ? [5, 5, 7, 9][p.sz] : Math.max(4, Math.min(9, 4 + 5 * Math.sqrt(p.n / maxN)));
+          const c = el('circle', { cx: cx + off, cy: y(p.idx), r: rad, fill: C.s1, stroke: C.surface, 'stroke-width': 2, tabindex: 0, 'aria-label': o.tipTitle(p) + ': ' + fmt(p.idx, 0) }, g);
+          if (animate && c.animate) c.animate([{ opacity: 0, transform: 'translateY(-14px)' }, { opacity: 1, transform: 'none' }], { duration: 450, delay: 150 + li * 60 + k * 30, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' });
+          const hit = el('circle', { cx: cx + off, cy: y(p.idx), r: 14, fill: 'transparent' }, g);
+          const rows = [[o.lblIdx, fmt(p.idx, 0), C.s1]].concat(p.n != null ? [[o.lblPcs, fmt(p.n, 0)]] : [], [[o.lblLotAvg, fmt(L.idx, 0), C.text]]);
+          bindTip(hit, o.tipTitle(p), rows); bindTip(c, o.tipTitle(p), rows);
+        });
+      });
+      // legenda
+      const lg = el('g', { transform: `translate(${m.l + r * 0.4}, ${m.t - r * 0.55})` }, g);
+      el('circle', { cx: 6, cy: -fs * 0.32, r: 5, fill: C.s1 }, lg);
+      const t1 = el('text', { x: 18, y: 0, fill: C.text2 }, lg, o.lblSpool);
+      const off = 18 + (t1.getComputedTextLength ? t1.getComputedTextLength() : 120) + 26;
+      el('line', { x1: off, x2: off + 18, y1: -fs * 0.32, y2: -fs * 0.32, stroke: C.text, 'stroke-width': 2, 'stroke-linecap': 'round' }, lg);
+      el('text', { x: off + 26, y: 0, fill: C.text2 }, lg, o.lblLotAvg);
+      svg.setAttribute('aria-label', o.caption || '');
+      const withN = o.points.length && o.points[0].n != null;
+      table(host, o.caption, withN ? ['', o.lblIdx, o.lblPcs] : ['', o.lblIdx], o.points.map((p) => (withN ? [o.tipTitle(p), fmt(p.idx, 0), fmt(p.n, 0)] : [o.tipTitle(p), fmt(p.idx, 0)])));
+    });
+  }
+
+  /* ---------- barra segmentada alta (um todo em partes) — HTML ----------
+     o: { parts:[{label, value, color, dark?}], unit:'%', dec, caption } */
+  function segbar(host, o) {
+    host.textContent = ''; host.classList.add('segbar');
+    const total = o.parts.reduce((s, p) => s + p.value, 0);
+    const bar = h('div', 'segbar-bar', host); bar.setAttribute('role', 'img'); bar.setAttribute('aria-label', (o.caption || '') + ': ' + o.parts.map((p) => p.label + ' ' + fmt(p.value, o.dec || 0) + (o.unit || '')).join(', '));
+    o.parts.forEach((p) => {
+      if (p.value <= 0) return;
+      const s = h('div', 'segbar-seg', bar); s.style.flexGrow = p.value / total; s.style.flexBasis = '0'; s.style.background = p.color; s.tabIndex = 0;
+      const lab = h('span', '', s, fmt(p.value, o.dec || 0) + (o.unit || '')); lab.style.color = p.dark ? '#0B1017' : '#fff';
+      bindTip(s, p.label, [['', fmt(p.value, o.dec || 0) + (o.unit || ''), p.color]]);
+      requestAnimationFrame(() => { if (lab.scrollWidth + 14 > s.clientWidth) lab.hidden = true; });
+    });
+    const lg = h('div', 'segbar-legend', host);
+    o.parts.forEach((p) => { const it = h('span', '', lg); const sw = h('i', '', it); sw.style.background = p.color; h('span', '', it, p.label); });
+    table(host, o.caption, ['', o.unit || ''], o.parts.map((p) => [p.label, fmt(p.value, o.dec || 0) + (o.unit || '')]));
+    return { replay() { if (reduced() || !bar.animate) return; bar.animate([{ clipPath: 'inset(0 100% 0 0 round 6px)' }, { clipPath: 'inset(0 0 0 0 round 6px)' }], { duration: 900, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' }); } };
+  }
+
+  /* ---------- lista de medidores (nome · barra · valor) — HTML ----------
+     o: { rows:[{label, value, note?}], max, unit, dec, color, caption } */
+  function meters(host, o) {
+    host.textContent = ''; host.classList.add('meters');
+    const max = o.max || Math.max.apply(null, o.rows.map((x) => x.value));
+    const bars = [];
+    o.rows.forEach((row) => {
+      const r = h('div', 'meter-row', host); h('span', 'meter-name', r, row.label);
+      const tr = h('span', 'meter-track', r), fl = h('i', '', tr); fl.style.width = Math.max(0, (row.value / max) * 100) + '%'; if (o.color) fl.style.background = o.color; bars.push(fl);
+      h('b', 'meter-val', r, fmt(row.value, o.dec || 0) + (o.unit || ''));
+      r.tabIndex = 0; bindTip(r, row.label, [[row.note || '', fmt(row.value, o.dec || 0) + (o.unit || ''), o.color || C.s1]]);
+    });
+    table(host, o.caption, ['', o.unit || ''], o.rows.map((x) => [x.label, fmt(x.value, o.dec || 0) + (o.unit || '')]));
+    return { replay() { if (reduced()) return; bars.forEach((b, i) => b.animate && b.animate([{ transform: 'scaleX(0)' }, { transform: 'none' }], { duration: 700, delay: i * 60, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' })); } };
+  }
+
+  /* ---------- dispersão por linha (cada ponto = uma pessoa/unidade anônima), índice com mediana = 100 ----------
+     o: { rows:[{label, idx[]}], lo, hi, lblMedian, tipRow(label, v), caption } */
+  function rowsDots(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7), n = o.rows.length;
+      const lblW = Math.min(w * 0.34, r * 9.5);
+      const m = { l: lblW, r: r * 0.8, t: r * 1.4, b: r * 1.6 };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b, band = ph / n, lo = o.lo || 40, hi = o.hi || 140;
+      const x = (v) => m.l + ((Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * pw;
+      const g = el('g', { 'font-size': fs }, svg);
+      for (let v = lo; v <= hi; v += 20) { el('line', { x1: x(v), x2: x(v), y1: m.t, y2: m.t + ph, stroke: v === 100 ? C.axis : C.grid, 'stroke-width': v === 100 ? 1.5 : 1 }, g);
+        el('text', { x: x(v), y: m.t + ph + fs * 1.5, 'text-anchor': 'middle', fill: v === 100 ? C.text : C.text3, 'font-weight': v === 100 ? 600 : 400, style: 'font-variant-numeric: tabular-nums' }, g, String(v)); }
+      el('text', { x: x(100), y: m.t - fs * 0.6, 'text-anchor': 'middle', fill: C.text2 }, g, o.lblMedian);
+      o.rows.forEach((row, i) => {
+        const cy = m.t + band * i + band / 2;
+        el('text', { x: m.l - r * 0.6, y: cy + fs * 0.35, 'text-anchor': 'end', fill: C.text2 }, g, row.label);
+        el('line', { x1: x(Math.min.apply(null, row.idx)), x2: x(Math.max.apply(null, row.idx)), y1: cy, y2: cy, stroke: C.mute, 'stroke-width': 2, 'stroke-linecap': 'round' }, g);
+        row.idx.forEach((v, k) => { const c = el('circle', { cx: x(v), cy, r: 5, fill: C.s1, stroke: C.surface, 'stroke-width': 2 }, g);
+          if (animate && c.animate) c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 120 + i * 70 + k * 18, fill: 'both' });
+          const hit = el('circle', { cx: x(v), cy, r: 12, fill: 'transparent', tabindex: -1 }, g); bindTip(hit, row.label, [[o.lblIdx || '', fmt(v, 0), C.s1]]); });
+      });
+      svg.setAttribute('aria-label', o.caption || '');
+      table(host, o.caption, ['', 'min', 'max', 'n'], o.rows.map((x_) => [x_.label, Math.min.apply(null, x_.idx), Math.max.apply(null, x_.idx), x_.idx.length]));
+    });
+  }
+
+  /* ---------- linhas no tempo com mira (monitor e curvas acumuladas) ----------
+     o: { series:[{name, color, pts:[[t(ms)|x, v]], dashFrom?}], xIsTime, fmtX(x), fmtV(v), yPad, min0, unit, caption, gapAfter } */
+  function lines(host, o) {
+    return mount(host, ({ svg, w, h: H, r }) => {
+      const fs = Math.max(11, r * 0.7);
+      const all = [].concat.apply([], o.series.map((s) => s.pts));
+      if (!all.length) return;
+      const xs = all.map((p) => p[0]), vs = all.map((p) => p[1]);
+      let x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), v0 = Math.min.apply(null, vs), v1 = Math.max.apply(null, vs);
+      if (o.min0) v0 = 0; const padV = (v1 - v0) * (o.yPad == null ? 0.12 : o.yPad) || Math.abs(v1) * 0.01 || 1; if (!o.min0) v0 -= padV; v1 += padV; if (x1 === x0) x1 = x0 + 1;
+      const m = { l: r * 0.4, r: r * (o.rightPad || 4.4), t: r * 0.8, b: r * 1.7 };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b;
+      const X = (t) => m.l + ((t - x0) / (x1 - x0)) * pw, Y = (v) => m.t + ph - ((v - v0) / (v1 - v0)) * ph;
+      const g = el('g', { 'font-size': fs }, svg);
+      const step = (v1 - v0) / 4;
+      for (let k = 0; k <= 4; k++) { const v = v0 + step * k; el('line', { x1: m.l, x2: m.l + pw, y1: Y(v), y2: Y(v), stroke: C.grid, 'stroke-width': 1 }, g);
+        el('text', { x: m.l + pw + r * 0.35, y: Y(v) + fs * 0.35, fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, o.fmtV(v)); }
+      (o.xTicks || []).forEach((t) => { if (t < x0 || t > x1) return; el('line', { x1: X(t), x2: X(t), y1: m.t, y2: m.t + ph, stroke: C.grid, 'stroke-width': 1 }, g); el('text', { x: X(t) + 4, y: m.t + ph + fs * 1.45, fill: C.text3 }, g, o.fmtTick ? o.fmtTick(t) : o.fmtX(t)); });
+      o.series.forEach((s) => {
+        if (!s.pts.length) return;
+        const segs = []; let cur = [];
+        s.pts.forEach((p, i) => { if (i && o.gapAfter && p[0] - s.pts[i - 1][0] > o.gapAfter) { segs.push(cur); cur = []; } cur.push(p); }); segs.push(cur);
+        segs.forEach((sg, k) => {
+          if (sg.length > 1) el('path', { d: 'M' + sg.map((p) => X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1)).join('L'), fill: 'none', stroke: s.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, g);
+          if (k > 0) { const a = segs[k - 1][segs[k - 1].length - 1], b = sg[0]; el('line', { x1: X(a[0]), y1: Y(a[1]), x2: X(b[0]), y2: Y(b[1]), stroke: s.color, 'stroke-width': 1, opacity: .45 }, g); }
+        });
+        const lp = s.pts[s.pts.length - 1]; el('circle', { cx: X(lp[0]), cy: Y(lp[1]), r: 5, fill: s.color, stroke: C.surface, 'stroke-width': 2 }, g);
+      });
+      const cross = el('line', { y1: m.t, y2: m.t + ph, stroke: C.axis, 'stroke-width': 1, visibility: 'hidden' }, g);
+      const hit = el('rect', { x: m.l, y: m.t, width: pw, height: ph, fill: 'transparent', tabindex: 0, 'aria-label': o.caption || '' }, g);
+      const move = (e) => { const b = svg.getBoundingClientRect(); const px = ((e.clientX - b.left) / b.width) * w; const t = x0 + ((px - m.l) / pw) * (x1 - x0);
+        let best = null; o.series.forEach((s) => s.pts.forEach((p) => { if (!best || Math.abs(p[0] - t) < Math.abs(best - t)) best = p[0]; }));
+        cross.setAttribute('x1', X(best)); cross.setAttribute('x2', X(best)); cross.setAttribute('visibility', 'visible');
+        const rows = o.series.map((s) => { let bp = null; s.pts.forEach((p) => { if (!bp || Math.abs(p[0] - best) < Math.abs(bp[0] - best)) bp = p; }); return bp ? [s.name, o.fmtV(bp[1]), s.color] : null; }).filter(Boolean);
+        showTip(e.clientX, e.clientY, o.fmtX(best), rows); };
+      hit.addEventListener('pointermove', move); hit.addEventListener('pointerdown', move);
+      hit.addEventListener('pointerleave', () => { cross.setAttribute('visibility', 'hidden'); hideTip(); });
+      svg.setAttribute('aria-label', o.caption || '');
+    });
+  }
+
+  return { C, setLocale, fmt, columns, pareto, longSeries, strip, segbar, meters, rowsDots, lines, showTip, hideTip, bindTip, table, h, el };
+})();
+
+</script>
+<script>
+/* Textos da apresentação "Planejamento e controle" — en · pt · ja · de.
+   {chaves} são preenchidas com os indicadores calculados dos relatórios (data.public.json). */
+const OPS_I18N = {
+  en: {
+    locale: 'en-US', name: 'English',
+    ui: { deck: 'Planning and control', back: 'Showcase', close: 'Close', prev: 'Previous', next: 'Next', source: 'Source: Sensor Technology management reports, November 2026.',
+      chapters: { intro: 'Opening', market: 'Market', plan: 'Planning', platinum: 'Platinum', production: 'Production', people: 'People', suppliers: 'Suppliers', customers: 'Customers', delivery: 'Delivery', partners: 'Partners' } },
+    cover: { title: 'We start building your sensor before you order it.',
+      lead: 'How Sensor Technology reads the whole market, decides what to produce and keeps every lot under control, from the platinum spool to the delivered parcel.',
+      t1: 'Production starts', t2: 'Your order arrives', t3: 'Ready to ship', weeks: 'weeks', cap: 'A wire-wound sensor takes about {p50} weeks to build. Planning ahead is what makes it available when you need it.' },
+    why: { title: 'A sensor takes weeks to build. Your project cannot wait that long.',
+      lead: 'Half of our pieces are finished by week {p50} after the lot enters the line, and 95% by week {p95}. So the decision to produce has to be taken before the purchase order exists.',
+      cap: 'Share of pieces finished, by week after the lot enters production', x: 'week after entering the line', row: 'of the pieces', wk: 'Week {n}', m50: 'half finished', m95: '95% finished',
+      note: '{pcs} pieces in {lots} production lots since {since}.' },
+    market: { title: 'Every month we read fifteen years of demand.',
+      lead: 'Every invoice and every open order since 2011 feeds one model, by product family, tolerance class, country and type of customer. We compare order intake with shipments and follow consumption over the last 3, 6, 9 and 12 months.',
+      s1: 'months of history', s2: 'customers followed', s3: 'part numbers', roll: '12-month average', month: 'Monthly demand (index, peak = 100)', cap: 'Monthly demand since 2011, as an index',
+      ruleT: 'The rule that triggers production', rule: 'Free balance ÷ average monthly order intake = months of coverage.', r1: 'Under 1 month', r1d: 'produce', r2: 'Over 6 months', r2d: 'flagged as non-moving' },
+    abc: { title: 'Seven families carry more than 80% of the volume.',
+      lead: 'The ABC curve ranks the {n} product families shipped in the last 12 months. It shows where a stock-out would hurt most, and therefore where stock and capacity must be ready first.',
+      zA: 'A', zB: 'B', zC: 'C', fam: 'families', share: 'Share of each family', cum: 'Cumulative share', item: 'Family ranked {n}', of: 'of the pieces', cap: 'ABC curve of product families, last 12 months' },
+    ahead: { title: 'A third of today’s production plan has no customer name on it yet.',
+      lead: 'Every production lot is linked to the orders it will serve. What we plan beyond those orders is free balance: sensors already being built for demand the statistics tell us is coming.',
+      linked: 'Linked to customer orders', free: 'Free balance, built ahead of orders', formula: 'Free balance = stock + work in progress − open orders', note: 'Wire-wound sensor line, production plan of November 2026.', cap: 'Composition of the production plan' },
+    spool: { title: 'Every platinum spool has its own signature.',
+      lead: 'Two spools from the same wire lot do not behave alike. Before a spool is released we wind pilot lots, measure each piece at 0 °C and 100 °C to obtain its resistance and temperature coefficient, and run yield samples. Only then are the winding parameters fixed for series production.',
+      steps: ['Spool received', 'Pilot lot', 'Measured at 0 °C and 100 °C', 'Yield sample', 'Released for series'],
+      s1: 'spools traced in 12 months', s2: 'pilot runs and yield samples in 6 months', s3: 'sensors measured one by one',
+      cap: 'Tight-tolerance yield of each spool, against the 12-month average (= 100)', avg: '12-month average = 100', lot: 'Lot {n}', sp: 'Lot {l}, spool {s}', idx: 'Index', pcs: 'Pieces', one: 'One spool', lotavg: 'Lot average',
+      note: 'Main product family, spools with at least 400 pieces. Lots are anonymised.' },
+    classes: { title: 'Tolerance classes are harvested, not ordered.',
+      lead: 'A production lot yields a mix of classes. Each family has a registered yield per class, checked against what the classification bench measures. Planning converts the classes customers ask for into the number of pieces that must enter the line.',
+      a: 'Lot enters the line', b: 'Each piece measured at 0 °C and 100 °C', c: 'Tolerance classes', d: 'Orders served first in, first out by delivery date', e: 'Stock is applied first. Only the shortfall is produced.', note: 'Schematic, not to scale.' },
+    control: { title: 'Every lot has a planned week, and 97% of the pieces make it.',
+      lead: 'Each lot is followed stage by stage against its planned start and end. In the last 12 months, {last12}% of {pcs12} pieces left the line by the planned date.',
+      stages: ['Welded', 'Adjusted', 'Coated', 'Classified', 'Finished'], cap: 'Pieces finished by the planned date, by year', row: 'on time' },
+    prod: { title: 'Productivity is measured where the work happens.',
+      lead: 'Every operator logs every operation on every lot: {records} million piece-operations in 24 months, across {operations} operations. One record, four uses.',
+      rec: 'One record: who, which operation, which lot, how many pieces, how long',
+      u: [['Standard times', 'Real pieces per hour for each operation and product.'], ['Lead time of each lot', 'Planned weeks come from measured capacity.'], ['People on each line', 'Allocation follows the load at each stage.'], ['Career plan', 'What each person masters turns into points.']] },
+    career: { title: 'A career plan built on what each person masters.',
+      lead: 'Every operation has a grade from 1 to 5, by difficulty and criticality. When an operator is approved in an operation, its points count. Points open the next level.',
+      levels: ['Assembly assistant', 'Junior assembler', 'Junior assembler II', 'Assembler', 'Assembler II', 'Senior assembler', 'Senior assembler II'], lead2: ['Junior line leader', 'Senior line leader', 'Production coordinator'],
+      pts: 'points', track: 'Leadership track', s1: 'approved skills, one operator in one operation', s2: 'operations mastered per operator, on average' },
+    retain: { title: 'Knowledge that stays in the house.',
+      lead: 'Skills are recorded per person and per operation, so no critical step depends on a single pair of hands. And people stay.',
+      hero: 'satisfied in our {year} internal satisfaction survey, {n} respondents', s1: 'of the 40 busiest operations have three or more certified operators', s2: 'years: the longest service in our assembly team' },
+    supply: { title: 'Suppliers are developed, scored and scored again.',
+      lead: 'Every delivery is scored. The quality index combines certification, on-time delivery and conformity at incoming inspection, and places each supplier in a class from A to D. Homologation is tracked item by item, for each supplier.',
+      p1: 'Certification', p2: 'On-time delivery', p3: 'Incoming inspection', iq: 'Supplier quality index', cls: ['above 90', '75 to 90', '45 to 75', 'below 45'], clsT: 'Class',
+      s1: 'suppliers under continuous evaluation', s2: 'deliveries scored in 24 months', s3: 'suppliers developed, {n} more in development', s4: 'of approved requisitions become purchase orders within 2 days' },
+    custom: { title: 'Your specification travels with every order line.',
+      lead: 'Each requirement is registered on the order line and decides how the lot is split, inspected, labelled and packed.',
+      chips: ['X-ray of 100% of the lot', 'X-ray of 50% of the lot', 'X-ray of samples', 'Serial numbers', 'Special labels', 'Development items with their own follow-up'],
+      s1: 'of open order lines carry a customer-specific requirement', s2: 'of the pieces on order go through X-ray' },
+    deliver: { title: 'We follow each parcel until someone signs for it.',
+      lead: 'The air waybill is issued from our ERP and linked to the invoice and the export declaration. A live board in our shipping area shows every parcel: route, customs clearance, estimated arrival and who received it.',
+      steps: ['Invoice and shipping advice', 'Air waybill issued from the ERP', 'Pickup', 'Export declaration', 'Customs clearance', 'Delivered and signed'], note: 'FedEx is integrated today. DHL and UPS come next on the same board.' },
+    partners: { title: 'For partners: a closer look.', lead: 'The controls, the traceability chain and the analyses behind this presentation.',
+      b1: 'Open the partner area', h1: 'Access code required', b2: 'Live markets', h2: 'Currencies and precious metals, updated every minute' },
+  },
+
+  pt: {
+    locale: 'pt-BR', name: 'Português',
+    ui: { deck: 'Planejamento e controle', back: 'Showcase', close: 'Fechar', prev: 'Anterior', next: 'Próximo', source: 'Fonte: relatórios gerenciais da Sensor Technology, novembro de 2026.',
+      chapters: { intro: 'Abertura', market: 'Mercado', plan: 'Planejamento', platinum: 'Platina', production: 'Produção', people: 'Pessoas', suppliers: 'Fornecedores', customers: 'Clientes', delivery: 'Entrega', partners: 'Parceiros' } },
+    cover: { title: 'Começamos a fabricar o seu sensor antes de você pedir.',
+      lead: 'Como a Sensor Technology lê o mercado inteiro, decide o que produzir e mantém cada lote sob controle, do carretel de platina ao pacote entregue.',
+      t1: 'Início da produção', t2: 'Seu pedido chega', t3: 'Pronto para embarque', weeks: 'semanas', cap: 'Um sensor de fio enrolado leva cerca de {p50} semanas para ficar pronto. Planejar antes é o que o deixa disponível quando você precisa.' },
+    why: { title: 'Um sensor leva semanas para ficar pronto. O seu projeto não pode esperar tanto.',
+      lead: 'Metade das nossas peças fica pronta até a {p50}ª semana depois que o lote entra na linha, e 95% até a {p95}ª. Por isso a decisão de produzir tem de ser tomada antes de o pedido de compra existir.',
+      cap: 'Participação das peças concluídas, por semana após a entrada do lote na produção', x: 'semana após a entrada na linha', row: 'das peças', wk: 'Semana {n}', m50: 'metade pronta', m95: '95% prontas',
+      note: '{pcs} peças em {lots} lotes de produção desde {since}.' },
+    market: { title: 'Todo mês lemos quinze anos de demanda.',
+      lead: 'Cada nota fiscal e cada pedido em carteira desde 2011 alimenta um único modelo, por família de produto, classe de tolerância, país e tipo de cliente. Comparamos a captação de pedidos com o faturamento e acompanhamos o consumo dos últimos 3, 6, 9 e 12 meses.',
+      s1: 'meses de histórico', s2: 'clientes acompanhados', s3: 'códigos de produto', roll: 'Média de 12 meses', month: 'Demanda mensal (índice, pico = 100)', cap: 'Demanda mensal desde 2011, em índice',
+      ruleT: 'A regra que dispara a produção', rule: 'Saldo livre ÷ captação média mensal = meses de cobertura.', r1: 'Menos de 1 mês', r1d: 'produzir', r2: 'Mais de 6 meses', r2d: 'sinalizado como sem giro' },
+    abc: { title: 'Sete famílias respondem por mais de 80% do volume.',
+      lead: 'A curva ABC ordena as {n} famílias de produto embarcadas nos últimos 12 meses. Ela mostra onde uma ruptura de estoque doeria mais e, portanto, onde estoque e capacidade precisam estar prontos primeiro.',
+      zA: 'A', zB: 'B', zC: 'C', fam: 'famílias', share: 'Participação de cada família', cum: 'Participação acumulada', item: 'Família na posição {n}', of: 'das peças', cap: 'Curva ABC das famílias de produto, últimos 12 meses' },
+    ahead: { title: 'Um terço do plano de produção de hoje ainda não tem nome de cliente.',
+      lead: 'Cada lote de produção é vinculado aos pedidos que vai atender. O que planejamos além desses pedidos é saldo livre: sensores já em fabricação para uma demanda que a estatística mostra que virá.',
+      linked: 'Vinculado a pedidos de clientes', free: 'Saldo livre, fabricado antes do pedido', formula: 'Saldo livre = estoque + produção em andamento − pedidos em carteira', note: 'Linha de sensores de fio enrolado, plano de produção de novembro de 2026.', cap: 'Composição do plano de produção' },
+    spool: { title: 'Cada carretel de platina tem a sua assinatura.',
+      lead: 'Dois carretéis do mesmo lote de fio não se comportam igual. Antes de liberar um carretel, fazemos lotes piloto, medimos cada peça a 0 °C e a 100 °C para obter o valor elétrico e o coeficiente de temperatura, e rodamos amostras de rendimento. Só então fixamos os parâmetros de enrolamento da produção em série.',
+      steps: ['Carretel recebido', 'Lote piloto', 'Medição a 0 °C e 100 °C', 'Amostra de rendimento', 'Liberado para a série'],
+      s1: 'carretéis rastreados em 12 meses', s2: 'ensaios de piloto e amostras de rendimento em 6 meses', s3: 'sensores medidos um a um',
+      cap: 'Rendimento das classes mais apertadas de cada carretel, frente à média de 12 meses (= 100)', avg: 'média de 12 meses = 100', lot: 'Lote {n}', sp: 'Lote {l}, carretel {s}', idx: 'Índice', pcs: 'Peças', one: 'Um carretel', lotavg: 'Média do lote',
+      note: 'Principal família de produto, carretéis com pelo menos 400 peças. Lotes anonimizados.' },
+    classes: { title: 'Classe de tolerância se colhe, não se encomenda.',
+      lead: 'Um lote de produção rende uma mistura de classes. Cada família tem um rendimento cadastrado por classe, conferido com o que a bancada de classificação mede. O planejamento converte as classes que os clientes pedem na quantidade de peças que precisa entrar na linha.',
+      a: 'Lote entra na linha', b: 'Cada peça medida a 0 °C e 100 °C', c: 'Classes de tolerância', d: 'Pedidos atendidos em fila, por data de entrega', e: 'Primeiro se aplica o estoque. Só a diferença é produzida.', note: 'Esquema fora de escala.' },
+    control: { title: 'Cada lote tem semana marcada, e 97% das peças cumprem.',
+      lead: 'Cada lote é acompanhado etapa por etapa frente ao início e ao fim planejados. Nos últimos 12 meses, {last12}% de {pcs12} peças saíram da linha até a data planejada.',
+      stages: ['Soldado', 'Ajustado', 'Pintado', 'Classificado', 'Acabado'], cap: 'Peças concluídas até a data planejada, por ano', row: 'no prazo' },
+    prod: { title: 'A produtividade é medida onde o trabalho acontece.',
+      lead: 'Cada pessoa da linha aponta cada operação de cada lote: {records} milhões de peças-operação em 24 meses, em {operations} operações. Um apontamento, quatro usos.',
+      rec: 'Um apontamento: quem, qual operação, qual lote, quantas peças, quanto tempo',
+      u: [['Tempos-padrão', 'Peças por hora reais de cada operação e produto.'], ['Lead time de cada lote', 'As semanas planejadas vêm da capacidade medida.'], ['Pessoas em cada linha', 'A alocação segue a carga de cada etapa.'], ['Plano de carreira', 'O que cada pessoa domina vira pontos.']] },
+    career: { title: 'Um plano de carreira construído sobre o que cada pessoa domina.',
+      lead: 'Cada operação tem uma nota de 1 a 5, por dificuldade e criticidade. Quando a pessoa é aprovada em uma operação, os pontos passam a contar. Os pontos abrem o nível seguinte.',
+      levels: ['Auxiliar de montagem', 'Montador júnior', 'Montador júnior II', 'Montador pleno', 'Montador pleno II', 'Montador sênior', 'Montador sênior II'], lead2: ['Líder de montagem júnior', 'Líder de montagem sênior', 'Coordenador de produção'],
+      pts: 'pontos', track: 'Trilha de liderança', s1: 'habilidades aprovadas, uma pessoa em uma operação', s2: 'operações dominadas por pessoa, em média' },
+    retain: { title: 'Conhecimento que fica em casa.',
+      lead: 'As habilidades são registradas por pessoa e por operação, para que nenhuma etapa crítica dependa de um único par de mãos. E as pessoas ficam.',
+      hero: 'de satisfação na Pesquisa de Satisfação Interna de {year}, {n} respondentes', s1: 'das 40 operações de maior volume têm três ou mais pessoas certificadas', s2: 'anos: o maior tempo de casa na nossa montagem' },
+    supply: { title: 'Fornecedor se desenvolve, se avalia e se avalia de novo.',
+      lead: 'Toda entrega é pontuada. O índice de qualidade combina certificação, pontualidade e conformidade na inspeção de recebimento, e coloca cada fornecedor em uma classe de A a D. A homologação é acompanhada item a item, para cada fornecedor.',
+      p1: 'Certificação', p2: 'Pontualidade', p3: 'Inspeção de recebimento', iq: 'Índice de qualidade do fornecedor', cls: ['acima de 90', '75 a 90', '45 a 75', 'abaixo de 45'], clsT: 'Classe',
+      s1: 'fornecedores em avaliação contínua', s2: 'entregas pontuadas em 24 meses', s3: 'fornecedores desenvolvidos, mais {n} em desenvolvimento', s4: 'das solicitações aprovadas viram pedido de compra em até 2 dias' },
+    custom: { title: 'A sua especificação acompanha cada linha do pedido.',
+      lead: 'Cada exigência é registrada na linha do pedido e define como o lote é dividido, inspecionado, etiquetado e embalado.',
+      chips: ['Raio X em 100% do lote', 'Raio X em 50% do lote', 'Raio X por amostragem', 'Números de série', 'Etiquetas especiais', 'Itens de desenvolvimento com acompanhamento próprio'],
+      s1: 'das linhas de pedido em carteira trazem uma exigência específica do cliente', s2: 'das peças em carteira passam por raio X' },
+    deliver: { title: 'Acompanhamos cada pacote até alguém assinar o recebimento.',
+      lead: 'O AWB é emitido pelo nosso ERP e vinculado à nota fiscal e à declaração de exportação. Um painel ao vivo na expedição mostra cada pacote: rota, desembaraço aduaneiro, previsão de chegada e quem recebeu.',
+      steps: ['Nota fiscal e aviso de embarque', 'AWB emitido pelo ERP', 'Coleta', 'Declaração de exportação', 'Desembaraço aduaneiro', 'Entregue e assinado'], note: 'A FedEx já está integrada. DHL e UPS entram em seguida no mesmo painel.' },
+    partners: { title: 'Para parceiros: um olhar mais de perto.', lead: 'Os controles, a cadeia de rastreabilidade e as análises por trás desta apresentação.',
+      b1: 'Abrir a área de parceiros', h1: 'Exige código de acesso', b2: 'Mercados ao vivo', h2: 'Moedas e metais preciosos, atualizados a cada minuto' },
+  },
+
+  ja: {
+    locale: 'ja-JP', name: '日本語',
+    ui: { deck: '生産計画と管理', back: 'ショーケース', close: '閉じる', prev: '前へ', next: '次へ', source: '出典：センサー・テクノロジー社 管理レポート（2026年11月）',
+      chapters: { intro: 'はじめに', market: '市場', plan: '計画', platinum: '白金', production: '生産', people: '人材', suppliers: 'サプライヤー', customers: 'お客様', delivery: '納品', partners: 'パートナー' } },
+    cover: { title: 'ご注文をいただく前に、センサーの生産を始めています。',
+      lead: 'センサー・テクノロジーが市場全体をどう読み、何を生産するかを決め、白金線のスプールからお届けまで、すべてのロットをどう管理しているかをご紹介します。',
+      t1: '生産開始', t2: 'ご注文', t3: '出荷可能', weeks: '週', cap: '巻線型センサーの生産には約{p50}週間かかります。必要なときにお届けできるのは、先を見越した計画があるからです。' },
+    why: { title: 'センサーの生産には数週間かかります。お客様のプロジェクトはそれを待てません。',
+      lead: 'ロット投入から{p50}週目までに半数、{p95}週目までに95%が完成します。そのため、生産の判断は注文書が届く前に下す必要があります。',
+      cap: 'ロット投入後の週ごとの完成品の割合', x: 'ライン投入後の週', row: '全体に占める割合', wk: '{n}週目', m50: '半数が完成', m95: '95%が完成',
+      note: '{since}年以降、{lots}ロット・{pcs}個の実績。' },
+    market: { title: '15年分の需要を、毎月読み解いています。',
+      lead: '2011年以降のすべての出荷と受注残を、製品ファミリー、許容差クラス、国、顧客区分ごとに一つのモデルに集約しています。受注と出荷を比較し、直近3・6・9・12か月の消費を追跡します。',
+      s1: 'か月分の履歴', s2: '社のお客様を追跡', s3: '品番', roll: '12か月平均', month: '月次需要（指数、ピーク＝100）', cap: '2011年以降の月次需要（指数）',
+      ruleT: '生産を開始する基準', rule: 'フリー在庫 ÷ 月平均受注 ＝ カバー月数', r1: '1か月未満', r1d: '生産する', r2: '6か月超', r2d: '滞留として警告' },
+    abc: { title: '7つのファミリーで、数量の80%以上を占めます。',
+      lead: 'ABC分析では、直近12か月に出荷した{n}の製品ファミリーを順位づけします。欠品の影響が最も大きい品目、つまり在庫と生産能力を最優先で確保すべき品目が分かります。',
+      zA: 'A', zB: 'B', zC: 'C', fam: 'ファミリー', share: '各ファミリーの構成比', cum: '累積構成比', item: '第{n}位のファミリー', of: '数量比', cap: '製品ファミリーのABC曲線（直近12か月）' },
+    ahead: { title: '現在の生産計画の3分の1は、まだお客様の名前が付いていません。',
+      lead: '各生産ロットは、充当する注文に紐づけられています。注文を超えて計画した分がフリー在庫です。統計が示す今後の需要に向けて、すでに生産が始まっています。',
+      linked: 'お客様の注文に紐づく分', free: 'フリー在庫（注文前に生産）', formula: 'フリー在庫 ＝ 在庫 ＋ 仕掛品 − 受注残', note: '巻線型センサーライン、2026年11月時点の生産計画。', cap: '生産計画の内訳' },
+    spool: { title: '白金線のスプールには、一本ごとに個性があります。',
+      lead: '同じ線材ロットでも、スプールが違えば特性は同じではありません。スプールを量産に使う前に、パイロットロットを巻き、全数を0 °Cと100 °Cで測定して抵抗値と温度係数を求め、歩留まりサンプルを確認します。そのうえで量産の巻線条件を決定します。',
+      steps: ['スプール受入', 'パイロットロット', '0 °C・100 °C測定', '歩留まりサンプル', '量産へリリース'],
+      s1: '本のスプールを追跡（12か月）', s2: '回のパイロット・歩留まり確認（6か月）', s3: '個を1個ずつ測定',
+      cap: 'スプールごとの高精度クラス歩留まり（12か月平均＝100）', avg: '12か月平均＝100', lot: 'ロット{n}', sp: 'ロット{l}・スプール{s}', idx: '指数', pcs: '個数', one: 'スプール1本', lotavg: 'ロット平均',
+      note: '主力製品ファミリー、400個以上のスプールが対象。ロット名は匿名化しています。' },
+    classes: { title: '許容差クラスは「注文する」ものではなく「収穫する」ものです。',
+      lead: '一つの生産ロットからは、複数のクラスが混ざって生まれます。ファミリーごとにクラス別の歩留まりを登録し、分類工程の実測値と照合しています。計画部門は、お客様が求めるクラスを、ラインに投入すべき数量に換算します。',
+      a: 'ロットをラインに投入', b: '全数を0 °C・100 °Cで測定', c: '許容差クラス', d: '納期順・先入れ先出しで注文に充当', e: 'まず在庫を充当し、不足分のみを生産します。', note: '模式図（縮尺は実際と異なります）' },
+    control: { title: 'すべてのロットに計画週があり、97%が計画どおりに完成します。',
+      lead: '各ロットを、計画した開始・終了日に対して工程ごとに追跡しています。直近12か月では、{pcs12}個のうち{last12}%が計画日までにラインを出ました。',
+      stages: ['溶接', '調整', '塗装', '分類', '仕上げ'], cap: '計画日までに完成した数量の割合（年別）', row: '計画どおり' },
+    prod: { title: '生産性は、作業の現場で測ります。',
+      lead: 'すべての作業者が、すべてのロットのすべての工程を記録しています。24か月で約{recordsMan}万件、{operations}工程。一つの記録を、四つの用途に使います。',
+      rec: '一つの記録：誰が・どの工程で・どのロットを・何個・何時間で',
+      u: [['標準時間', '工程・製品ごとの実際の時間当たり生産数。'], ['各ロットのリードタイム', '計画週数は実測の能力から算出します。'], ['各ラインの人員', '工程ごとの負荷に合わせて配置します。'], ['キャリアプラン', '習得した技能がポイントになります。']] },
+    career: { title: '一人ひとりが習得した技能に基づくキャリアプラン。',
+      lead: 'すべての工程に、難易度と重要度に応じた1〜5の評価点があります。作業者がその工程で認定されると、ポイントが加算されます。ポイントが次の等級への扉を開きます。',
+      levels: ['組立アシスタント', 'ジュニア組立員', 'ジュニア組立員 II', '組立員', '組立員 II', 'シニア組立員', 'シニア組立員 II'], lead2: ['ジュニアラインリーダー', 'シニアラインリーダー', '生産コーディネーター'],
+      pts: 'ポイント', track: 'リーダーコース', s1: '件の認定技能（作業者×工程）', s2: '工程を一人が平均して習得' },
+    retain: { title: '知識は、社内に残ります。',
+      lead: '技能は人ごと・工程ごとに記録しています。重要な工程が、一人の手だけに頼ることはありません。そして、人が定着しています。',
+      hero: '{year}年 従業員満足度調査での満足度（回答者{n}名）', s1: '主要40工程のうち、認定作業者が3名以上いる工程数', s2: '年：組立部門での最長勤続年数' },
+    supply: { title: 'サプライヤーは、育成し、評価し、繰り返し評価します。',
+      lead: 'すべての納入を採点します。品質指数は、認証、納期遵守、受入検査の適合率を組み合わせ、各サプライヤーをA〜Dのクラスに分類します。認定状況は、サプライヤーごと・品目ごとに管理しています。',
+      p1: '認証', p2: '納期遵守', p3: '受入検査', iq: 'サプライヤー品質指数', cls: ['90超', '75〜90', '45〜75', '45未満'], clsT: 'クラス',
+      s1: '社を継続的に評価', s2: '件の納入を採点（24か月）', s3: '社を育成済み、さらに{n}社を育成中', s4: 'の承認済み購入依頼が2日以内に発注へ' },
+    custom: { title: 'お客様の仕様は、注文の明細ごとに引き継がれます。',
+      lead: 'ご要望は注文明細に登録され、ロットの分割、検査、ラベル、梱包の方法を決定します。',
+      chips: ['ロット全数のX線検査', 'ロットの50%のX線検査', '抜取りX線検査', 'シリアル番号', '専用ラベル', '開発品の個別フォロー'],
+      s1: 'の受注明細にお客様固有の要求があります', s2: 'の受注数量がX線検査を通ります' },
+    deliver: { title: '受領のサインをいただくまで、荷物を追跡します。',
+      lead: '航空運送状（AWB）は当社のERPから発行し、請求書と輸出申告に紐づけています。出荷場のライブボードで、すべての荷物の経路、通関状況、到着予定、受領者を確認しています。',
+      steps: ['請求書・出荷案内', 'ERPからAWB発行', '集荷', '輸出申告', '通関', '配達・受領サイン'], note: '現在はFedExと連携済み。DHLとUPSも同じボードに追加予定です。' },
+    partners: { title: 'パートナーの皆様へ：さらに詳しく。', lead: 'このプレゼンテーションの背景にある管理手法、トレーサビリティ、分析をご覧いただけます。',
+      b1: 'パートナーエリアを開く', h1: 'アクセスコードが必要です', b2: 'ライブ・マーケット', h2: '為替と貴金属を1分ごとに更新' },
+  },
+
+  de: {
+    locale: 'de-DE', name: 'Deutsch',
+    ui: { deck: 'Planung und Steuerung', back: 'Showcase', close: 'Schließen', prev: 'Zurück', next: 'Weiter', source: 'Quelle: Managementberichte der Sensor Technology, November 2026.',
+      chapters: { intro: 'Einstieg', market: 'Markt', plan: 'Planung', platinum: 'Platin', production: 'Fertigung', people: 'Menschen', suppliers: 'Lieferanten', customers: 'Kunden', delivery: 'Lieferung', partners: 'Partner' } },
+    cover: { title: 'Wir beginnen mit Ihrem Sensor, bevor Sie ihn bestellen.',
+      lead: 'Wie Sensor Technology den gesamten Markt liest, entscheidet, was gefertigt wird, und jedes Los unter Kontrolle hält, von der Platinspule bis zum zugestellten Paket.',
+      t1: 'Fertigung beginnt', t2: 'Ihre Bestellung trifft ein', t3: 'Versandbereit', weeks: 'Wochen', cap: 'Ein drahtgewickelter Sensor braucht rund {p50} Wochen. Vorausschauende Planung macht ihn verfügbar, wenn Sie ihn brauchen.' },
+    why: { title: 'Ein Sensor braucht Wochen. Ihr Projekt kann nicht so lange warten.',
+      lead: 'Die Hälfte unserer Teile ist bis zur {p50}. Woche nach dem Einschleusen des Loses fertig, 95 % bis zur {p95}. Woche. Die Entscheidung zu fertigen muss also fallen, bevor die Bestellung existiert.',
+      cap: 'Anteil fertiggestellter Teile je Woche nach Fertigungsbeginn des Loses', x: 'Woche nach dem Einschleusen', row: 'der Teile', wk: 'Woche {n}', m50: 'Hälfte fertig', m95: '95 % fertig',
+      note: '{pcs} Teile in {lots} Fertigungslosen seit {since}.' },
+    market: { title: 'Jeden Monat lesen wir fünfzehn Jahre Nachfrage.',
+      lead: 'Jede Rechnung und jeder offene Auftrag seit 2011 fließt in ein Modell, nach Produktfamilie, Toleranzklasse, Land und Kundentyp. Wir vergleichen Auftragseingang und Auslieferungen und verfolgen den Verbrauch der letzten 3, 6, 9 und 12 Monate.',
+      s1: 'Monate Historie', s2: 'Kunden im Blick', s3: 'Artikelnummern', roll: '12-Monats-Durchschnitt', month: 'Monatliche Nachfrage (Index, Spitze = 100)', cap: 'Monatliche Nachfrage seit 2011 als Index',
+      ruleT: 'Die Regel, die die Fertigung auslöst', rule: 'Freier Bestand ÷ durchschnittlicher monatlicher Auftragseingang = Reichweite in Monaten.', r1: 'Unter 1 Monat', r1d: 'fertigen', r2: 'Über 6 Monate', r2d: 'als Ladenhüter markiert' },
+    abc: { title: 'Sieben Familien tragen mehr als 80 % des Volumens.',
+      lead: 'Die ABC-Kurve ordnet die {n} Produktfamilien, die in den letzten 12 Monaten ausgeliefert wurden. Sie zeigt, wo eine Fehlmenge am meisten schmerzen würde und wo Bestand und Kapazität zuerst bereitstehen müssen.',
+      zA: 'A', zB: 'B', zC: 'C', fam: 'Familien', share: 'Anteil je Familie', cum: 'Kumulierter Anteil', item: 'Familie auf Rang {n}', of: 'der Teile', cap: 'ABC-Kurve der Produktfamilien, letzte 12 Monate' },
+    ahead: { title: 'Ein Drittel des heutigen Fertigungsplans trägt noch keinen Kundennamen.',
+      lead: 'Jedes Fertigungslos ist mit den Aufträgen verknüpft, die es bedienen wird. Was wir darüber hinaus planen, ist freier Bestand: Sensoren, die bereits für eine Nachfrage gebaut werden, die laut Statistik kommen wird.',
+      linked: 'Mit Kundenaufträgen verknüpft', free: 'Freier Bestand, vor der Bestellung gefertigt', formula: 'Freier Bestand = Lager + Umlaufbestand − offene Aufträge', note: 'Linie für drahtgewickelte Sensoren, Fertigungsplan November 2026.', cap: 'Zusammensetzung des Fertigungsplans' },
+    spool: { title: 'Jede Platinspule hat ihre eigene Signatur.',
+      lead: 'Zwei Spulen aus demselben Drahtlos verhalten sich nicht gleich. Bevor eine Spule freigegeben wird, wickeln wir Pilotlose, messen jedes Teil bei 0 °C und 100 °C, um Widerstand und Temperaturkoeffizient zu bestimmen, und fahren Ausbeutemuster. Erst dann legen wir die Wickelparameter für die Serie fest.',
+      steps: ['Spule eingegangen', 'Pilotlos', 'Messung bei 0 °C und 100 °C', 'Ausbeutemuster', 'Freigabe für die Serie'],
+      s1: 'Spulen in 12 Monaten rückverfolgt', s2: 'Pilotläufe und Ausbeutemuster in 6 Monaten', s3: 'Sensoren einzeln gemessen',
+      cap: 'Ausbeute der engen Toleranzklassen je Spule, bezogen auf den 12-Monats-Durchschnitt (= 100)', avg: '12-Monats-Durchschnitt = 100', lot: 'Los {n}', sp: 'Los {l}, Spule {s}', idx: 'Index', pcs: 'Teile', one: 'Eine Spule', lotavg: 'Losdurchschnitt',
+      note: 'Wichtigste Produktfamilie, Spulen mit mindestens 400 Teilen. Lose anonymisiert.' },
+    classes: { title: 'Toleranzklassen werden geerntet, nicht bestellt.',
+      lead: 'Ein Fertigungslos ergibt einen Mix aus Klassen. Für jede Familie ist eine Ausbeute je Klasse hinterlegt und wird mit den Messwerten der Klassierung abgeglichen. Die Planung rechnet die von den Kunden gewünschten Klassen in die Stückzahl um, die in die Linie eingeschleust werden muss.',
+      a: 'Los geht in die Linie', b: 'Jedes Teil bei 0 °C und 100 °C gemessen', c: 'Toleranzklassen', d: 'Aufträge nach Liefertermin, first in, first out', e: 'Zuerst wird der Lagerbestand zugeteilt. Gefertigt wird nur die Fehlmenge.', note: 'Schema, nicht maßstäblich.' },
+    control: { title: 'Jedes Los hat seine Planwoche, und 97 % der Teile halten sie ein.',
+      lead: 'Jedes Los wird Stufe für Stufe gegen geplanten Start und geplantes Ende verfolgt. In den letzten 12 Monaten haben {last12} % von {pcs12} Teilen die Linie zum geplanten Termin verlassen.',
+      stages: ['Geschweißt', 'Abgeglichen', 'Beschichtet', 'Klassiert', 'Fertig'], cap: 'Zum geplanten Termin fertiggestellte Teile, nach Jahr', row: 'termingerecht' },
+    prod: { title: 'Produktivität wird dort gemessen, wo die Arbeit geschieht.',
+      lead: 'Jede Fachkraft bucht jeden Arbeitsgang an jedem Los: {records} Millionen Teile-Arbeitsgänge in 24 Monaten, über {operations} Arbeitsgänge. Eine Buchung, vier Verwendungen.',
+      rec: 'Eine Buchung: wer, welcher Arbeitsgang, welches Los, wie viele Teile, wie lange',
+      u: [['Vorgabezeiten', 'Tatsächliche Teile pro Stunde je Arbeitsgang und Produkt.'], ['Durchlaufzeit je Los', 'Planwochen stammen aus gemessener Kapazität.'], ['Besetzung je Linie', 'Die Zuteilung folgt der Last jeder Stufe.'], ['Laufbahnplan', 'Was jede Person beherrscht, wird zu Punkten.']] },
+    career: { title: 'Ein Laufbahnplan auf Basis dessen, was jede Person beherrscht.',
+      lead: 'Jeder Arbeitsgang hat eine Note von 1 bis 5, nach Schwierigkeit und Kritikalität. Wird eine Fachkraft für einen Arbeitsgang freigegeben, zählen dessen Punkte. Punkte öffnen die nächste Stufe.',
+      levels: ['Montagehilfskraft', 'Montagefachkraft Junior', 'Montagefachkraft Junior II', 'Montagefachkraft', 'Montagefachkraft II', 'Montagefachkraft Senior', 'Montagefachkraft Senior II'], lead2: ['Linienleitung Junior', 'Linienleitung Senior', 'Fertigungskoordination'],
+      pts: 'Punkte', track: 'Führungslaufbahn', s1: 'freigegebene Qualifikationen, eine Person für einen Arbeitsgang', s2: 'Arbeitsgänge beherrscht jede Person im Schnitt' },
+    retain: { title: 'Wissen, das im Haus bleibt.',
+      lead: 'Qualifikationen werden je Person und je Arbeitsgang erfasst, damit kein kritischer Schritt von einem einzigen Paar Hände abhängt. Und die Menschen bleiben.',
+      hero: 'Zufriedenheit in unserer internen Mitarbeiterbefragung {year}, {n} Teilnehmende', s1: 'der 40 meistgenutzten Arbeitsgänge haben drei oder mehr qualifizierte Personen', s2: 'Jahre: die längste Betriebszugehörigkeit in unserer Montage' },
+    supply: { title: 'Lieferanten werden entwickelt, bewertet und erneut bewertet.',
+      lead: 'Jede Lieferung wird bewertet. Der Qualitätsindex verbindet Zertifizierung, Termintreue und Konformität in der Wareneingangsprüfung und ordnet jeden Lieferanten einer Klasse von A bis D zu. Die Freigabe wird Artikel für Artikel je Lieferant verfolgt.',
+      p1: 'Zertifizierung', p2: 'Termintreue', p3: 'Wareneingangsprüfung', iq: 'Lieferanten-Qualitätsindex', cls: ['über 90', '75 bis 90', '45 bis 75', 'unter 45'], clsT: 'Klasse',
+      s1: 'Lieferanten in laufender Bewertung', s2: 'bewertete Lieferungen in 24 Monaten', s3: 'Lieferanten entwickelt, {n} weitere in Entwicklung', s4: 'der genehmigten Bedarfsanforderungen werden binnen 2 Tagen zur Bestellung' },
+    custom: { title: 'Ihre Spezifikation begleitet jede Auftragsposition.',
+      lead: 'Jede Anforderung wird an der Auftragsposition hinterlegt und bestimmt, wie das Los geteilt, geprüft, etikettiert und verpackt wird.',
+      chips: ['Röntgenprüfung von 100 % des Loses', 'Röntgenprüfung von 50 % des Loses', 'Röntgenprüfung von Stichproben', 'Seriennummern', 'Sonderetiketten', 'Entwicklungsartikel mit eigener Verfolgung'],
+      s1: 'der offenen Auftragspositionen tragen eine kundenspezifische Anforderung', s2: 'der bestellten Teile durchlaufen die Röntgenprüfung' },
+    deliver: { title: 'Wir verfolgen jedes Paket, bis jemand den Empfang quittiert.',
+      lead: 'Der Luftfrachtbrief wird aus unserem ERP erstellt und mit Rechnung und Ausfuhranmeldung verknüpft. Eine Live-Tafel im Versand zeigt jedes Paket: Route, Zollabfertigung, voraussichtliche Ankunft und wer es angenommen hat.',
+      steps: ['Rechnung und Versandanzeige', 'Luftfrachtbrief aus dem ERP', 'Abholung', 'Ausfuhranmeldung', 'Zollabfertigung', 'Zugestellt und quittiert'], note: 'FedEx ist heute integriert. DHL und UPS folgen auf derselben Tafel.' },
+    partners: { title: 'Für Partner: ein genauerer Blick.', lead: 'Die Kontrollen, die Rückverfolgbarkeitskette und die Analysen hinter dieser Präsentation.',
+      b1: 'Partnerbereich öffnen', h1: 'Zugangscode erforderlich', b2: 'Live-Märkte', h2: 'Währungen und Edelmetalle, jede Minute aktualisiert' },
+  },
+};
+
+</script>
+<script>const OPS_DATA = {"demand":{"since":2011,"customers":615,"products":1251,"months":190,"first":"2011-01","last":"2026-10","idx":[34.9,36.6,42.2,41.3,42.5,34.6,33.7,43.1,37.2,30.4,37.0,26.5,32.6,46.8,34.7,34.8,47.9,35.9,34.1,38.1,29.9,36.0,33.8,26.5,31.8,39.6,24.6,36.6,27.9,37.0,37.9,26.5,40.0,26.5,34.6,21.8,44.0,40.3,23.2,32.6,30.6,33.7,36.5,40.2,25.1,33.8,37.7,23.1,34.5,31.4,37.6,35.6,29.3,30.2,48.6,29.2,32.0,39.2,26.8,26.9,32.7,24.6,35.0,27.3,23.2,29.8,30.6,27.6,25.1,30.5,27.6,13.1,24.7,21.6,24.2,19.8,29.8,18.4,26.4,28.0,24.3,29.8,33.0,27.5,30.8,25.9,27.8,29.1,31.6,35.8,38.6,37.4,30.0,44.5,33.0,30.7,32.0,30.3,30.1,31.3,35.2,29.0,30.5,40.2,32.1,32.2,26.2,19.5,37.4,33.7,35.3,27.8,36.4,39.1,31.6,28.9,27.8,27.2,21.1,23.3,44.6,22.1,22.7,38.1,35.6,29.3,34.1,33.0,35.2,33.6,31.0,24.3,39.9,34.5,38.8,39.5,51.7,31.7,38.5,72.6,35.3,33.6,60.3,26.6,100.0,30.9,52.6,43.1,43.8,33.9,34.1,26.8,26.2,39.6,17.1,10.6,27.1,36.1,23.2,25.0,29.2,19.5,23.9,28.1,20.2,34.0,32.9,18.5,37.3,23.9,25.2,30.8,29.5,38.4,29.8,26.1,25.7,35.8,31.6,15.9,34.9,22.2,39.7,41.8,30.9,27.5,35.1,29.8,52.5,45.5],"roll":[null,null,null,null,null,null,null,null,null,null,null,36.7,36.5,37.3,36.7,36.1,36.6,36.7,36.7,36.3,35.7,36.2,35.9,35.9,35.9,35.3,34.4,34.6,32.9,33.0,33.3,32.3,33.2,32.4,32.5,32.1,33.1,33.2,33.0,32.7,32.9,32.6,32.5,33.7,32.4,33.0,33.3,33.4,32.6,31.9,33.1,33.3,33.2,32.9,33.9,33.0,33.6,34.0,33.1,33.4,33.3,32.7,32.5,31.8,31.3,31.3,29.8,29.6,29.1,28.3,28.4,27.3,26.6,26.3,25.4,24.8,25.4,24.4,24.1,24.1,24.0,24.0,24.4,25.6,26.1,26.5,26.8,27.6,27.7,29.2,30.2,31.0,31.4,32.7,32.7,32.9,33.0,33.4,33.6,33.8,34.1,33.5,32.8,33.1,33.3,32.2,31.7,30.7,31.2,31.5,31.9,31.6,31.7,32.5,32.6,31.7,31.3,30.9,30.5,30.8,31.4,30.4,29.4,30.2,30.2,29.4,29.6,29.9,30.5,31.1,31.9,32.0,31.6,32.6,34.0,34.1,35.4,35.6,36.0,39.3,39.3,39.3,41.7,41.9,46.9,46.6,47.8,48.1,47.4,47.6,47.2,43.4,42.6,43.1,39.6,38.2,32.1,32.6,30.1,28.6,27.4,26.2,25.4,25.5,25.0,24.5,25.8,26.5,27.3,26.3,26.5,27.0,27.0,28.6,29.0,28.9,29.3,29.5,29.4,29.2,29.0,28.8,30.0,30.9,31.1,30.1,30.6,30.9,33.1,33.9]},"abc":{"n":58,"shares":[35.48,15.37,11.56,11.28,3.33,2.38,2.22,2.06,1.46,1.28,1.19,1.14,1.04,1.02,0.9,0.73,0.72,0.69,0.68,0.51,0.51,0.49,0.37,0.37,0.36,0.34,0.33,0.27,0.27,0.15,0.15,0.14,0.13,0.13,0.1,0.1,0.09,0.08,0.07,0.07,0.06,0.05,0.05,0.04,0.03,0.03,0.03,0.03,0.03,0.02,0.02,0.02,0.02,0.02,0.01,0.01,0.0,0.0],"A":7,"B":13,"C":38,"cumA":81.6,"cumB":95.0},"lead":{"weeks":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],"hist":[0.15,0.24,2.38,7.18,11.8,16.01,14.34,13.46,11.95,7.0,4.51,3.92,2.36,1.75,1.02,0.68,0.3,0.14,0.21,0.17],"p50":7,"p95":13,"pcs":1763291,"lots":973,"since":2021},"ontime":{"years":[2022,2023,2024,2025,2026],"pct":[81.9,87.6,98.5,97.7,97.3],"last12":97.4,"pcs12":255359},"plan":{"free_pct":33.8,"linked_pct":66.2},"yield":{"pcs":382137,"spools":211,"pilot_runs":471,"sample_runs":307},"spools":{"points":[{"lot":1,"sp":1,"idx":94.1,"sz":3},{"lot":1,"sp":2,"idx":108.5,"sz":2},{"lot":1,"sp":3,"idx":76.1,"sz":1},{"lot":2,"sp":1,"idx":102.3,"sz":2},{"lot":2,"sp":2,"idx":95.6,"sz":3},{"lot":2,"sp":3,"idx":78.4,"sz":3},{"lot":2,"sp":4,"idx":84.9,"sz":3},{"lot":2,"sp":5,"idx":84.3,"sz":3},{"lot":2,"sp":6,"idx":87.8,"sz":1},{"lot":3,"sp":1,"idx":97.4,"sz":2},{"lot":3,"sp":2,"idx":111.9,"sz":2},{"lot":3,"sp":3,"idx":94.5,"sz":2},{"lot":3,"sp":4,"idx":98.1,"sz":3},{"lot":3,"sp":5,"idx":100.0,"sz":1},{"lot":3,"sp":6,"idx":120.4,"sz":2},{"lot":3,"sp":7,"idx":99.5,"sz":1},{"lot":3,"sp":8,"idx":100.3,"sz":1},{"lot":3,"sp":9,"idx":109.3,"sz":1},{"lot":4,"sp":1,"idx":101.8,"sz":3},{"lot":4,"sp":2,"idx":107.0,"sz":1},{"lot":4,"sp":3,"idx":110.1,"sz":3},{"lot":4,"sp":4,"idx":110.8,"sz":2},{"lot":4,"sp":5,"idx":97.1,"sz":2},{"lot":4,"sp":6,"idx":95.1,"sz":1},{"lot":5,"sp":1,"idx":106.5,"sz":3},{"lot":5,"sp":2,"idx":94.7,"sz":3},{"lot":5,"sp":3,"idx":98.8,"sz":2},{"lot":5,"sp":4,"idx":103.2,"sz":3},{"lot":5,"sp":5,"idx":101.4,"sz":1},{"lot":5,"sp":6,"idx":102.4,"sz":1},{"lot":5,"sp":7,"idx":101.7,"sz":2},{"lot":5,"sp":8,"idx":107.8,"sz":2},{"lot":5,"sp":9,"idx":112.8,"sz":1},{"lot":6,"sp":1,"idx":105.9,"sz":3},{"lot":6,"sp":2,"idx":103.6,"sz":3},{"lot":6,"sp":3,"idx":105.4,"sz":2},{"lot":6,"sp":4,"idx":111.3,"sz":1},{"lot":6,"sp":5,"idx":113.3,"sz":2},{"lot":6,"sp":6,"idx":104.2,"sz":1},{"lot":6,"sp":7,"idx":101.1,"sz":3},{"lot":6,"sp":8,"idx":98.6,"sz":2},{"lot":7,"sp":1,"idx":100.4,"sz":3},{"lot":7,"sp":2,"idx":107.9,"sz":3},{"lot":7,"sp":3,"idx":84.0,"sz":1},{"lot":7,"sp":4,"idx":100.0,"sz":2},{"lot":7,"sp":5,"idx":119.4,"sz":1},{"lot":7,"sp":6,"idx":96.3,"sz":2}],"lots":[{"lot":1,"idx":97.0},{"lot":2,"idx":87.3},{"lot":3,"idx":102.2},{"lot":4,"idx":103.9},{"lot":5,"idx":102.7},{"lot":6,"idx":104.7},{"lot":7,"idx":101.6}]},"ops":{"records":27279662,"operations":151,"skills":938,"avg_skills":20,"top40_cov3":39},"career":{"levels":[{"code":"00000","pts":0},{"code":"10000","pts":100},{"code":"11000","pts":180},{"code":"20000","pts":250},{"code":"21000","pts":350},{"code":"30000","pts":500},{"code":"31000","pts":650},{"code":"40000","pts":0},{"code":"50000","pts":0},{"code":"60000","pts":0}]},"people":{"longest":29,"psi":{"year":2025,"pct":96.2,"n":54}},"supply":{"evaluated":54,"deliveries":630,"weights":[20,40,40],"developed":39,"developing":6,"po2d":88.2},"custom":{"req_pct":41.0,"xray_pcs_pct":33.0}};</script>
+<script>
+/* ============================================================
+   Apresentação "Planejamento e controle" — motor do deck e slides
+   ?lang=en|pt|ja|de · ?embed=1 (aberta dentro do app) · #n abre no slide n
+   ============================================================ */
+(() => {
+  const D = OPS_DATA, H = Viz.h, C = Viz.C;
+  const q = new URLSearchParams(location.search);
+  const EMBED = q.get('embed') === '1';
+  const LANGS = ['en', 'pt', 'ja', 'de'];
+  // idioma: ?lang= (explícito) → escolhido antes nestas páginas → ?alang= (idioma do app que abriu) → navegador
+  let lang = q.get('lang') || '';
+  if (!LANGS.includes(lang)) { try { lang = localStorage.getItem('ops-lang') || ''; } catch (e) {} }
+  if (!LANGS.includes(lang)) lang = q.get('alang') || '';
+  if (!LANGS.includes(lang)) lang = (navigator.language || 'en').slice(0, 2).toLowerCase();
+  if (!LANGS.includes(lang)) lang = 'en';
+  let L = OPS_I18N[lang];
+  const fill = (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? v[k] : m));
+  const F = (n, d) => Viz.fmt(n, d);
+  const mobile = () => matchMedia('(max-width: 760px), (orientation: portrait) and (max-width: 1100px)').matches;
+  const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const svg = (d, vb) => `<svg viewBox="${vb || '0 0 24 24'}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const ICON = {
+    prev: svg('<path d="m15 6-6 6 6 6"/>'), next: svg('<path d="m9 6 6 6-6 6"/>'), x: svg('<path d="M6 6l12 12M18 6 6 18"/>'), back: svg('<path d="M4 12h16M10 6l-6 6 6 6"/>'),
+    check: svg('<path d="m5 12.5 4.5 4.5L19 7.5"/>'), lock: svg('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'), pulse: svg('<path d="M3 12h4l2.5-6 4 12 2.5-6H21"/>'),
+    arr: svg('<path d="M4 12h15M13 6l6 6-6 6"/>'),
+  };
+  const txt = (s, o, extra) => { const t = H('div', 'txt', s); H('h1', '', t, o.title); H('p', 'lead', t, fill(o.lead, extra)); return t; };
+  const stat = (p, v, l) => { const d = H('div', 'stat', p); H('b', '', d, v); H('span', '', d, l); return d; };
+  const anim = (node, kf, opt) => { if (!reduced() && node.animate) node.animate(kf, Object.assign({ easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' }, opt)); };
+
+  /* ---------------- slides ---------------- */
+  const SLIDES = [
+    { id: 'cover', ch: 'intro', build(s) {
+      s.classList.add('cover');
+      const t = H('div', 'txt', s); H('h1', '', t, L.cover.title); H('p', 'lead', t, L.cover.lead);
+      const p50 = D.lead.p50, U = p50 + (mobile() ? 4.2 : 1.7), pos = (w) => ((w + p50) / U) * 100 + '%';
+      const tl = H('div', 'tl', s); tl.setAttribute('role', 'img'); tl.setAttribute('aria-label', fill(L.cover.cap, { p50 }));
+      H('div', 'tl-axis', tl);
+      for (let w = -p50; w <= 1; w++) { const tk = H('div', 'tl-tick', tl); tk.style.left = pos(w); H('span', '', tk, w === 0 ? '0' : (w > 0 ? '+' : '−') + Math.abs(w)); }
+      H('span', 'tl-unit', tl, L.cover.weeks);
+      const bar = H('div', 'tl-bar', tl); bar.style.width = pos(0);
+      const m1 = H('div', 'tl-m start', tl, L.cover.t1); m1.style.left = '0'; H('i', '', m1);
+      const m2 = H('div', 'tl-m order', tl, L.cover.t2); m2.style.left = pos(0); H('i', '', m2);
+      const m3 = H('div', 'tl-m ship', tl, L.cover.t3); m3.style.left = pos(0.42); H('i', '', m3);
+      H('p', 'note', s, fill(L.cover.cap, { p50 }));
+      return () => { anim(bar, [{ transform: 'scaleX(0)' }, { transform: 'none' }], { duration: 1700, delay: 250 }); anim(m1, [{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 150 });
+        anim(m2, [{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 1750 }); anim(m3, [{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 2150 }); };
+    } },
+
+    { id: 'why', ch: 'market', build(s) {
+      const o = D.lead; txt(s, L.why, { p50: o.p50, p95: o.p95 });
+      const f = H('div', 'fig', s); H('p', 'cap', f, L.why.cap); const v = H('div', '', f);
+      const labels = o.weeks.map(String);
+      const ch = Viz.columns(v, { labels, values: o.hist, unit: '%', dec: 1, title: (i) => fill(L.why.wk, { n: labels[i] }), rowLabel: L.why.row, xTitle: L.why.x,
+        marks: [{ at: o.p50, text: L.why.m50 }, { at: o.p95, text: L.why.m95 }], caption: L.why.cap, head: [L.why.x, '%'] });
+      H('p', 'note', f, fill(L.why.note, { pcs: F(o.pcs), lots: F(o.lots), since: o.since }));
+      return () => ch.replay();
+    } },
+
+    { id: 'market', ch: 'market', build(s) {
+      const o = D.demand, t = txt(s, L.market);
+      const st = H('div', 'stats', t); stat(st, F(o.months), L.market.s1); stat(st, F(o.customers), L.market.s2); stat(st, F(o.products), L.market.s3);
+      const f = H('div', 'fig', s); const v = H('div', '', f);
+      const mf = new Intl.DateTimeFormat(L.locale, { month: 'short', year: 'numeric' });
+      const ch = Viz.longSeries(v, { idx: o.idx, roll: o.roll, first: o.first, lblMonth: L.market.month, lblRoll: L.market.roll, fmtMonth: (d) => mf.format(d), caption: L.market.cap });
+      const r = H('div', 'rule', f); H('h3', '', r, L.market.ruleT); H('p', '', r, L.market.rule);
+      const ul = H('ul', '', r); [[L.market.r1, L.market.r1d], [L.market.r2, L.market.r2d]].forEach(([a, b]) => { const li = H('li', '', ul); H('b', '', li, a); li.appendChild(document.createTextNode(' : ' + b)); });
+      return () => ch.replay();
+    } },
+
+    { id: 'abc', ch: 'plan', build(s) {
+      const o = D.abc, t = txt(s, L.abc, { n: o.n });
+      const tb = H('div', 'abc-t', t);
+      [[L.abc.zA, o.A, o.cumA], [L.abc.zB, o.B, o.cumB - o.cumA], [L.abc.zC, o.C, 100 - o.cumB]].forEach(([z, n, p]) => { H('b', '', tb, z); H('span', '', tb, F(n) + ' ' + L.abc.fam); H('span', 'v', tb, F(p, 0) + '% ' + L.abc.of); });
+      const f = H('div', 'fig', s); const v = H('div', '', f);
+      const ch = Viz.pareto(v, { shares: o.shares, A: o.A, B: o.B, cumA: o.cumA, cumB: o.cumB, zone: { A: L.abc.zA, B: L.abc.zB, C: L.abc.zC }, tipItem: (i) => fill(L.abc.item, { n: i + 1 }), lblShare: L.abc.share, lblCum: L.abc.cum, caption: L.abc.cap });
+      return () => ch.replay();
+    } },
+
+    { id: 'ahead', ch: 'plan', build(s) {
+      const o = D.plan; txt(s, L.ahead);
+      const f = H('div', 'fig', s); f.style.gap = '1.6rem';
+      const hn = H('div', 'hero-n', f, F(o.free_pct, 0) + '%'); H('p', 'hero-l', f, L.ahead.free);
+      const sb = H('div', '', f);
+      const bar = Viz.segbar(sb, { parts: [{ label: L.ahead.linked, value: o.linked_pct, color: C.mute }, { label: L.ahead.free, value: o.free_pct, color: C.s1, dark: true }], unit: '%', dec: 0, caption: L.ahead.cap });
+      H('p', 'formula', f, L.ahead.formula); H('p', 'note', f, L.ahead.note);
+      return () => { bar.replay(); anim(hn, [{ opacity: 0, transform: 'translateY(.6rem)' }, { opacity: 1, transform: 'none' }], { duration: 600, delay: 100 }); };
+    } },
+
+    { id: 'spool', ch: 'platinum', build(s) {
+      const y = D.yield, sp = D.spools, t = txt(s, L.spool);
+      const st = H('div', 'stats', t); stat(st, F(y.spools), L.spool.s1); stat(st, F(y.pilot_runs + y.sample_runs), L.spool.s2); stat(st, F(y.pcs), L.spool.s3);
+      const f = H('div', 'fig', s);
+      const ol = H('ol', 'steps', f); L.spool.steps.forEach((x) => H('li', '', ol, x));
+      H('p', 'cap', f, L.spool.cap); const v = H('div', '', f);
+      const vals = sp.points.map((p) => p.idx), lo = Math.floor(Math.min.apply(null, vals) / 10) * 10, hi = Math.ceil(Math.max.apply(null, vals) / 10) * 10;
+      const ch = Viz.strip(v, { points: sp.points, lots: sp.lots, yMin: lo, yMax: hi, lblLot: (l) => fill(L.spool.lot, { n: l }), tipTitle: (p) => fill(L.spool.sp, { l: p.lot, s: p.sp }), lblIdx: L.spool.idx, lblPcs: L.spool.pcs, lblAvg: L.spool.avg, lblLotAvg: L.spool.lotavg, lblSpool: L.spool.one, caption: L.spool.cap });
+      H('p', 'note', f, L.spool.note);
+      return () => ch.replay();
+    } },
+
+    { id: 'classes', ch: 'platinum', build(s) {
+      txt(s, L.classes);
+      const f = H('div', 'fig', s); const fl = H('div', 'flow3', f);
+      const a = H('div', 'box', fl, L.classes.a); H('small', '', a, L.classes.b);
+      H('div', 'arr', fl).innerHTML = ICON.arr;
+      const mid = H('div', '', fl); H('h3', '', H('div', 'cls', mid), L.classes.c); const ul = mid.firstChild;
+      [['W0.03', '1/10', '--r1', 1], ['W0.06', '1/5', '--r2', 1], ['W0.1', '1/3', '--r3', 1], ['W0.15', 'A', '--r4', 0], ['W0.3', 'B', '--r5', 0]].forEach(([n, old, col, dark]) => { const li = H('li', '', ul, n); H('small', '', li, old); li.style.background = `var(${col})`; li.style.color = dark ? '#0B1017' : '#fff'; });
+      H('div', 'arr', fl).innerHTML = ICON.arr;
+      const d = H('div', 'box', fl, L.classes.d); H('small', '', d, L.classes.e);
+      H('p', 'note', f, L.classes.note);
+      const rows = Array.from(ul.querySelectorAll('li'));
+      return () => rows.forEach((li, i) => anim(li, [{ opacity: 0, transform: 'translateX(-.8rem)' }, { opacity: 1, transform: 'none' }], { duration: 450, delay: 250 + i * 90 }));
+    } },
+
+    { id: 'control', ch: 'production', build(s) {
+      const o = D.ontime, t = txt(s, L.control, { last12: F(o.last12, 1), pcs12: F(o.pcs12) });
+      const ol = H('ol', 'steps', t); L.control.stages.forEach((x) => H('li', '', ol, x));
+      const f = H('div', 'fig', s); H('p', 'cap', f, L.control.cap); const v = H('div', '', f);
+      const ch = Viz.columns(v, { labels: o.years.map(String), values: o.pct, unit: '%', dec: 1, yMax: 100, valueLabels: 'all', rowLabel: L.control.row, caption: L.control.cap, head: ['', '%'] });
+      return () => ch.replay();
+    } },
+
+    { id: 'prod', ch: 'production', build(s) {
+      const o = D.ops; txt(s, L.prod, { records: F(Math.round(o.records / 1e6)), recordsMan: F(Math.round(o.records / 1e4)), operations: F(o.operations) });
+      const f = H('div', 'fig', s); f.style.gap = '0';
+      H('div', 'rec', f, L.prod.rec); H('div', 'link-v', f);
+      const ul = H('ul', 'uses', f); L.prod.u.forEach(([a, b]) => { const li = H('li', '', ul); H('b', '', li, a); H('span', '', li, b); });
+      const items = Array.from(ul.children);
+      return () => items.forEach((li, i) => anim(li, [{ opacity: 0, transform: 'translateY(.6rem)' }, { opacity: 1, transform: 'none' }], { duration: 450, delay: 300 + i * 110 }));
+    } },
+
+    { id: 'career', ch: 'people', build(s) {
+      const o = D.ops, lv = D.career.levels.slice(0, 7), t = txt(s, L.career);
+      const st = H('div', 'stats', t); stat(st, F(o.skills), L.career.s1); stat(st, F(o.avg_skills), L.career.s2);
+      const f = H('div', 'fig', s);
+      const tr = H('div', 'track', f); H('b', '', tr, L.career.track); L.career.lead2.forEach((x) => H('span', '', tr, x));
+      const ul = H('ol', 'ladder', f); const max = lv[lv.length - 1].pts; const bars = [];
+      lv.slice().reverse().forEach((x, k) => { const i = lv.length - 1 - k; const li = H('li', '', ul); H('span', '', li, L.career.levels[i]); const b = H('div', 'bar', H('div', '', li)); b.style.width = Math.max(.6, (x.pts / max) * 100) + '%'; bars.push(b); H('b', '', li, F(x.pts) + ' ' + L.career.pts); });
+      return () => bars.slice().reverse().forEach((b, i) => anim(b, [{ transform: 'scaleX(0)' }, { transform: 'none' }], { duration: 600, delay: 200 + i * 90 }));
+    } },
+
+    { id: 'retain', ch: 'people', build(s) {
+      const p = D.people, o = D.ops; txt(s, L.retain);
+      const f = H('div', 'fig', s); f.style.gap = '1.2rem';
+      const hn = H('div', 'hero-n', f, F(p.psi.pct, 1) + '%'); H('p', 'hero-l', f, fill(L.retain.hero, { year: p.psi.year, n: p.psi.n }));
+      const st = H('div', 'stats two', f); stat(st, F(o.top40_cov3), L.retain.s1); stat(st, F(p.longest), L.retain.s2);
+      return () => anim(hn, [{ opacity: 0, transform: 'translateY(.6rem)' }, { opacity: 1, transform: 'none' }], { duration: 700, delay: 150 });
+    } },
+
+    { id: 'supply', ch: 'suppliers', build(s) {
+      const o = D.supply, t = txt(s, L.supply);
+      const st = H('div', 'stats two', t); stat(st, F(o.evaluated), L.supply.s1); stat(st, F(o.deliveries), L.supply.s2); stat(st, F(o.developed), fill(L.supply.s3, { n: o.developing })); stat(st, F(o.po2d, 0) + '%', L.supply.s4);
+      const f = H('div', 'fig', s); f.style.gap = '2.2rem';
+      const g1 = H('div', 'grp', f); H('h3', '', g1, L.supply.iq); const sb = H('div', '', g1);
+      const bar = Viz.segbar(sb, { parts: [{ label: L.supply.p1, value: o.weights[0], color: C.s1, dark: true }, { label: L.supply.p2, value: o.weights[1], color: C.s2 }, { label: L.supply.p3, value: o.weights[2], color: C.s3, dark: true }], unit: '%', caption: L.supply.iq });
+      const g2 = H('div', 'grp', f); H('h3', '', g2, L.supply.clsT + ' A–D'); const sc = H('div', 'scale', g2);
+      [['D', 3, '--r5', 0], ['C', 2, '--r4', 0], ['B', 1, '--r3', 1], ['A', 0, '--r2', 1]].forEach(([n, i, col, dark]) => { const d = H('div', '', sc, n); H('small', '', d, L.supply.cls[i]); d.style.background = `var(${col})`; d.style.color = dark ? '#0B1017' : '#fff'; });
+      return () => bar.replay();
+    } },
+
+    { id: 'custom', ch: 'customers', build(s) {
+      const o = D.custom, t = txt(s, L.custom);
+      const st = H('div', 'stats two', t); stat(st, F(o.req_pct, 0) + '%', L.custom.s1); stat(st, F(o.xray_pcs_pct, 0) + '%', L.custom.s2);
+      const f = H('div', 'fig', s); const ul = H('ul', 'chips', f);
+      L.custom.chips.forEach((x) => { const li = H('li', '', ul); li.innerHTML = ICON.check; H('span', '', li, x); });
+      const items = Array.from(ul.children);
+      return () => items.forEach((li, i) => anim(li, [{ opacity: 0, transform: 'translateX(-.8rem)' }, { opacity: 1, transform: 'none' }], { duration: 400, delay: 200 + i * 80 }));
+    } },
+
+    { id: 'deliver', ch: 'delivery', build(s) {
+      s.classList.add('wide'); txt(s, L.deliver);
+      const f = H('div', 'fig', s); f.style.height = 'auto';
+      const ol = H('ol', 'steps big', f); L.deliver.steps.forEach((x) => H('li', '', ol, x)); H('p', 'note', f, L.deliver.note);
+      const items = Array.from(ol.children);
+      return () => items.forEach((li, i) => anim(li, [{ opacity: 0, transform: 'translateY(.7rem)' }, { opacity: 1, transform: 'none' }], { duration: 450, delay: 250 + i * 130 }));
+    } },
+
+    { id: 'partners', ch: 'partners', build(s) {
+      s.classList.add('center'); txt(s, L.partners);
+      const c = H('div', 'cta', s), qs = `?lang=${lang}${EMBED ? '&embed=1' : ''}`;
+      const a = H('div', '', c); const b1 = H('a', 'btn primary', a); b1.href = 'partners.html' + qs; b1.innerHTML = ICON.lock; H('span', '', b1, L.partners.b1); H('small', '', a, L.partners.h1);
+      const b = H('div', '', c); const b2 = H('a', 'btn', b); b2.href = 'monitor.html' + qs; b2.innerHTML = ICON.pulse; H('span', '', b2, L.partners.b2); H('small', '', b, L.partners.h2);
+    } },
+  ];
+
+  /* ---------------- estrutura fixa ---------------- */
+  const deck = document.getElementById('deck');
+  const top = H('header', 'top', deck);
+  const logo = H('img', '', top); logo.src = 'logo.png'; logo.alt = 'Sensor Technology'; logo.draggable = false;
+  const name = H('span', 'name', top);
+  H('span', 'sp', top);
+  const langs = H('div', 'langs', top); langs.setAttribute('role', 'group');
+  const LBL = { en: 'EN', pt: 'PT', ja: '日本語', de: 'DE' };
+  LANGS.forEach((l) => { const b = H('button', '', langs, LBL[l]); b.type = 'button'; b.dataset.l = l; b.setAttribute('lang', l); b.addEventListener('click', () => setLang(l)); });
+  const xb = H(EMBED ? 'button' : 'a', 'x', top);
+  if (EMBED) { xb.type = 'button'; xb.addEventListener('click', () => { try { parent.postMessage({ type: 'ops-close' }, location.origin); } catch (e) {} }); } else xb.href = './';
+  const stage = H('main', 'stage', deck); stage.id = 'stage';
+  const nav = H('footer', 'nav', deck);
+  const bPrev = H('button', 'arrow prev', nav); bPrev.type = 'button'; bPrev.innerHTML = ICON.prev;
+  const prog = H('div', 'prog', nav), ticks = H('div', 'ticks', prog), lbl = H('div', 'lbl', prog), lblCh = H('b', '', lbl), lblSrc = H('span', '', lbl);
+  const count = H('span', 'count', nav);
+  const bNext = H('button', 'arrow next', nav); bNext.type = 'button'; bNext.innerHTML = ICON.next;
+
+  let idx = 0, enters = [], els = [];
+  function build() {
+    L = OPS_I18N[lang]; Viz.setLocale(L.locale); Viz.hideTip();
+    document.documentElement.lang = lang === 'pt' ? 'pt-BR' : lang;
+    document.title = 'Sensor Technology · ' + L.ui.deck;
+    name.textContent = L.ui.deck; lblSrc.textContent = L.ui.source;
+    xb.innerHTML = EMBED ? ICON.x : ICON.back; H('span', '', xb, EMBED ? L.ui.close : L.ui.back);
+    bPrev.setAttribute('aria-label', L.ui.prev); bNext.setAttribute('aria-label', L.ui.next);
+    Array.from(langs.children).forEach((b) => b.classList.toggle('on', b.dataset.l === lang));
+    stage.textContent = ''; ticks.textContent = ''; enters = []; els = [];
+    SLIDES.forEach((sl, i) => {
+      const s = H('section', 'slide', stage); s.dataset.id = sl.id; s.setAttribute('aria-roledescription', 'slide');
+      els.push(s); enters.push(sl.build(s) || null);
+      const tb = H('button', i > 0 && SLIDES[i - 1].ch !== sl.ch ? 'gap' : '', ticks); tb.type = 'button'; tb.setAttribute('aria-label', (i + 1) + ' · ' + L.ui.chapters[sl.ch]); tb.addEventListener('click', () => go(i));
+    });
+    show(idx, 0, true);
+  }
+  function show(i, dir, instant) {
+    idx = Math.max(0, Math.min(SLIDES.length - 1, i));
+    els.forEach((s, k) => { s.classList.toggle('on', k === idx); s.classList.toggle('before', k < idx); s.setAttribute('aria-hidden', k === idx || mobile() ? 'false' : 'true'); });
+    Array.from(ticks.children).forEach((b, k) => { b.classList.toggle('on', k === idx); b.classList.toggle('done', k < idx); });
+    lblCh.textContent = L.ui.chapters[SLIDES[idx].ch]; count.textContent = (idx + 1) + ' / ' + SLIDES.length;
+    bPrev.disabled = idx === 0; bNext.disabled = idx === SLIDES.length - 1;
+    try { history.replaceState(null, '', location.pathname + location.search + '#' + (idx + 1)); } catch (e) {}
+    Viz.hideTip();
+    if (!mobile() && enters[idx]) setTimeout(() => { try { enters[idx](); } catch (e) {} }, instant ? 60 : 120);
+  }
+  function go(i) { if (i === idx || i < 0 || i >= SLIDES.length) return; show(i, i > idx ? 1 : -1); }
+  function setLang(l) { if (l === lang) return; lang = l; try { localStorage.setItem('ops-lang', l); } catch (e) {} const u = new URL(location.href); u.searchParams.set('lang', l); try { history.replaceState(null, '', u.pathname + u.search + u.hash); } catch (e) {} build(); }
+
+  bPrev.addEventListener('click', () => go(idx - 1)); bNext.addEventListener('click', () => go(idx + 1));
+  document.addEventListener('keydown', (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key) && !(e.target.closest && e.target.closest('a,button'))) { e.preventDefault(); go(idx + 1); }
+    else if (['ArrowRight', 'PageDown'].includes(e.key)) { e.preventDefault(); go(idx + 1); }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(idx - 1); }
+    else if (e.key === 'Home') go(0); else if (e.key === 'End') go(SLIDES.length - 1);
+    else if (e.key === 'Escape' && EMBED) { try { parent.postMessage({ type: 'ops-close' }, location.origin); } catch (err) {} }
+  });
+  // deslizar com o dedo (só no modo deck)
+  let sx = null, sy = 0;
+  stage.addEventListener('touchstart', (e) => { if (e.touches.length === 1) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; } }, { passive: true });
+  stage.addEventListener('touchend', (e) => { if (sx == null || mobile()) { sx = null; return; } const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy; sx = null; if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.6) go(idx + (dx < 0 ? 1 : -1)); }, { passive: true });
+  window.addEventListener('hashchange', () => { const n = parseInt(location.hash.slice(1), 10); if (n >= 1 && n <= SLIDES.length && n - 1 !== idx) show(n - 1, 0); });
+
+  const h0 = parseInt(location.hash.slice(1), 10); if (h0 >= 1 && h0 <= SLIDES.length) idx = h0 - 1;
+  const start = () => build();
+  if (document.fonts && document.fonts.ready) { let done = false; const once = () => { if (!done) { done = true; start(); } }; document.fonts.ready.then(once); setTimeout(once, 1200); } else start();
+  window.OPS_DECK = { go, setLang, get index() { return idx; }, count: SLIDES.length };
+})();
+
+</script>
+</body>
+</html>

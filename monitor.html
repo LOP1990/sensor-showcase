@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="icons/icon-192.png">
+<title>Sensor Technology · Market monitor</title>
+<!-- versão 2026.11.10-2053 -->
+<style>
+@font-face { font-family: 'Martian Mono'; font-style: normal; font-display: swap; font-weight: 100 800; font-stretch: 75% 112.5%; src: url(fonts/MartianMono-var.woff2) format('woff2'); }
+@font-face { font-family: 'Noto Sans JP'; font-weight: 700; font-display: swap; src: url(fonts/NotoSansJP-bold.woff2) format('woff2'); unicode-range: U+3000-30FF, U+4E00-9FFF, U+FF00-FFEF; }
+@font-face { font-family: 'Noto Sans JP'; font-weight: 450; font-display: swap; src: url(fonts/NotoSansJP-text.woff2) format('woff2'); unicode-range: U+3000-30FF, U+4E00-9FFF, U+FF00-FFEF; }
+/* ============================================================
+   Sensor Technology · páginas de operações (planejamento, parceiros)
+   Mesmos tokens do app; tudo em rem — a raiz acompanha o tamanho da tela (do celular ao painel 4K).
+   ============================================================ */
+:root {
+  color-scheme: dark;
+  --bg: #05070B; --bg-2: #0B1017; --surface: #10161F; --surface-2: #151D28;
+  --line: rgba(191, 211, 230, .14); --line-2: rgba(191, 211, 230, .28);
+  --text: #EFECE6; --text-2: #B3BDCA; --text-3: #8792A8;
+  --plat: #BFD3E6; --plat-2: #E8F1FB; --glow: #FFD27A;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  --r1: #cde2fb; --r2: #86b6ef; --r3: #3987e5; --r4: #256abf; --r5: #184f95;
+  --font: 'Archivo', 'Noto Sans JP', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+html { font-size: clamp(13px, min(1.11vw, 1.98vh), 46px); -webkit-text-size-adjust: 100%; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 1rem; line-height: 1.5; overflow: hidden; overscroll-behavior: none; }
+html[lang="ja"] body { line-break: strict; overflow-wrap: anywhere; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; touch-action: manipulation; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--plat); outline-offset: 3px; border-radius: 4px; }
+p, h1, h2, h3, ul, ol, figure { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+
+/* ---------- gráficos ---------- */
+.viz { position: relative; min-height: 0; }
+.viz svg { display: block; width: 100%; height: 100%; overflow: visible; font-family: inherit; }
+.viz svg [tabindex]:focus { outline: none; }
+.viz svg [tabindex]:focus-visible { stroke: var(--plat); stroke-width: 1.5; }
+.viz-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
+.viz-tip { position: fixed; z-index: 90; pointer-events: none; max-width: 22rem; padding: .55rem .75rem; border-radius: .5rem; background: #1B2532; border: 1px solid var(--line-2); box-shadow: 0 .6rem 1.8rem rgba(0, 0, 0, .5); font-size: .78rem; line-height: 1.35; color: var(--text-2); }
+.viz-tip[hidden] { display: none; }
+.viz-tip-t { color: var(--text-2); margin-bottom: .25rem; }
+.viz-tip-r { display: flex; align-items: baseline; gap: .45rem; white-space: nowrap; }
+.viz-tip-r b { color: var(--text); font-weight: 600; font-size: .95rem; font-variant-numeric: tabular-nums; }
+.viz-key { flex: none; width: .9rem; height: 2px; border-radius: 2px; align-self: center; }
+
+.segbar-bar { display: flex; gap: 2px; height: 1.75rem; max-height: 28px; min-height: 22px; border-radius: 6px; }
+.segbar-seg { min-width: 2px; border-radius: 4px; display: flex; align-items: center; padding: 0 .5rem; overflow: visible; font-size: .8rem; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.segbar-seg span[hidden] { display: none; }
+.segbar-legend { display: flex; flex-wrap: wrap; gap: .35rem 1.4rem; margin-top: .7rem; font-size: .8rem; color: var(--text-2); }
+.segbar-legend > span { display: inline-flex; align-items: center; gap: .5rem; }
+.segbar-legend i { width: .75rem; height: .75rem; border-radius: 2px; flex: none; }
+
+.meters { display: grid; gap: .55rem; }
+.meter-row { display: grid; grid-template-columns: minmax(8rem, 38%) 1fr auto; align-items: center; gap: .9rem; font-size: .85rem; color: var(--text-2); }
+.meter-track { height: .5rem; border-radius: 99px; background: rgba(57, 135, 229, .22); overflow: hidden; }
+.meter-track i { display: block; height: 100%; border-radius: 99px; background: var(--s1); transform-origin: left center; }
+.meter-val { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; min-width: 2.4rem; text-align: right; }
+
+/* ---------- peças comuns ---------- */
+.stat { display: grid; gap: .1rem; }
+.stat b { font-size: 2rem; line-height: 1.05; font-weight: 600; font-stretch: 105%; letter-spacing: -.01em; color: var(--text); }
+.stat span { font-size: .85rem; color: var(--text-2); max-width: 17rem; }
+.note { font-size: .78rem; color: var(--text-3); }
+.btn { display: inline-flex; align-items: center; gap: .6rem; min-height: 2.9rem; padding: .7rem 1.35rem; border-radius: 999px; border: 1px solid var(--line-2); font-weight: 500; color: var(--text); text-decoration: none; transition: background .2s, border-color .2s; }
+.btn:hover { background: rgba(191, 211, 230, .08); }
+.btn:active { background: rgba(191, 211, 230, .16); }
+.btn.primary { background: var(--plat); border-color: var(--plat); color: var(--bg); font-weight: 600; }
+.btn.primary:hover { background: var(--plat-2); }
+.btn svg { width: 1.15rem; height: 1.15rem; flex: none; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+
+/* ============================================================
+   Sensor Technology · Monitor de mercados (câmbio e metais preciosos)
+   Linguagem de terminal: fundo preto, âmbar para rótulos, branco para preços, verde/vermelho + seta para variação.
+   ============================================================ */
+:root {
+  --k: #000; --k2: #0A0B0D; --k3: #14161A; --rule: #2A2D33;
+  --amber: #FFA028; --amber-2: #B36F16; --white: #F4F1EA; --dim: #8A8F98;
+  --up: #2FD479; --down: #FF5A52; --sel: #1E3A5F; --cyan: #7FC8FF;
+  --mono: 'Martian Mono', ui-monospace, 'Cascadia Mono', 'Roboto Mono', Consolas, 'Noto Sans JP', monospace;
+}
+html { font-size: clamp(11px, min(.94vw, 1.68vh), 40px); }
+body { background: var(--k); color: var(--amber); font-family: var(--mono); font-stretch: 87.5%; font-size: 1rem; line-height: 1.3; overflow: hidden; font-variant-numeric: tabular-nums; }
+.mon { position: fixed; inset: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; }
+
+/* barra superior */
+.bar { display: flex; align-items: center; gap: 1.1rem; padding: .55rem 1rem; background: var(--k2); border-bottom: 1px solid var(--rule); min-height: 3.1rem; }
+.bar img { height: 1.9rem; width: auto; display: block; }
+.bar .ttl { color: var(--k); background: var(--amber); font-weight: 700; padding: .2rem .7rem; letter-spacing: .04em; white-space: nowrap; }
+.bar .sub { color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.bar .sp { flex: 1; }
+.clocks { display: flex; gap: 1.3rem; white-space: nowrap; }
+.clocks span { color: var(--dim); }
+.clocks b { color: var(--white); font-weight: 500; margin-left: .45rem; }
+.live { display: inline-flex; align-items: center; gap: .5rem; color: var(--up); font-weight: 600; white-space: nowrap; }
+.live i { width: .6rem; height: .6rem; border-radius: 50%; background: currentColor; box-shadow: 0 0 .6rem currentColor; animation: pulse 2s ease-in-out infinite; }
+.live.stale { color: var(--amber); } .live.off { color: var(--down); } .live.stale i, .live.off i { animation: none; box-shadow: none; }
+@keyframes pulse { 50% { opacity: .35; } }
+.bar .langs { display: flex; gap: .15rem; }
+.bar .langs button { padding: .25rem .5rem; color: var(--dim); border: 1px solid transparent; min-height: 2rem; font-size: .85rem; }
+.bar .langs button.on { color: var(--k); background: var(--white); }
+.bar .x { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .8rem; border: 1px solid var(--rule); color: var(--white); min-height: 2rem; text-decoration: none; font-size: .9rem; white-space: nowrap; }
+.bar .x svg { width: .95rem; height: .95rem; }
+
+/* fita */
+.tape { overflow: hidden; border-bottom: 1px solid var(--rule); background: var(--k); white-space: nowrap; height: 2.3rem; display: flex; align-items: center; }
+.tape-run { display: inline-flex; gap: 2.6rem; padding-left: 2.6rem; animation: tape 60s linear infinite; will-change: transform; }
+.tape:hover .tape-run { animation-play-state: paused; }
+@keyframes tape { to { transform: translateX(-50%); } }
+.tape-i { display: inline-flex; gap: .7rem; align-items: baseline; }
+.tape-i b { color: var(--white); font-weight: 600; }
+
+/* grade principal */
+.grid { display: grid; grid-template-columns: minmax(0, 34fr) minmax(0, 66fr); grid-template-rows: minmax(0, 1fr); gap: 1px; background: var(--rule); min-height: 0; }
+.col { display: grid; gap: 1px; background: var(--rule); min-height: 0; }
+.col.l { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+.col.r { grid-template-rows: minmax(0, 1.55fr) minmax(0, 1fr); }
+.row2 { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 1px; background: var(--rule); min-height: 0; }
+.pane { background: var(--k); display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; min-width: 0; }
+.pane > h2 { margin: 0; display: flex; align-items: center; gap: .7rem; padding: .32rem .8rem; background: var(--k3); font-size: .9rem; font-weight: 600; color: var(--amber); letter-spacing: .03em; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+.pane > h2 small { font-size: .82rem; font-weight: 400; color: var(--dim); margin-left: auto; overflow: hidden; text-overflow: ellipsis; }
+.pane > h2 kbd { font: inherit; color: var(--k); background: var(--amber); padding: 0 .4rem; font-weight: 700; }
+
+/* linhas grandes (6 instrumentos principais) */
+.big { display: grid; grid-auto-rows: minmax(0, 1fr); }
+.q { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: auto auto; column-gap: 1.3rem; row-gap: .4rem; align-content: center; padding: .5rem 1rem; border-bottom: 1px solid var(--rule); cursor: pointer; text-align: left; width: 100%; position: relative; }
+.q:last-child { border-bottom: 0; }
+.q.sel { background: linear-gradient(90deg, var(--sel), transparent 85%); }
+.q.sel::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--cyan); }
+.q .nm { grid-column: 1; grid-row: 1; align-self: center; font-size: 1.4rem; font-weight: 700; color: var(--amber); display: flex; align-items: baseline; gap: .7rem; white-space: nowrap; min-width: 0; }
+.q .nm kbd { font: inherit; font-size: .8rem; font-weight: 600; color: var(--dim); border: 1px solid var(--rule); padding: 0 .35rem; }
+.q .px { grid-column: 2; grid-row: 1; align-self: center; font-size: 2.7rem; line-height: 1.05; font-weight: 600; font-stretch: 80%; color: var(--white); letter-spacing: -.01em; text-align: right; padding: 0 .3rem; border-radius: 2px; transition: background 1.2s ease-out; }
+.q .px.fu { background: rgba(47, 212, 121, .32); transition: none; } .q .px.fd { background: rgba(255, 90, 82, .34); transition: none; }
+.q .ch { grid-column: 3; grid-row: 1; align-self: center; display: grid; gap: .1rem; justify-items: end; min-width: 8.4rem; }
+.q .ch b { font-size: 1.3rem; font-weight: 600; white-space: nowrap; }
+.q .ch small { font-size: .78rem; color: var(--dim); white-space: nowrap; }
+.q .meta { grid-column: 1 / -1; grid-row: 2; font-size: .86rem; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.q .meta b { color: var(--white); font-weight: 400; margin-right: .9rem; }
+.up { color: var(--up); } .dn { color: var(--down); } .fl { color: var(--dim); }
+.q .meta { font-size: .82rem; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.q .meta b { color: var(--white); font-weight: 400; }
+
+/* gráfico */
+.chart { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-height: 0; }
+.chart-head { display: flex; align-items: baseline; gap: 1.2rem; padding: .7rem 1rem .2rem; flex-wrap: wrap; }
+.chart-head .nm { font-size: 1.5rem; font-weight: 700; color: var(--amber); }
+.chart-head .px { font-size: 1.5rem; font-weight: 600; color: var(--white); }
+.chart-head .unit { color: var(--dim); font-size: .9rem; }
+.chart-head .sp { flex: 1; }
+.ranges { display: flex; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.ranges button { padding: .3rem .8rem; background: var(--k); color: var(--dim); min-height: 2rem; min-width: 3rem; font-size: .9rem; }
+.ranges button.on { background: var(--amber); color: var(--k); font-weight: 700; }
+.chart .viz { min-height: 0; height: 100%; padding: 0 .4rem; }
+.chart .viz svg text { font-family: var(--mono); font-stretch: 80%; }
+.chart-note { padding: .25rem 1rem .5rem; color: var(--dim); font-size: .8rem; min-height: 1.6rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* tabelas */
+.tb { width: 100%; border-collapse: collapse; align-self: start; }
+.tb th { font-weight: 400; color: var(--dim); font-size: .8rem; text-align: right; padding: .35rem .8rem .25rem; white-space: nowrap; }
+.tb th:first-child, .tb td:first-child { text-align: left; }
+.tb td { padding: .42rem .8rem; text-align: right; color: var(--white); border-top: 1px solid #16181C; white-space: nowrap; font-size: 1.08rem; }
+.tb td:first-child { color: var(--amber); font-weight: 600; }
+.tb td small { color: var(--dim); font-size: .8rem; }
+.scroll { overflow: auto; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
+
+/* rodapé */
+.foot { padding: .4rem 1rem; border-top: 1px solid var(--rule); background: var(--k2); color: var(--dim); font-size: .78rem; line-height: 1.45; }
+.foot span { margin-right: 1.6rem; white-space: nowrap; display: inline-block; }
+
+.viz-tip { background: #000; border: 1px solid var(--amber-2); border-radius: 0; font-family: var(--mono); color: var(--dim); box-shadow: none; }
+.viz-tip-r b { color: var(--white); }
+
+/* ---------- celular / janela estreita: empilha ---------- */
+@media (max-width: 900px), (orientation: portrait) {
+  html { font-size: 14px; }
+  body { overflow: auto; }
+  .mon { position: static; display: block; }
+  .bar { flex-wrap: wrap; gap: .5rem .8rem; }
+  .bar .sub, .clocks { display: none; }
+  .grid, .col, .row2 { display: block; background: none; }
+  .pane { border-bottom: 1px solid var(--rule); }
+  .q { padding: .8rem .9rem; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto; }
+  .q .nm { grid-column: 1 / -1; grid-row: 1; font-size: 1.15rem; }
+  .q .px { grid-column: 1; grid-row: 2; font-size: 2.2rem; text-align: left; padding: 0; }
+  .q .ch { grid-column: 2; grid-row: 2; min-width: 0; }
+  .q .meta { grid-row: 3; white-space: normal; line-height: 1.5; }
+  .tb td, .tb th { padding-left: .5rem; padding-right: .5rem; }
+  .chart .viz { height: 16rem; }
+  .foot span { display: block; white-space: normal; margin: 0 0 .25rem; }
+}
+@media (prefers-reduced-motion: reduce) { .tape-run { animation: none; } }
+
+</style>
+</head>
+<body>
+<div id="mon" class="mon"></div>
+<script>
+/* ============================================================
+   Sensor Technology · gráficos (SVG puro, sem bibliotecas)
+   Regras: marcas finas, eixo único, grade em fio contínuo, texto sempre nas cores de texto,
+   dica (tooltip) em todos os gráficos, tabela equivalente para leitores de tela.
+   ============================================================ */
+const Viz = (() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const C = {
+    s1: '#3987e5', s2: '#d95926', s3: '#199e70', s4: '#c98500',
+    ramp: ['#cde2fb', '#86b6ef', '#3987e5', '#256abf', '#184f95'],
+    mute: '#3a4658', grid: 'rgba(191,211,230,.13)', axis: 'rgba(191,211,230,.30)',
+    text: '#EFECE6', text2: '#B3BDCA', text3: '#8792A8', surface: '#05070B', glow: '#FFD27A',
+    good: '#0ca30c', warn: '#fab219', bad: '#d03b3b',
+  };
+  let LOCALE = 'en-US';
+  const setLocale = (l) => { LOCALE = l; };
+  const nf = (d) => new Intl.NumberFormat(LOCALE, { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 });
+  const fmt = (v, d) => nf(d).format(v);
+  const rem = () => parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  const reduced = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function el(name, attrs, parent, text) {
+    const n = document.createElementNS(NS, name);
+    if (attrs) for (const k in attrs) if (attrs[k] != null) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  function h(tag, cls, parent, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+
+  /* ---------- dica (uma só para a página) ---------- */
+  let tip;
+  function tipEl() {
+    if (!tip) { tip = h('div', 'viz-tip', document.body); tip.setAttribute('role', 'status'); tip.hidden = true; }
+    return tip;
+  }
+  // rows: [[rótulo, valor, cor?]]; title opcional. Tudo via textContent.
+  function showTip(x, y, title, rows) {
+    const t = tipEl(); t.textContent = '';
+    if (title) h('div', 'viz-tip-t', t, title);
+    (rows || []).forEach(([label, value, color]) => {
+      const r = h('div', 'viz-tip-r', t);
+      if (color) { const k = h('i', 'viz-key', r); k.style.background = color; }
+      h('b', '', r, value); h('span', '', r, label);
+    });
+    t.hidden = false;
+    const z = (parseFloat(document.documentElement.style.zoom) || 1);
+    const vw = window.innerWidth / z, vh = window.innerHeight / z;
+    const w = t.offsetWidth, hh = t.offsetHeight, pad = 12;
+    let left = x / z + 14, top = y / z - hh - 12;
+    if (left + w + pad > vw) left = x / z - w - 14;
+    if (left < pad) left = pad;
+    if (top < pad) top = y / z + 18;
+    if (top + hh + pad > vh) top = vh - hh - pad;
+    t.style.left = left + 'px'; t.style.top = top + 'px';
+  }
+  function hideTip() { if (tip) tip.hidden = true; }
+  // liga a dica a um elemento (mouse, toque e foco)
+  function bindTip(node, title, rows) {
+    const on = (e) => { const p = e.touches ? e.touches[0] : e; let x = p.clientX, y = p.clientY; if (x == null) { const b = node.getBoundingClientRect(); x = b.left + b.width / 2; y = b.top; } showTip(x, y, typeof title === 'function' ? title() : title, typeof rows === 'function' ? rows() : rows); };
+    node.addEventListener('pointerenter', on); node.addEventListener('pointermove', on);
+    node.addEventListener('pointerleave', hideTip); node.addEventListener('focus', on); node.addEventListener('blur', hideTip);
+    node.addEventListener('pointerdown', on);
+  }
+  document.addEventListener('scroll', hideTip, true);
+
+  /* ---------- tabela equivalente (leitor de tela) ---------- */
+  function table(host, caption, head, rows) {
+    const t = h('table', '', h('div', 'viz-sr', host)); // a tabela vai dentro de um bloco recortado (tabela não respeita width/overflow)
+    h('caption', '', t, caption || '');
+    const tr = h('tr', '', h('thead', '', t)); head.forEach((x) => h('th', '', tr, x));
+    const tb = h('tbody', '', t);
+    rows.forEach((r) => { const rr = h('tr', '', tb); r.forEach((x) => h('td', '', rr, String(x))); });
+  }
+
+  /* ---------- base: mede o contêiner, cria o SVG e redesenha no resize ---------- */
+  function mount(host, draw) {
+    host.classList.add('viz');
+    let raf = 0, last = '';
+    const render = (animate) => {
+      const w = host.clientWidth, hgt = host.clientHeight;
+      if (w < 40 || hgt < 40) return;
+      const key = w + 'x' + hgt + '@' + rem() + LOCALE;
+      if (!animate && key === last) return;
+      last = key;
+      host.textContent = '';
+      const svg = el('svg', { viewBox: `0 0 ${w} ${hgt}`, width: w, height: hgt, role: 'img' }, host);
+      draw({ svg, w, h: hgt, r: rem(), animate: !!animate && !reduced(), host });
+    };
+    if (window.ResizeObserver) new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => render(false)); }).observe(host);
+    host._render = render;
+    render(false);
+    return { render, replay: () => render(true) };
+  }
+  const ticks = (max, n) => {
+    const raw = max / (n || 4), p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+    const step = (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p; const out = [];
+    for (let v = 0; v <= max + 1e-9; v += step) out.push(+v.toFixed(6));
+    return out;
+  };
+  function grow(node, attr, from, to, ms, delay) {
+    if (!node.animate) { node.setAttribute(attr, to); return; }
+    const a = el('animate', { attributeName: attr, from, to, dur: (ms || 700) + 'ms', begin: 'indefinite', fill: 'freeze', calcMode: 'spline', keySplines: '.2 .7 .2 1', keyTimes: '0;1' }, node);
+    node.setAttribute(attr, from);
+    setTimeout(() => { try { a.beginElement(); } catch (e) { node.setAttribute(attr, to); } }, delay || 0);
+    setTimeout(() => node.setAttribute(attr, to), (delay || 0) + (ms || 700) + 60);
+  }
+  function fadeIn(node, ms, delay) {
+    if (!node.animate) return;
+    node.animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms || 500, delay: delay || 0, fill: 'both', easing: 'ease-out' });
+  }
+
+  /* ---------- colunas (histograma / séries curtas) ----------
+     o: { labels[], values[], unit:'%', dec, title(i)→str, rowLabel, xTitle, yMax, color, colors[i], marks:[{at, text}], labelEvery, valueLabels:'all'|[i…]|null,
+          caption, head:[x,y] } */
+  function columns(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7), n = o.values.length;
+      const m = { l: r * 2.4, r: r * 0.6, t: r * (o.marks ? 2.2 : 1.2), b: r * (o.xTitle ? 2.9 : 1.8) };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b;
+      const max = o.yMax || Math.max.apply(null, o.values) * 1.12;
+      const tk = ticks(max, 4), top = Math.max(max, tk[tk.length - 1]);
+      const y = (v) => m.t + ph - (v / top) * ph, band = pw / n, bw = Math.min(24 * (r / 16), band - 2, band * 0.72);
+      const g = el('g', { 'font-size': fs, 'font-family': 'inherit' }, svg);
+      tk.forEach((v) => {
+        el('line', { x1: m.l, x2: w - m.r, y1: y(v), y2: y(v), stroke: v === 0 ? C.axis : C.grid, 'stroke-width': 1 }, g);
+        el('text', { x: m.l - r * 0.4, y: y(v) + fs * 0.35, 'text-anchor': 'end', fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, fmt(v, 0) + (o.unit || ''));
+      });
+      const every = o.labelEvery || (band < fs * 2.2 ? Math.ceil(fs * 2.2 / band) : 1);
+      o.values.forEach((v, i) => {
+        const x = m.l + band * i + (band - bw) / 2, yy = y(v), hh = Math.max(0, m.t + ph - yy), rad = Math.min(4, bw / 2, hh);
+        const col = (o.colors && o.colors[i]) || o.color || C.s1;
+        const path = (top_) => `M${x},${m.t + ph}V${top_ + rad}q0,-${rad} ${rad},-${rad}h${bw - 2 * rad}q${rad},0 ${rad},${rad}V${m.t + ph}Z`;
+        const p = el('path', { d: path(yy), fill: col }, g);
+        if (animate && hh > 1 && p.animate) { p.style.transformBox = 'fill-box'; p.style.transformOrigin = '50% 100%';
+          p.animate([{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: 650, delay: 120 + i * 28, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' }); }
+        if (i % every === 0 || i === n - 1) el('text', { x: x + bw / 2, y: m.t + ph + fs * 1.5, 'text-anchor': 'middle', fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, o.labels[i]);
+        const showVal = o.valueLabels === 'all' || (Array.isArray(o.valueLabels) && o.valueLabels.includes(i));
+        if (showVal) { const t = el('text', { x: x + bw / 2, y: yy - fs * 0.55, 'text-anchor': 'middle', fill: C.text, 'font-weight': 600, style: 'font-variant-numeric: tabular-nums' }, g, fmt(v, o.dec || 0) + (o.unit || '')); if (animate) fadeIn(t, 400, 500 + i * 28); }
+        const hit = el('rect', { x: m.l + band * i, y: m.t, width: band, height: ph, fill: 'transparent', tabindex: 0, 'aria-label': (o.title ? o.title(i) : o.labels[i]) + ': ' + fmt(v, o.dec || 0) + (o.unit || '') }, g);
+        hit.addEventListener('pointerenter', () => p.setAttribute('opacity', .78)); hit.addEventListener('pointerleave', () => p.removeAttribute('opacity'));
+        bindTip(hit, o.title ? o.title(i) : o.labels[i], [[o.rowLabel || '', fmt(v, o.dec || 0) + (o.unit || ''), col]]);
+      });
+      (o.marks || []).forEach((mk) => {
+        const idx = o.labels.indexOf(String(mk.at)); if (idx < 0) return;
+        const x = m.l + band * idx + band / 2;
+        el('line', { x1: x, x2: x, y1: m.t - r * 0.25, y2: m.t + ph, stroke: C.glow, 'stroke-width': 1.5 }, g);
+        const anchor = x + 6 + String(mk.text).length * fs * 0.58 > w - 2 ? 'end' : 'start';
+        el('text', { x: x + (anchor === 'end' ? -6 : 6), y: m.t - r * 0.5, 'text-anchor': anchor, fill: C.text, 'font-weight': 600 }, g, mk.text);
+      });
+      if (o.xTitle) el('text', { x: m.l + pw / 2, y: H - fs * 0.35, 'text-anchor': 'middle', fill: C.text3 }, g, o.xTitle);
+      svg.setAttribute('aria-label', o.caption || '');
+      table(host, o.caption, o.head || ['', ''], o.values.map((v, i) => [o.title ? o.title(i) : o.labels[i], fmt(v, o.dec || 0) + (o.unit || '')]));
+    });
+  }
+
+  /* ---------- curva ABC: barras (participação) + linha (acumulado), um eixo só (%) ----------
+     o: { shares[], A, B, zone:{A,B,C}, tipItem(i), lblShare, lblCum, caption } */
+  function pareto(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7), n = o.shares.length;
+      const m = { l: r * 2.6, r: r * 0.8, t: r * 1.9, b: r * 1.4 };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b, band = pw / n, bw = Math.max(2, Math.min(24, band - 2));
+      const y = (v) => m.t + ph - (v / 100) * ph, xC = (i) => m.l + band * i + band / 2;
+      const g = el('g', { 'font-size': fs }, svg);
+      const zones = [[0, o.A, o.zone.A, 'rgba(57,135,229,.13)'], [o.A, o.A + o.B, o.zone.B, 'rgba(57,135,229,.065)'], [o.A + o.B, n, o.zone.C, 'transparent']];
+      zones.forEach(([a, b, label, fill]) => {
+        el('rect', { x: m.l + band * a, y: m.t, width: band * (b - a), height: ph, fill }, g);
+        el('text', { x: m.l + band * a + r * 0.4, y: m.t - r * 0.55, fill: C.text2, 'font-weight': 600 }, g, label);
+        if (a > 0) el('line', { x1: m.l + band * a, x2: m.l + band * a, y1: m.t - r * 1.2, y2: m.t + ph, stroke: C.axis, 'stroke-width': 1 }, g);
+      });
+      [0, 25, 50, 75, 100].forEach((v) => {
+        el('line', { x1: m.l, x2: w - m.r, y1: y(v), y2: y(v), stroke: v === 0 ? C.axis : C.grid, 'stroke-width': 1 }, g);
+        el('text', { x: m.l - r * 0.4, y: y(v) + fs * 0.35, 'text-anchor': 'end', fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, v + '%');
+      });
+      let cum = 0; const pts = [];
+      o.shares.forEach((v, i) => {
+        cum += v; pts.push([xC(i), y(Math.min(100, cum))]);
+        const x = m.l + band * i + (band - bw) / 2, yy = y(v), hh = m.t + ph - yy, rad = Math.min(4, bw / 2, hh);
+        const d = hh < 0.6 ? `M${x},${m.t + ph - 1}h${bw}v1h-${bw}Z` : `M${x},${m.t + ph}V${yy + rad}q0,-${rad} ${rad},-${rad}h${bw - 2 * rad}q${rad},0 ${rad},${rad}V${m.t + ph}Z`;
+        const p = el('path', { d, fill: C.s1 }, g);
+        if (animate && p.animate) p.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 100 + i * 12, fill: 'both' });
+        const c = Math.min(100, cum);
+        const hit = el('rect', { x: m.l + band * i, y: m.t, width: band, height: ph, fill: 'transparent', tabindex: i < 12 ? 0 : -1, 'aria-label': o.tipItem(i) }, g);
+        bindTip(hit, o.tipItem(i), [[o.lblShare, fmt(v, 1) + '%', C.s1], [o.lblCum, fmt(c, 1) + '%', C.text]]);
+      });
+      const line = el('path', { d: 'M' + pts.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join('L'), fill: 'none', stroke: C.text, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, g);
+      if (animate && line.getTotalLength) { const L = line.getTotalLength(); line.style.strokeDasharray = L; line.animate && line.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 1100, delay: 350, easing: 'ease-out', fill: 'both' }).finished.then(() => { line.style.strokeDasharray = ''; }).catch(() => {}); }
+      // marcadores nos cortes A e B, com rótulo direto
+      [[o.A - 1, o.cumA], [o.A + o.B - 1, o.cumB]].forEach(([i, v], k) => {
+        const [px, py] = pts[i];
+        el('circle', { cx: px, cy: py, r: 5, fill: C.text, stroke: C.surface, 'stroke-width': 2 }, g);
+        const t = el('text', { x: px + 10, y: py + fs * 1.25, fill: C.text, 'font-weight': 600, style: 'font-variant-numeric: tabular-nums' }, g, fmt(v, 0) + '%');
+        if (animate) fadeIn(t, 400, 900 + k * 200);
+      });
+      // legenda (2 séries)
+      const lg = el('g', { transform: `translate(${w - m.r}, ${m.t + ph * 0.56})` }, g);
+      const l1 = el('text', { x: 0, y: 0, 'text-anchor': 'end', fill: C.text2 }, lg, o.lblCum);
+      el('line', { x1: -(l1.getComputedTextLength ? l1.getComputedTextLength() : 120) - 26, x2: -(l1.getComputedTextLength ? l1.getComputedTextLength() : 120) - 8, y1: -fs * 0.32, y2: -fs * 0.32, stroke: C.text, 'stroke-width': 2, 'stroke-linecap': 'round' }, lg);
+      const l2 = el('text', { x: 0, y: fs * 1.6, 'text-anchor': 'end', fill: C.text2 }, lg, o.lblShare);
+      el('rect', { x: -(l2.getComputedTextLength ? l2.getComputedTextLength() : 120) - 22, y: fs * 1.6 - fs * 0.78, width: 12, height: fs * 0.8, rx: 2, fill: C.s1 }, lg);
+      svg.setAttribute('aria-label', o.caption || '');
+      let c2 = 0; table(host, o.caption, ['#', o.lblShare, o.lblCum], o.shares.map((v, i) => { c2 += v; return [i + 1, fmt(v, 2) + '%', fmt(Math.min(100, c2), 1) + '%']; }));
+    });
+  }
+
+  /* ---------- série mensal longa: área (mensal) + linha (média móvel de 12 meses), um eixo (índice) ----------
+     o: { idx[], roll[], first:'YYYY-MM', lblMonth, lblRoll, fmtMonth(date)→str, caption } */
+  function longSeries(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7), n = o.idx.length;
+      const narrow = w < 560;
+      const m = { l: r * 0.4, r: r * 0.4, t: r * (narrow ? 3.1 : 1.6), b: r * 1.7 };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b;
+      const x = (i) => m.l + (i / (n - 1)) * pw, y = (v) => m.t + ph - (v / 105) * ph;
+      const [y0, m0] = o.first.split('-').map(Number);
+      const g = el('g', { 'font-size': fs }, svg);
+      el('line', { x1: m.l, x2: w - m.r, y1: y(0), y2: y(0), stroke: C.axis, 'stroke-width': 1 }, g);
+      for (let i = 0; i < n; i++) { const mo = (m0 - 1 + i) % 12, yr = y0 + Math.floor((m0 - 1 + i) / 12);
+        if (mo === 0 && (yr % 2 === 1 || pw / (n / 12) > fs * 3.2)) { el('line', { x1: x(i), x2: x(i), y1: m.t, y2: y(0), stroke: C.grid, 'stroke-width': 1 }, g); el('text', { x: x(i) + 4, y: y(0) + fs * 1.45, fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, String(yr)); } }
+      const area = 'M' + o.idx.map((v, i) => x(i).toFixed(1) + ',' + y(v).toFixed(1)).join('L') + `L${x(n - 1)},${y(0)}L${x(0)},${y(0)}Z`;
+      const a = el('path', { d: area, fill: C.s1, opacity: .16 }, g);
+      const thin = el('path', { d: 'M' + o.idx.map((v, i) => x(i).toFixed(1) + ',' + y(v).toFixed(1)).join('L'), fill: 'none', stroke: C.s1, 'stroke-width': 1, opacity: .55, 'stroke-linejoin': 'round' }, g);
+      const rp = o.roll.map((v, i) => v == null ? null : [x(i), y(v)]).filter(Boolean);
+      const line = el('path', { d: 'M' + rp.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join('L'), fill: 'none', stroke: C.text, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, g);
+      if (animate) { fadeIn(a, 700, 100); fadeIn(thin, 700, 100); if (line.getTotalLength && line.animate) { const L = line.getTotalLength(); line.style.strokeDasharray = L; line.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 1500, delay: 300, easing: 'ease-out', fill: 'both' }).finished.then(() => { line.style.strokeDasharray = ''; }).catch(() => {}); } }
+      const last = rp[rp.length - 1]; el('circle', { cx: last[0], cy: last[1], r: 5, fill: C.text, stroke: C.surface, 'stroke-width': 2 }, g);
+      // legenda no alto
+      const lg = el('g', { transform: `translate(${m.l}, ${m.t - r * 0.7})` }, g);
+      const y1 = narrow ? -fs * 1.55 : 0;
+      el('line', { x1: 0, x2: 18, y1: y1 - fs * 0.32, y2: y1 - fs * 0.32, stroke: C.text, 'stroke-width': 2, 'stroke-linecap': 'round' }, lg);
+      const t1 = el('text', { x: 26, y: y1, fill: C.text2 }, lg, o.lblRoll);
+      const off = narrow ? 0 : 26 + (t1.getComputedTextLength ? t1.getComputedTextLength() : 160) + 28;
+      el('rect', { x: off + (narrow ? 3 : 0), y: -fs * 0.78, width: 12, height: fs * 0.8, rx: 2, fill: C.s1, opacity: .5 }, lg);
+      el('text', { x: off + (narrow ? 26 : 20), y: 0, fill: C.text2 }, lg, o.lblMonth);
+      // mira + dica
+      const cross = el('line', { y1: m.t, y2: y(0), stroke: C.axis, 'stroke-width': 1, visibility: 'hidden' }, g);
+      const dot = el('circle', { r: 5, fill: C.text, stroke: C.surface, 'stroke-width': 2, visibility: 'hidden' }, g);
+      const hit = el('rect', { x: m.l, y: m.t, width: pw, height: ph, fill: 'transparent', tabindex: 0, 'aria-label': o.caption || '' }, g);
+      const move = (e) => { const b = svg.getBoundingClientRect(); const px = ((e.clientX - b.left) / b.width) * w; const i = Math.max(0, Math.min(n - 1, Math.round(((px - m.l) / pw) * (n - 1))));
+        cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('visibility', 'visible');
+        if (o.roll[i] != null) { dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(o.roll[i])); dot.setAttribute('visibility', 'visible'); } else dot.setAttribute('visibility', 'hidden');
+        const d = new Date(y0, m0 - 1 + i, 1);
+        showTip(e.clientX, e.clientY, o.fmtMonth(d), [[o.lblRoll, o.roll[i] == null ? '–' : fmt(o.roll[i], 0), C.text], [o.lblMonth, fmt(o.idx[i], 0), C.s1]]); };
+      hit.addEventListener('pointermove', move); hit.addEventListener('pointerdown', move);
+      hit.addEventListener('pointerleave', () => { cross.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden'); hideTip(); });
+      svg.setAttribute('aria-label', o.caption || '');
+      const rows = []; for (let i = 11; i < n; i += 12) { const d = new Date(y0, m0 - 1 + i, 1); rows.push([o.fmtMonth(d), fmt(o.idx[i], 0), o.roll[i] == null ? '–' : fmt(o.roll[i], 0)]); }
+      table(host, o.caption, ['', o.lblMonth, o.lblRoll], rows);
+    });
+  }
+
+  /* ---------- pontos por grupo (carretéis por lote), eixo único (índice, 100 = média) ----------
+     o: { points:[{lot, sp, idx, n}], lots:[{lot, idx, n}], lblLot(l), tipTitle(p), lblIdx, lblPcs, lblAvg, lblLotAvg, yMin, yMax, caption } */
+  function strip(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7), lots = o.lots.map((l) => l.lot), n = lots.length;
+      const m = { l: r * 2.6, r: r * 0.8, t: r * 1.5, b: r * 1.9 };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b, band = pw / n;
+      const lo = o.yMin || 70, hi = o.yMax || 125, y = (v) => m.t + ph - ((Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * ph;
+      const g = el('g', { 'font-size': fs }, svg);
+      for (let v = Math.ceil(lo / 10) * 10; v <= hi; v += 10) {
+        el('line', { x1: m.l, x2: w - m.r, y1: y(v), y2: y(v), stroke: v === 100 ? C.axis : C.grid, 'stroke-width': v === 100 ? 1.5 : 1 }, g);
+        el('text', { x: m.l - r * 0.4, y: y(v) + fs * 0.35, 'text-anchor': 'end', fill: v === 100 ? C.text : C.text3, 'font-weight': v === 100 ? 600 : 400, style: 'font-variant-numeric: tabular-nums' }, g, String(v));
+      }
+      const maxN = Math.max.apply(null, o.points.map((p) => p.n || 1));
+      lots.forEach((lot, li) => {
+        const cx = m.l + band * li + band / 2;
+        if (li > 0) el('line', { x1: m.l + band * li, x2: m.l + band * li, y1: m.t, y2: m.t + ph, stroke: C.grid, 'stroke-width': 1 }, g);
+        el('text', { x: cx, y: m.t + ph + fs * 1.6, 'text-anchor': 'middle', fill: C.text3 }, g, o.lblLot(lot));
+        const L = o.lots[li];
+        const tick = el('line', { x1: cx - band * 0.34, x2: cx + band * 0.34, y1: y(L.idx), y2: y(L.idx), stroke: C.text, 'stroke-width': 2, 'stroke-linecap': 'round' }, g);
+        if (animate) fadeIn(tick, 400, 700 + li * 60);
+        const ps = o.points.filter((p) => p.lot === lot);
+        ps.forEach((p, k) => {
+          const off = ps.length > 1 ? ((k / (ps.length - 1)) - 0.5) * band * 0.56 : 0;
+          const rad = p.sz ? [5, 5, 7, 9][p.sz] : Math.max(4, Math.min(9, 4 + 5 * Math.sqrt(p.n / maxN)));
+          const c = el('circle', { cx: cx + off, cy: y(p.idx), r: rad, fill: C.s1, stroke: C.surface, 'stroke-width': 2, tabindex: 0, 'aria-label': o.tipTitle(p) + ': ' + fmt(p.idx, 0) }, g);
+          if (animate && c.animate) c.animate([{ opacity: 0, transform: 'translateY(-14px)' }, { opacity: 1, transform: 'none' }], { duration: 450, delay: 150 + li * 60 + k * 30, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' });
+          const hit = el('circle', { cx: cx + off, cy: y(p.idx), r: 14, fill: 'transparent' }, g);
+          const rows = [[o.lblIdx, fmt(p.idx, 0), C.s1]].concat(p.n != null ? [[o.lblPcs, fmt(p.n, 0)]] : [], [[o.lblLotAvg, fmt(L.idx, 0), C.text]]);
+          bindTip(hit, o.tipTitle(p), rows); bindTip(c, o.tipTitle(p), rows);
+        });
+      });
+      // legenda
+      const lg = el('g', { transform: `translate(${m.l + r * 0.4}, ${m.t - r * 0.55})` }, g);
+      el('circle', { cx: 6, cy: -fs * 0.32, r: 5, fill: C.s1 }, lg);
+      const t1 = el('text', { x: 18, y: 0, fill: C.text2 }, lg, o.lblSpool);
+      const off = 18 + (t1.getComputedTextLength ? t1.getComputedTextLength() : 120) + 26;
+      el('line', { x1: off, x2: off + 18, y1: -fs * 0.32, y2: -fs * 0.32, stroke: C.text, 'stroke-width': 2, 'stroke-linecap': 'round' }, lg);
+      el('text', { x: off + 26, y: 0, fill: C.text2 }, lg, o.lblLotAvg);
+      svg.setAttribute('aria-label', o.caption || '');
+      const withN = o.points.length && o.points[0].n != null;
+      table(host, o.caption, withN ? ['', o.lblIdx, o.lblPcs] : ['', o.lblIdx], o.points.map((p) => (withN ? [o.tipTitle(p), fmt(p.idx, 0), fmt(p.n, 0)] : [o.tipTitle(p), fmt(p.idx, 0)])));
+    });
+  }
+
+  /* ---------- barra segmentada alta (um todo em partes) — HTML ----------
+     o: { parts:[{label, value, color, dark?}], unit:'%', dec, caption } */
+  function segbar(host, o) {
+    host.textContent = ''; host.classList.add('segbar');
+    const total = o.parts.reduce((s, p) => s + p.value, 0);
+    const bar = h('div', 'segbar-bar', host); bar.setAttribute('role', 'img'); bar.setAttribute('aria-label', (o.caption || '') + ': ' + o.parts.map((p) => p.label + ' ' + fmt(p.value, o.dec || 0) + (o.unit || '')).join(', '));
+    o.parts.forEach((p) => {
+      if (p.value <= 0) return;
+      const s = h('div', 'segbar-seg', bar); s.style.flexGrow = p.value / total; s.style.flexBasis = '0'; s.style.background = p.color; s.tabIndex = 0;
+      const lab = h('span', '', s, fmt(p.value, o.dec || 0) + (o.unit || '')); lab.style.color = p.dark ? '#0B1017' : '#fff';
+      bindTip(s, p.label, [['', fmt(p.value, o.dec || 0) + (o.unit || ''), p.color]]);
+      requestAnimationFrame(() => { if (lab.scrollWidth + 14 > s.clientWidth) lab.hidden = true; });
+    });
+    const lg = h('div', 'segbar-legend', host);
+    o.parts.forEach((p) => { const it = h('span', '', lg); const sw = h('i', '', it); sw.style.background = p.color; h('span', '', it, p.label); });
+    table(host, o.caption, ['', o.unit || ''], o.parts.map((p) => [p.label, fmt(p.value, o.dec || 0) + (o.unit || '')]));
+    return { replay() { if (reduced() || !bar.animate) return; bar.animate([{ clipPath: 'inset(0 100% 0 0 round 6px)' }, { clipPath: 'inset(0 0 0 0 round 6px)' }], { duration: 900, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' }); } };
+  }
+
+  /* ---------- lista de medidores (nome · barra · valor) — HTML ----------
+     o: { rows:[{label, value, note?}], max, unit, dec, color, caption } */
+  function meters(host, o) {
+    host.textContent = ''; host.classList.add('meters');
+    const max = o.max || Math.max.apply(null, o.rows.map((x) => x.value));
+    const bars = [];
+    o.rows.forEach((row) => {
+      const r = h('div', 'meter-row', host); h('span', 'meter-name', r, row.label);
+      const tr = h('span', 'meter-track', r), fl = h('i', '', tr); fl.style.width = Math.max(0, (row.value / max) * 100) + '%'; if (o.color) fl.style.background = o.color; bars.push(fl);
+      h('b', 'meter-val', r, fmt(row.value, o.dec || 0) + (o.unit || ''));
+      r.tabIndex = 0; bindTip(r, row.label, [[row.note || '', fmt(row.value, o.dec || 0) + (o.unit || ''), o.color || C.s1]]);
+    });
+    table(host, o.caption, ['', o.unit || ''], o.rows.map((x) => [x.label, fmt(x.value, o.dec || 0) + (o.unit || '')]));
+    return { replay() { if (reduced()) return; bars.forEach((b, i) => b.animate && b.animate([{ transform: 'scaleX(0)' }, { transform: 'none' }], { duration: 700, delay: i * 60, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' })); } };
+  }
+
+  /* ---------- dispersão por linha (cada ponto = uma pessoa/unidade anônima), índice com mediana = 100 ----------
+     o: { rows:[{label, idx[]}], lo, hi, lblMedian, tipRow(label, v), caption } */
+  function rowsDots(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7), n = o.rows.length;
+      const lblW = Math.min(w * 0.34, r * 9.5);
+      const m = { l: lblW, r: r * 0.8, t: r * 1.4, b: r * 1.6 };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b, band = ph / n, lo = o.lo || 40, hi = o.hi || 140;
+      const x = (v) => m.l + ((Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * pw;
+      const g = el('g', { 'font-size': fs }, svg);
+      for (let v = lo; v <= hi; v += 20) { el('line', { x1: x(v), x2: x(v), y1: m.t, y2: m.t + ph, stroke: v === 100 ? C.axis : C.grid, 'stroke-width': v === 100 ? 1.5 : 1 }, g);
+        el('text', { x: x(v), y: m.t + ph + fs * 1.5, 'text-anchor': 'middle', fill: v === 100 ? C.text : C.text3, 'font-weight': v === 100 ? 600 : 400, style: 'font-variant-numeric: tabular-nums' }, g, String(v)); }
+      el('text', { x: x(100), y: m.t - fs * 0.6, 'text-anchor': 'middle', fill: C.text2 }, g, o.lblMedian);
+      o.rows.forEach((row, i) => {
+        const cy = m.t + band * i + band / 2;
+        el('text', { x: m.l - r * 0.6, y: cy + fs * 0.35, 'text-anchor': 'end', fill: C.text2 }, g, row.label);
+        el('line', { x1: x(Math.min.apply(null, row.idx)), x2: x(Math.max.apply(null, row.idx)), y1: cy, y2: cy, stroke: C.mute, 'stroke-width': 2, 'stroke-linecap': 'round' }, g);
+        row.idx.forEach((v, k) => { const c = el('circle', { cx: x(v), cy, r: 5, fill: C.s1, stroke: C.surface, 'stroke-width': 2 }, g);
+          if (animate && c.animate) c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 120 + i * 70 + k * 18, fill: 'both' });
+          const hit = el('circle', { cx: x(v), cy, r: 12, fill: 'transparent', tabindex: -1 }, g); bindTip(hit, row.label, [[o.lblIdx || '', fmt(v, 0), C.s1]]); });
+      });
+      svg.setAttribute('aria-label', o.caption || '');
+      table(host, o.caption, ['', 'min', 'max', 'n'], o.rows.map((x_) => [x_.label, Math.min.apply(null, x_.idx), Math.max.apply(null, x_.idx), x_.idx.length]));
+    });
+  }
+
+  /* ---------- linhas no tempo com mira (monitor e curvas acumuladas) ----------
+     o: { series:[{name, color, pts:[[t(ms)|x, v]], dashFrom?}], xIsTime, fmtX(x), fmtV(v), yPad, min0, unit, caption, gapAfter } */
+  function lines(host, o) {
+    return mount(host, ({ svg, w, h: H, r }) => {
+      const fs = Math.max(11, r * 0.7);
+      const all = [].concat.apply([], o.series.map((s) => s.pts));
+      if (!all.length) return;
+      const xs = all.map((p) => p[0]), vs = all.map((p) => p[1]);
+      let x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), v0 = Math.min.apply(null, vs), v1 = Math.max.apply(null, vs);
+      if (o.min0) v0 = 0; const padV = (v1 - v0) * (o.yPad == null ? 0.12 : o.yPad) || Math.abs(v1) * 0.01 || 1; if (!o.min0) v0 -= padV; v1 += padV; if (x1 === x0) x1 = x0 + 1;
+      const m = { l: r * 0.4, r: r * (o.rightPad || 4.4), t: r * 0.8, b: r * 1.7 };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b;
+      const X = (t) => m.l + ((t - x0) / (x1 - x0)) * pw, Y = (v) => m.t + ph - ((v - v0) / (v1 - v0)) * ph;
+      const g = el('g', { 'font-size': fs }, svg);
+      const step = (v1 - v0) / 4;
+      for (let k = 0; k <= 4; k++) { const v = v0 + step * k; el('line', { x1: m.l, x2: m.l + pw, y1: Y(v), y2: Y(v), stroke: C.grid, 'stroke-width': 1 }, g);
+        el('text', { x: m.l + pw + r * 0.35, y: Y(v) + fs * 0.35, fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, o.fmtV(v)); }
+      (o.xTicks || []).forEach((t) => { if (t < x0 || t > x1) return; el('line', { x1: X(t), x2: X(t), y1: m.t, y2: m.t + ph, stroke: C.grid, 'stroke-width': 1 }, g); el('text', { x: X(t) + 4, y: m.t + ph + fs * 1.45, fill: C.text3 }, g, o.fmtTick ? o.fmtTick(t) : o.fmtX(t)); });
+      o.series.forEach((s) => {
+        if (!s.pts.length) return;
+        const segs = []; let cur = [];
+        s.pts.forEach((p, i) => { if (i && o.gapAfter && p[0] - s.pts[i - 1][0] > o.gapAfter) { segs.push(cur); cur = []; } cur.push(p); }); segs.push(cur);
+        segs.forEach((sg, k) => {
+          if (sg.length > 1) el('path', { d: 'M' + sg.map((p) => X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1)).join('L'), fill: 'none', stroke: s.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, g);
+          if (k > 0) { const a = segs[k - 1][segs[k - 1].length - 1], b = sg[0]; el('line', { x1: X(a[0]), y1: Y(a[1]), x2: X(b[0]), y2: Y(b[1]), stroke: s.color, 'stroke-width': 1, opacity: .45 }, g); }
+        });
+        const lp = s.pts[s.pts.length - 1]; el('circle', { cx: X(lp[0]), cy: Y(lp[1]), r: 5, fill: s.color, stroke: C.surface, 'stroke-width': 2 }, g);
+      });
+      const cross = el('line', { y1: m.t, y2: m.t + ph, stroke: C.axis, 'stroke-width': 1, visibility: 'hidden' }, g);
+      const hit = el('rect', { x: m.l, y: m.t, width: pw, height: ph, fill: 'transparent', tabindex: 0, 'aria-label': o.caption || '' }, g);
+      const move = (e) => { const b = svg.getBoundingClientRect(); const px = ((e.clientX - b.left) / b.width) * w; const t = x0 + ((px - m.l) / pw) * (x1 - x0);
+        let best = null; o.series.forEach((s) => s.pts.forEach((p) => { if (!best || Math.abs(p[0] - t) < Math.abs(best - t)) best = p[0]; }));
+        cross.setAttribute('x1', X(best)); cross.setAttribute('x2', X(best)); cross.setAttribute('visibility', 'visible');
+        const rows = o.series.map((s) => { let bp = null; s.pts.forEach((p) => { if (!bp || Math.abs(p[0] - best) < Math.abs(bp[0] - best)) bp = p; }); return bp ? [s.name, o.fmtV(bp[1]), s.color] : null; }).filter(Boolean);
+        showTip(e.clientX, e.clientY, o.fmtX(best), rows); };
+      hit.addEventListener('pointermove', move); hit.addEventListener('pointerdown', move);
+      hit.addEventListener('pointerleave', () => { cross.setAttribute('visibility', 'hidden'); hideTip(); });
+      svg.setAttribute('aria-label', o.caption || '');
+    });
+  }
+
+  return { C, setLocale, fmt, columns, pareto, longSeries, strip, segbar, meters, rowsDots, lines, showTip, hideTip, bindTip, table, h, el };
+})();
+
+</script>
+<script>const METALS_HIST = {"base":"2020-01-01","d":[146,147,148,149,152,153,154,155,156,159,160,161,162,163,166,167,168,169,170,173,174,175,176,177,180,181,182,183,188,189,190,191,194,195,196,197,198,201,202,203,204,205,208,209,210,211,212,222,223,224,225,226,229,230,231,232,233,236,237,238,239,240,243,244,245,246,247,250,251,252,253,254,257,258,259,260,261,264,265,266,267,268,272,273,274,275,278,279,280,281,282,285,286,287,288,289,292,293,294,295,296,299,300,302,303,306,307,308,309,310,313,314,315,316,317,320,322,323,324,327,328,329,330,331,334,335,336,337,338,341,342,343,344,345,348,349,350,351,352,369,370,371,372,373,376,377,378,379,380,383,384,385,386,387,390,391,392,393,394,397,398,399,400,401,404,405,406,407,408,411,412,413,414,415,418,419,420,421,422,425,426,427,428,429,432,433,434,435,436,439,440,441,442,443,446,447,448,449,450,453,454,455,456,461,462,463,464,467,468,469,470,471,474,475,476,477,478,481,482,483,484,485,488,489,490,491,492,495,496,497,498,499,502,503,504,505,506,509,510,511,512,513,516,517,518,519,523,524,525,526,527,530,531,532,533,534,537,538,539,540,541,544,545,546,547,548,553,554,558,559,560,561,562,565,566,567,568,569,572,573,574,575,576,587,589,590,593,594,595,596,597,600,601,602,603,604,607,608,609,610,611,615,616,617,618,621,622,623,624,625,628,629,630,631,632,635,637,638,639,642,643,644,645,646,650,651,652,653,656,657,658,659,660,663,664,665,667,671,672,673,674,677,678,679,680,681,685,687,691,692,693,694,695,698,699,700,701,702,705,706,707,708,712,713,714,715,716,733,734,735,736,737,740,741,742,743,744,747,748,749,750,751,754,755,756,757,758,761,762,763,764,765,768,769,770,771,772,775,776,777,778,779,782,783,784,785,786,789,790,791,792,793,796,797,798,799,800,803,804,805,806,807,808,809,810,811,812,813,814,815,816,817,818,819,820,821,822,823,824,825,826,827,828,829,830,831,832,833,834,835,836,837,838,839,840,841,842,843,844,845,846,847,848,849,852,853,854,855,856,859,860,861,862,863,866,867,868,869,870,873,874,875,876,877,880,881,882,883,884,887,888,889,890,891,894,895,896,898,901,902,903,904,905,908,909,910,911,912,915,916,917,918,919,922,923,924,925,926,929,930,931,932,933,936,937,938,939,940,943,944,945,946,947,950,951,952,953,954,957,958,959,960,961,964,965,966,967,968,971,972,973,974,975,978,979,981,982,985,986,987,988,989,992,993,994,995,996,999,1000,1001,1002,1003,1006,1007,1008,1009,1010,1013,1014,1016,1017,1020,1021,1022,1023,1024,1027,1028,1029,1030,1031,1034,1035,1037,1038,1041,1042,1043,1044,1045,1048,1050,1051,1052,1055,1056,1057,1058,1059,1062,1063,1064,1065,1066,1069,1070,1071,1072,1076,1077,1078,1079,1080,1083,1084,1086,1087,1090,1091,1092,1093,1095,1098,1099,1100,1101,1104,1105,1106,1107,1108,1111,1112,1113,1114,1115,1118,1119,1120,1121,1122,1125,1126,1127,1128,1129,1132,1133,1134,1135,1136,1139,1140,1141,1142,1143,1146,1147,1148,1149,1150,1153,1154,1155,1156,1157,1160,1161,1162,1163,1164,1167,1168,1169,1170,1171,1174,1175,1176,1177,1178,1181,1182,1183,1184,1185,1188,1189,1190,1191,1195,1196,1197,1198,1199,1202,1203,1204,1205,1209,1210,1211,1212,1213,1217,1218,1219,1220,1223,1224,1225,1226,1227,1230,1231,1232,1233,1234,1237,1238,1239,1240,1241,1244,1245,1246,1247,1248,1251,1252,1253,1258,1259,1260,1261,1262,1265,1266,1267,1268,1269,1272,1273,1274,1275,1276,1279,1280,1281,1282,1283,1286,1287,1288,1289,1290,1293,1294,1295,1296,1297,1300,1301,1302,1303,1304,1307,1308,1309,1310,1311,1314,1315,1316,1317,1318,1321,1322,1323,1324,1325,1328,1329,1330,1331,1332,1335,1336,1337,1338,1339,1342,1343,1344,1349,1350,1351,1352,1353,1356,1357,1358,1359,1360,1363,1364,1365,1366,1367,1370,1371,1372,1373,1374,1377,1378,1379,1384,1385,1386,1387,1388,1391,1392,1393,1394,1395,1398,1399,1400,1401,1405,1406,1407,1408,1409,1412,1413,1414,1415,1420,1421,1422,1423,1426,1427,1428,1429,1430,1433,1434,1435,1436,1440,1441,1442,1443,1444,1447,1448,1449,1450,1451,1454,1455,1456,1457,1458,1461,1462,1463,1464,1465,1468,1469,1470,1471,1472,1475,1476,1477,1478,1479,1482,1483,1484,1485,1486,1489,1490,1491,1492,1493,1496,1497,1498,1499,1500,1503,1504,1505,1506,1507,1510,1511,1512,1513,1514,1517,1518,1519,1520,1521,1524,1525,1526,1527,1528,1531,1532,1533,1534,1535,1538,1539,1540,1541,1542,1545,1546,1547,1548,1552,1553,1554,1555,1556,1559,1560,1561,1562,1563,1566,1567,1568,1569,1570,1573,1574,1575,1576,1577,1580,1581,1582,1583,1587,1588,1589,1590,1591,1594,1595,1596,1597,1598,1601,1602,1603,1604,1605,1608,1609,1610,1611,1615,1616,1617,1618,1619,1622,1623,1624,1625,1626,1629,1630,1631,1632,1633,1636,1638,1639,1640,1643,1644,1645,1646,1647,1651,1652,1653,1654,1657,1658,1659,1660,1661,1664,1665,1666,1667,1668,1671,1672,1673,1674,1675,1678,1679,1680,1681,1682,1685,1686,1687,1688,1689,1692,1693,1694,1695,1696,1699,1700,1701,1702,1703,1706,1707,1708,1709,1710,1713,1714,1715,1716,1717,1720,1721,1722,1723,1724,1727,1728,1729,1730,1731,1734,1735,1736,1737,1738,1741,1742,1743,1744,1745,1748,1749,1750,1751,1752,1755,1756,1757,1758,1759,1762,1763,1764,1765,1766,1769,1770,1771,1772,1773,1776,1777,1778,1779,1780,1783,1784,1785,1786,1787,1790,1791,1792,1793,1794,1797,1798,1799,1800,1801,1804,1805,1806,1807,1808,1811,1812,1813,1814,1815,1832,1833,1834,1835,1836,1839,1840,1841,1842,1843,1846,1847,1848,1849,1850,1853,1854,1855,1856,1857,1860,1861,1862,1863,1864,1867,1868,1869,1870,1871,1874,1875,1876,1877,1878,1881,1882,1883,1884,1885,1888,1889,1890,1891,1892,1895,1896,1897,1898,1899,1902,1903,1904,1905,1906,1909,1910,1911,1912,1913,1916,1917,1918,1919,1920,1923,1924,1925,1926,1927,1930,1931,1932,1933,1937,1938,1939,1940,1941,1944,1945,1946,1947,1948,1951,1952,1953,1954,1955,1958,1959,1960,1961,1962,1965,1966,1967,1968,1969,1972,1973,1974,1975,1976,1979,1980,1981,1982,1983,1986,1987,1988,1989,1990,1993,1994,1995,1996,1997,2000,2001,2002,2003,2004,2007,2008,2009,2010,2011,2014,2015,2017,2018,2021,2022,2023,2024,2025,2028,2029,2030,2031,2032,2035,2036,2037,2038,2039,2042,2043,2044,2045,2046,2049,2050,2051,2052,2053,2056,2057,2058,2059,2060,2063,2064,2065,2066,2067,2070,2071,2072,2073,2074,2077,2078,2079,2080,2081,2084,2085,2086,2087,2088,2091,2092,2093,2094,2095,2098,2099,2100,2101,2102,2105,2106,2107,2108,2109,2112,2113,2114,2115,2116,2119,2120,2121,2122,2123,2126,2127,2128,2129,2130,2133,2134,2135,2136,2137,2140,2141,2142,2143,2144,2147,2148,2149,2150,2154,2155,2156,2157,2158,2161,2162,2163,2164,2165,2168,2169,2170,2171,2172,2175,2176,2177,2178,2179,2196,2197,2198,2199,2200,2203,2204,2205,2206,2207,2210,2211,2212,2213,2214,2217,2219,2220,2221,2224,2225,2226,2227,2228,2231,2232,2233,2234,2235,2238,2239,2240,2241,2242,2245,2246,2247,2248,2249,2252,2253,2254,2255,2256,2259,2260,2261,2262,2263,2266,2267,2268,2269,2270,2273,2274,2275,2276,2277,2280,2281,2282,2283,2287,2288,2289,2290,2291,2294,2295,2296,2297,2298,2302,2303,2304,2305,2308,2309,2310,2311,2315,2316,2317,2318,2319,2322,2323,2324,2325,2326,2329,2330,2331,2332,2333,2336,2337,2338,2339,2340,2343,2344,2345,2346,2350,2351,2352,2353,2354,2357,2358,2359,2360,2361,2364,2365,2366,2367,2368,2371,2372,2373,2374,2375,2378,2379,2380,2381,2385,2386,2387,2388,2389,2392,2393,2394,2395,2396,2399,2400,2401,2402,2403,2406,2407,2408,2409,2410,2413,2414,2415,2416,2417,2420,2421,2422,2423,2424,2427,2428,2429,2430,2431,2434,2435,2436,2437,2438,2441,2442,2443,2444,2445],"pd":[57.8,57.54,57.51,56.45,57.06,56.64,56.96,56.45,55.32,56.16,57.06,55.68,55.74,55.74,55.1,56.03,55.84,55.29,55.35,55.42,55.35,55.68,54.17,53.43,54.36,56.12,55.74,56.14,56.7,57.02,56.09,56.87,56.87,56.51,55.97,56.13,56.61,57.38,59.08,59.57,60.02,61.17,63.49,62.68,62.07,56.8,57.71,60.82,60.14,58.92,58.76,59.05,59.5,60.31,59.5,59.21,59.79,59.6,59.37,59.21,59.86,59.21,60.24,57.54,61.69,63.49,62.75,63.07,63.07,62.43,62.65,62.97,63.26,63.91,65.38,65.61,63.42,64.07,62.91,62.04,61.72,61.17,62.56,64.32,63.68,63.42,64.26,64.77,64.93,65.13,66.54,66.32,66.32,65.26,64.81,65.41,64.48,64.32,65.54,65.32,65.0,65.26,64.64,61.46,61.08,62.27,62.27,62.68,64.58,65.13,66.67,67.96,63.95,64.39,64.19,64.07,63.74,63.49,63.58,63.58,63.49,63.36,64.36,64.77,64.81,64.93,64.36,64.29,62.17,62.01,62.01,61.62,61.27,62.43,61.72,61.85,62.04,62.3,61.88,64.61,63.23,64.84,63.94,63.91,63.2,63.58,63.52,63.78,64.77,64.42,63.55,59.42,59.71,59.4,60.83,60.1,59.94,59.42,59.57,57.43,58.08,57.98,59.1,59.3,60.77,60.12,59.78,60.84,60.42,61.44,61.4,60.57,60.14,59.12,59.95,60.32,58.74,60.94,60.45,59.48,60.81,60.77,60.44,60.59,60.87,60.28,59.88,59.67,60.75,61.37,65.06,64.86,66.94,69.96,68.6,68.39,69.04,69.39,68.97,70.99,67.06,69.36,69.58,70.08,68.76,68.82,68.85,68.83,70.44,69.94,69.57,71.06,72.45,72.53,71.4,73.47,73.3,73.45,75.64,76.0,75.24,76.02,75.83,77.22,77.38,76.9,75.94,74.76,75.89,75.41,73.46,74.26,73.94,74.0,74.11,73.35,72.66,70.76,69.13,70.22,69.56,71.36,71.99,71.65,72.63,72.67,73.2,73.0,72.27,71.48,71.62,71.67,71.48,71.46,73.57,65.14,65.99,67.78,66.9,68.56,69.21,69.45,70.64,70.57,73.49,73.23,74.28,75.73,74.71,75.78,75.32,75.14,72.6,69.94,68.95,70.26,70.84,72.57,71.1,70.81,69.05,69.36,69.8,71.13,70.36,70.0,70.52,69.38,66.45,64.72,61.8,60.61,63.8,65.77,64.45,63.55,63.97,66.2,65.5,64.59,63.45,63.5,62.85,59.48,57.82,56.49,55.03,51.84,52.91,53.55,53.49,49.46,50.25,53.79,52.37,52.12,49.86,49.6,50.98,51.23,50.92,51.59,50.83,52.87,57.23,55.32,56.97,57.51,55.78,53.91,56.32,55.38,53.91,54.04,54.85,53.79,52.91,55.01,53.96,53.93,54.06,54.71,55.78,54.5,55.08,56.18,59.14,60.5,56.79,54.0,51.88,51.12,51.49,48.05,48.82,47.46,47.78,48.81,49.79,50.97,51.13,50.96,48.48,46.19,44.65,45.54,47.35,52.22,50.11,51.67,51.41,51.68,53.24,52.55,52.86,51.93,55.64,51.36,51.18,52.31,57.15,56.95,57.9,59.17,60.87,64.93,66.69,66.65,65.11,65.01,65.82,63.54,62.55,62.04,61.27,62.44,61.94,64.14,65.37,61.96,63.06,65.43,64.83,65.91,64.92,69.72,68.03,66.19,69.46,72.88,75.63,79.37,86.92,85.88,84.93,83.64,84.57,80.58,67.53,68.85,72.49,73.37,73.37,73.37,74.13,72.9,73.7,73.4,72.99,72.99,72.99,65.96,61.84,65.28,65.08,67.33,67.33,67.33,67.33,67.09,65.96,66.54,72.06,72.06,72.06,73.78,69.48,70.7,70.42,70.42,70.42,70.42,70.92,70.31,71.67,72.48,71.68,71.68,71.68,63.04,65.68,64.89,65.12,65.57,68.85,66.61,66.88,66.53,64.32,60.16,61.37,61.53,60.22,57.57,57.61,64.15,60.67,59.46,58.38,56.85,57.87,59.66,60.14,61.28,59.41,59.34,58.46,58.44,59.57,57.61,58.77,57.69,56.37,56.56,57.44,53.2,53.51,55.6,53.29,54.27,55.3,54.82,54.15,54.75,54.69,55.16,58.44,57.21,57.95,57.95,58.61,59.22,62.18,67.93,67.39,63.34,61.53,58.95,55.43,56.15,56.77,56.13,57.22,61.5,60.9,61.61,61.99,63.99,64.36,66.72,62.65,61.6,62.94,65.06,67.92,67.43,67.65,69.05,67.74,65.91,65.87,65.4,65.74,66.11,62.27,61.64,63.27,66.6,65.84,66.08,64.52,64.42,62.12,62.99,63.24,63.09,65.96,66.8,69.55,65.12,67.59,66.73,66.44,67.45,68.01,68.09,69.46,66.76,65.88,67.47,71.92,70.34,69.0,70.45,71.21,71.1,72.04,70.28,69.84,68.13,65.57,63.56,62.84,62.15,63.38,65.64,63.63,61.77,63.45,60.79,60.37,59.24,57.69,58.87,56.67,58.64,60.13,59.34,58.1,59.51,61.94,62.98,60.35,60.32,58.76,56.25,55.73,55.88,53.68,54.5,54.93,54.25,55.32,57.45,55.63,55.1,54.16,54.13,57.16,55.17,56.08,56.02,52.02,49.34,48.12,48.7,48.51,50.88,50.71,51.68,51.96,51.96,52.42,49.34,52.07,51.07,52.45,51.05,50.85,50.77,51.01,50.84,50.91,49.1,48.54,49.58,48.66,48.55,49.58,47.93,47.45,45.58,47.86,49.92,49.47,47.77,46.34,45.69,47.08,46.96,44.81,44.08,47.39,42.49,44.22,43.47,43.06,43.16,43.0,42.92,42.3,40.81,41.04,40.1,40.89,41.18,41.14,40.53,39.64,39.41,40.21,39.74,42.62,43.16,42.72,41.1,40.5,40.13,39.64,40.76,40.98,40.52,40.45,40.36,40.77,41.46,41.46,41.34,40.95,40.01,41.25,39.74,40.63,40.68,41.83,42.11,43.76,45.53,45.43,44.71,42.8,41.35,41.79,41.96,40.42,39.61,39.11,40.49,41.27,43.34,44.13,45.31,45.12,43.69,44.23,43.29,43.2,42.86,44.05,43.62,42.6,41.13,41.67,41.92,41.49,41.47,40.14,40.89,42.07,41.52,41.55,38.64,39.44,39.65,40.34,40.37,40.93,40.63,40.01,38.61,37.12,37.03,37.51,37.17,35.38,35.56,35.45,35.88,35.98,36.25,35.88,35.74,35.41,35.71,36.24,36.32,35.57,37.11,37.1,36.6,35.99,36.58,36.54,35.71,35.65,35.05,35.56,36.9,35.54,36.75,36.16,36.03,35.62,35.16,35.26,36.95,37.57,36.56,35.54,34.8,35.28,36.23,35.9,36.51,37.03,36.07,35.56,36.36,35.99,35.44,35.43,35.32,35.67,35.67,35.1,35.73,36.45,36.81,36.91,36.83,36.68,37.16,37.33,37.45,37.1,36.54,36.48,37.07,37.68,37.26,36.14,35.14,35.38,34.6,34.63,33.59,34.94,34.51,34.36,34.1,33.91,33.35,32.79,33.35,33.74,33.82,34.07,33.67,33.53,33.73,33.04,32.94,32.79,31.34,31.07,29.32,28.56,29.02,29.62,30.18,31.6,31.38,30.7,30.34,30.93,30.96,30.37,29.76,29.16,29.17,28.36,27.39,27.72,27.75,28.18,28.71,28.8,32.18,35.48,36.88,36.0,36.65,36.06,36.06,35.04,34.43,33.97,33.03,32.92,32.62,31.27,31.01,29.81,29.21,28.88,28.64,28.95,28.7,28.33,27.84,27.17,27.09,27.64,26.67,27.08,27.96,27.91,27.18,27.66,28.83,28.61,28.47,28.41,27.47,27.99,27.53,25.95,25.91,25.62,26.85,25.65,28.41,27.64,28.11,28.2,28.5,28.07,27.91,28.1,28.15,26.46,27.18,27.65,28.01,27.57,27.89,29.96,30.36,30.07,29.57,30.79,31.02,31.91,31.01,29.19,28.64,32.05,29.42,29.26,29.09,28.8,29.32,29.93,29.78,29.07,29.42,29.5,29.62,30.76,31.83,30.82,31.43,30.78,30.3,30.47,30.56,29.88,30.11,29.48,30.19,29.5,28.72,28.19,28.21,27.83,28.05,28.66,28.71,28.42,27.9,29.03,28.81,28.87,29.03,29.44,28.82,29.79,29.66,29.81,28.83,28.34,28.65,28.48,28.1,27.65,26.49,26.56,26.86,27.12,26.64,26.89,26.26,26.04,26.11,26.3,26.35,25.91,26.6,26.75,27.49,29.22,28.12,27.15,28.52,29.28,29.25,30.53,30.26,30.33,29.88,29.03,28.91,28.27,27.91,27.35,28.24,27.52,26.65,26.19,26.18,27.0,26.05,26.29,26.42,26.4,26.77,27.33,26.78,24.9,24.15,25.65,25.67,26.93,26.62,26.43,27.2,26.91,27.22,26.95,26.58,26.56,27.0,26.46,27.12,27.51,27.17,27.23,28.25,27.77,27.49,26.78,26.8,26.79,26.38,27.45,27.82,29.57,30.03,30.52,30.97,31.55,31.11,30.56,29.9,29.41,29.45,30.14,29.27,28.05,28.99,28.94,28.56,28.91,29.6,29.09,29.3,30.36,31.14,30.58,29.51,29.62,30.36,31.06,31.25,31.31,31.53,34.0,34.04,35.41,36.27,34.54,32.8,32.62,32.22,31.46,31.15,30.42,29.51,29.49,28.51,28.17,28.15,28.5,29.05,30.15,30.72,29.45,30.67,30.02,29.75,29.65,29.45,29.48,29.21,29.84,29.04,29.63,29.13,29.52,29.26,29.09,29.25,29.1,28.47,28.03,28.02,27.67,27.68,28.1,28.21,28.75,28.51,29.14,28.91,29.09,29.27,29.49,28.78,29.0,28.51,29.11,29.9,30.15,29.05,29.09,28.98,29.88,30.32,31.05,30.58,30.26,30.0,30.03,29.81,29.52,29.7,29.86,30.25,29.79,29.62,29.98,29.8,29.19,28.66,28.57,28.3,27.89,27.85,28.55,28.08,28.08,27.42,27.45,27.65,27.6,27.48,27.56,28.03,27.97,28.33,27.72,27.64,27.56,28.14,28.02,28.06,28.66,28.85,28.74,29.01,28.81,26.96,26.19,26.78,26.42,26.06,26.02,25.55,25.9,26.43,27.0,26.33,25.86,25.91,26.12,26.27,26.06,26.44,26.28,25.91,26.43,26.66,26.79,26.53,27.07,26.98,27.62,27.41,27.04,26.71,27.3,27.35,28.67,28.78,28.42,28.56,28.21,27.35,27.28,27.34,27.3,27.08,27.04,27.65,27.84,28.21,28.78,30.15,29.83,29.97,29.39,29.42,28.96,28.63,29.43,29.09,29.22,29.81,29.75,29.11,30.04,30.79,31.67,30.32,30.48,30.98,31.06,30.6,30.6,30.84,32.31,33.78,33.09,33.2,33.99,36.54,35.1,34.29,35.14,34.46,33.28,34.07,34.38,35.16,34.21,33.18,33.28,32.95,32.47,31.6,31.43,31.06,31.93,31.13,31.13,31.01,30.54,30.98,30.49,30.24,30.75,30.67,30.07,30.45,30.21,30.16,30.7,31.08,31.78,31.43,30.82,31.03,31.18,31.98,32.5,33.04,32.91,32.51,31.14,31.16,31.05,32.41,32.91,33.79,33.44,33.64,34.46,33.24,34.11,34.13,34.17,34.85,36.01,38.03,39.89,39.94,39.55,41.16,42.44,42.41,43.17,39.55,39.37,38.99,39.65,38.84,38.7,36.81,38.48,39.16,39.75,40.17,38.95,38.68,39.09,38.24,38.6,39.66,40.61,40.45,38.88,37.94,38.45,39.19,38.58,37.8,38.35,38.64,38.99,39.29,40.03,38.95,39.4,39.56,39.93,41.35,40.06,40.87,40.75,41.09,41.19,42.31,44.65,43.22,46.04,45.77,46.58,47.68,46.84,50.44,51.13,49.7,50.65,49.38,48.17,49.35,50.24,50.79,50.62,51.74,56.52,51.99,54.97,47.51,47.07,48.69,49.12,46.17,44.55,45.39,46.32,46.8,45.85,44.33,45.26,45.01,46.12,45.97,46.49,47.89,47.62,49.1,47.59,48.98,49.19,46.76,46.54,45.54,45.19,43.71,46.36,45.2,45.93,45.35,42.94,44.92,43.91,40.56,39.79,38.1,39.25,39.93,38.0,38.18,39.33,40.11,40.47,40.27,41.53,40.9,43.61,42.77,41.39,41.59,42.51,42.82,42.65,41.83,42.14,42.53,40.23,40.04,40.25,39.03,39.27,40.17,39.8,40.89,41.89,41.64,40.51,39.98,40.24,40.58,39.79,38.83,38.39,38.04,37.48,37.03,37.25,37.98,37.46,37.58,36.95,37.54,37.11,37.68,37.04,35.85,33.53,34.01,33.39,34.18,35.86,36.83,37.14,36.8,40.93,34.85,35.27,34.59,33.75,32.93,33.3,33.69,39.19,32.93,35.61,40.61,35.45,35.55,33.65,34.39,35.17,35.05,36.03,35.76,34.74,35.08,35.66,36.43,35.35,34.86,35.86,34.91,34.92,35.45,35.57,35.08,35.47,37.63,38.09,38.02,37.29,37.91,38.1,36.9,36.05,36.44,36.14,35.37,36.04,36.49,36.66,36.0,36.42,35.78,38.21,38.2,36.37,35.88,37.32,38.33,39.0,37.96,36.93,36.8,36.14],"pt":[24.46,24.56,24.37,24.43,24.31,24.14,24.36,23.75,23.9,23.65,23.67,23.51,23.72,23.31,23.38,22.98,23.54,23.29,23.35,23.08,23.17,23.5,23.49,23.09,22.96,23.2,23.2,23.62,23.32,23.44,23.93,24.35,24.0,23.83,23.31,23.43,23.34,23.26,23.62,23.93,24.51,25.75,25.43,25.86,25.41,25.86,24.84,25.75,26.56,26.0,25.67,25.52,25.71,25.94,26.25,25.63,25.31,24.84,25.18,25.09,25.09,25.34,25.12,25.12,25.53,25.37,24.81,24.54,24.61,24.75,24.96,25.09,25.22,25.48,26.11,26.59,25.9,25.57,25.21,24.26,23.48,23.14,23.56,24.07,23.93,24.64,24.52,24.13,24.28,23.62,23.69,23.96,24.17,23.74,23.98,23.48,23.7,23.89,23.32,23.77,24.21,24.22,24.26,23.91,23.75,23.56,23.7,23.97,23.66,24.2,24.46,24.48,23.84,24.2,23.77,24.22,25.09,25.27,25.55,25.78,25.72,25.35,26.05,26.01,25.84,25.84,26.36,26.77,27.13,27.69,27.35,27.09,27.22,26.83,27.12,26.87,27.03,27.63,27.6,28.12,28.79,28.11,28.84,28.8,29.03,27.55,28.11,28.35,29.31,29.01,28.77,29.18,29.06,29.68,29.09,29.28,28.8,28.82,28.07,28.84,29.68,29.37,29.26,29.05,29.87,30.72,31.38,32.22,33.21,32.6,34.01,34.56,32.74,33.75,33.69,33.78,33.06,33.39,32.98,32.06,32.2,31.7,32.04,30.84,30.17,30.53,31.6,31.57,32.88,31.65,32.81,32.5,32.66,32.53,32.37,31.66,31.72,32.18,31.77,31.65,32.03,32.27,32.14,32.6,32.84,33.49,33.27,32.81,32.08,31.64,31.69,31.95,32.11,32.59,31.99,31.8,32.16,32.39,32.85,33.08,32.66,32.26,32.12,32.12,33.16,32.95,32.98,33.26,33.42,33.0,32.72,32.3,32.56,32.59,32.56,32.03,31.79,31.39,30.69,31.01,31.59,31.36,31.16,31.16,31.22,31.33,30.61,30.82,30.84,30.53,30.14,30.55,30.47,30.68,30.52,29.98,29.15,28.12,28.65,29.25,29.13,29.62,29.8,29.1,28.5,29.42,30.12,29.74,29.37,29.66,30.33,30.39,31.05,30.91,29.66,29.41,29.34,29.44,29.68,28.93,28.75,28.76,29.17,29.17,27.54,27.79,27.93,27.61,27.96,27.6,26.72,26.94,27.88,27.81,27.36,27.12,27.09,27.09,27.46,27.59,27.13,27.88,27.46,27.23,26.7,26.79,26.02,26.0,25.42,25.72,25.9,25.49,25.35,26.59,27.71,26.93,26.89,26.64,26.55,26.77,26.45,26.61,26.36,27.42,28.73,28.19,28.24,28.59,29.28,29.12,29.11,28.87,29.03,29.36,28.81,29.08,28.18,28.73,29.34,28.99,29.09,28.72,28.84,29.38,29.29,30.41,30.24,30.33,29.87,29.59,28.58,28.23,28.47,27.75,27.68,26.79,27.05,26.73,26.88,26.59,27.27,27.44,26.85,26.89,26.4,25.99,26.4,27.31,27.31,27.41,27.93,27.5,27.68,27.27,26.82,27.54,27.25,27.47,27.35,27.27,28.1,29.61,29.66,29.41,29.09,29.86,29.68,29.05,29.2,29.62,29.59,29.33,28.87,28.54,28.53,29.15,28.89,29.05,29.17,29.0,29.16,30.64,30.88,30.57,30.75,30.58,32.09,30.37,30.57,30.41,30.87,31.61,31.68,34.03,33.94,32.69,31.32,31.26,30.61,29.81,29.96,29.93,29.93,29.93,30.18,29.7,29.9,29.82,29.54,29.54,29.54,29.07,28.24,28.72,28.32,28.84,28.84,28.84,28.84,28.69,28.36,28.2,28.68,28.68,28.68,29.1,28.59,29.04,28.89,28.89,28.89,28.89,29.1,30.15,29.36,29.15,28.02,28.02,28.02,27.33,27.49,28.04,28.03,27.91,28.65,29.14,29.35,30.05,29.78,29.17,28.98,29.29,30.63,28.97,28.99,29.53,29.08,28.59,29.01,28.71,28.67,28.29,28.42,28.63,28.57,28.65,28.93,29.97,30.57,30.3,30.58,30.33,30.16,29.43,29.86,28.63,28.2,29.02,28.41,28.32,28.69,28.36,27.65,27.59,27.56,27.79,28.25,27.44,27.44,27.68,27.28,27.52,28.13,28.65,27.91,27.1,27.46,27.0,26.94,27.6,27.53,26.72,27.72,27.45,27.88,27.7,28.05,28.01,28.08,28.51,28.19,28.37,29.18,29.44,29.53,29.29,29.35,29.87,30.36,29.64,29.56,29.19,28.62,28.75,28.44,28.51,28.18,28.31,27.73,27.69,27.27,27.26,26.65,27.05,27.45,27.88,28.04,27.83,28.64,28.23,29.25,29.16,29.12,29.92,29.8,29.58,29.73,28.46,28.36,28.44,28.64,28.48,28.3,29.15,29.64,29.8,30.18,30.29,29.73,29.12,29.58,29.61,29.88,29.13,29.0,30.12,30.44,30.15,30.19,30.54,30.93,30.48,29.98,30.75,30.24,31.42,31.51,31.96,31.77,32.36,32.09,31.28,30.7,30.36,30.73,30.69,30.86,30.72,30.15,30.03,30.95,30.97,31.82,30.87,30.9,30.5,30.25,30.67,31.2,30.45,31.12,31.07,30.37,29.94,29.62,30.08,29.67,30.95,30.84,30.5,30.39,30.39,32.6,32.69,32.57,32.36,32.88,32.23,32.21,31.87,31.64,31.55,31.59,30.77,30.84,30.72,30.73,31.02,31.26,30.64,30.03,29.8,29.69,29.84,30.39,29.54,29.04,29.12,29.16,29.01,28.86,28.48,28.55,27.93,27.47,27.82,27.66,27.73,28.76,28.8,28.16,27.69,28.55,28.77,28.94,29.13,29.57,29.41,28.39,28.49,28.67,28.98,30.02,29.15,29.06,29.42,29.36,29.61,28.91,29.03,29.51,29.35,28.99,28.59,28.6,29.19,29.29,29.08,29.89,29.41,29.67,29.24,29.27,29.65,30.53,30.61,30.69,31.71,31.96,32.8,31.66,31.72,31.68,31.33,30.8,31.02,30.63,30.51,30.87,31.42,32.44,32.78,32.16,30.98,31.36,31.79,31.82,31.32,31.58,31.87,31.45,30.67,30.54,30.67,30.72,30.7,29.84,30.02,30.22,30.95,31.06,30.05,29.55,29.08,29.02,29.06,28.94,28.63,28.28,27.54,27.24,27.04,27.15,27.09,26.52,26.55,26.63,26.86,27.06,27.04,26.65,26.7,27.12,27.0,27.35,27.9,27.79,28.35,28.14,27.91,27.61,27.88,27.89,27.76,27.58,27.34,27.25,27.88,27.25,27.08,26.81,26.95,26.93,26.4,25.85,26.48,26.78,26.51,26.19,26.09,26.41,26.93,26.92,27.41,27.58,27.85,28.1,28.8,28.92,28.87,28.71,28.62,28.58,27.77,26.66,26.95,27.28,26.98,27.35,27.91,28.04,28.27,27.98,27.78,28.03,27.59,26.95,27.38,27.44,27.6,26.88,26.57,26.42,26.65,26.78,26.86,26.69,26.9,27.21,27.29,26.99,27.09,27.24,27.04,26.93,27.61,27.46,27.47,28.17,28.48,27.95,27.86,27.2,26.85,26.08,25.86,25.34,25.96,26.22,26.56,27.37,27.6,27.17,26.92,27.32,26.94,27.56,27.44,27.36,27.63,27.18,26.85,26.49,27.36,27.14,27.73,27.65,28.13,28.03,28.23,28.38,28.53,28.85,28.85,28.94,29.51,29.68,29.27,29.29,29.15,28.6,28.55,27.89,27.94,27.76,27.35,26.96,27.09,26.8,26.66,26.28,26.26,26.93,26.38,26.57,26.78,26.46,26.5,27.0,27.41,27.39,27.1,27.23,26.72,26.92,26.67,26.34,26.3,26.1,26.76,26.4,26.94,26.51,27.1,26.98,26.74,26.36,26.43,26.32,26.35,25.98,26.02,25.89,26.35,26.32,26.18,27.01,27.04,27.2,27.3,27.35,27.44,27.6,27.06,26.61,26.45,29.29,26.86,26.88,26.61,26.51,26.76,27.13,27.36,27.34,27.77,27.22,27.84,28.95,28.96,28.85,30.14,29.1,29.16,28.86,28.21,28.1,27.96,27.22,27.42,27.13,27.32,27.71,28.06,28.28,28.47,28.69,28.45,28.87,29.27,29.45,29.68,30.71,30.99,31.57,31.31,31.92,30.64,31.3,30.51,30.27,31.22,30.87,31.03,30.74,30.44,29.66,29.17,29.45,29.24,28.8,28.57,28.31,28.07,28.3,28.49,28.96,29.3,29.51,26.92,29.97,29.89,30.04,30.29,29.31,29.49,29.69,30.05,29.77,29.64,29.38,29.24,29.31,29.38,29.27,29.92,29.34,28.3,28.14,28.19,28.4,27.59,27.54,28.06,28.31,28.67,28.76,28.74,27.04,26.81,27.21,27.03,27.22,27.53,27.4,27.46,27.29,27.75,27.62,27.86,27.89,27.63,27.27,27.84,27.6,27.08,27.23,27.27,26.81,26.52,26.17,26.74,26.91,27.29,27.39,27.27,27.93,28.67,28.56,28.25,28.2,28.42,28.46,27.64,28.2,28.21,29.13,28.95,28.13,28.85,28.8,28.77,29.2,28.84,28.24,27.78,28.13,28.61,28.7,28.92,29.48,29.68,29.85,30.09,30.28,30.85,30.91,29.97,30.24,31.16,30.66,29.66,29.34,29.42,29.27,29.59,29.22,29.24,29.52,28.57,28.62,28.67,28.59,29.02,29.32,29.32,29.15,29.71,29.04,28.37,28.4,28.44,28.65,28.75,29.04,28.71,28.9,28.34,28.82,28.62,28.6,28.58,28.49,28.23,28.21,28.52,28.6,28.64,29.31,29.32,29.78,29.63,29.99,30.08,29.63,29.3,29.46,29.28,29.25,28.98,29.08,29.0,29.17,28.77,29.15,29.04,29.7,30.17,29.83,29.68,30.08,30.34,30.73,30.81,30.52,30.36,30.77,30.68,30.21,30.32,30.32,30.11,29.65,29.4,29.77,30.02,29.7,29.15,29.32,29.0,29.13,28.64,28.4,28.83,28.6,29.1,28.65,29.3,29.3,29.39,29.05,29.18,29.01,28.8,29.03,29.04,29.02,29.3,29.39,29.25,29.2,27.68,27.06,26.96,26.99,26.93,27.0,26.66,26.92,27.08,27.12,26.94,27.08,27.16,27.36,27.57,27.39,27.85,27.91,27.26,27.37,27.34,27.27,27.72,27.75,27.95,28.25,28.1,28.72,28.25,28.39,28.44,30.24,30.57,30.23,30.35,30.81,30.8,30.45,31.08,30.89,30.61,29.41,29.76,30.69,31.87,32.84,33.86,34.06,35.14,35.17,34.84,34.68,35.17,35.75,36.26,35.33,36.12,36.18,36.12,38.47,37.27,37.27,36.55,37.69,37.53,37.97,37.32,37.62,37.42,37.35,38.18,38.08,38.27,39.18,40.44,39.77,39.51,39.64,38.02,38.4,38.67,38.57,38.75,36.8,35.72,36.4,36.55,36.74,36.31,36.57,36.25,37.11,36.89,37.13,36.89,36.46,36.93,36.34,36.3,36.99,37.17,36.86,37.28,37.16,37.05,38.05,38.35,38.8,38.44,37.95,38.3,38.13,38.19,38.05,38.2,38.11,38.18,37.09,37.6,37.78,39.01,40.05,40.61,41.21,42.24,43.98,42.38,43.25,43.08,43.27,44.45,44.44,45.58,46.09,45.3,45.63,45.91,45.71,45.97,45.73,44.18,44.0,43.07,45.59,44.19,43.92,42.71,44.34,44.2,44.25,44.72,43.42,42.91,43.67,43.25,43.69,44.21,44.75,44.66,43.22,42.9,42.73,43.72,43.13,42.2,43.18,43.28,44.63,45.66,46.58,44.74,45.06,45.37,45.7,46.42,45.36,46.07,47.66,47.01,48.42,49.17,51.88,49.04,52.99,61.1,62.91,64.02,61.03,63.37,64.95,64.0,66.52,64.77,64.71,65.17,65.54,67.71,68.4,72.92,77.94,71.25,73.64,60.38,58.54,61.04,61.83,57.39,54.17,56.04,56.64,58.91,56.97,55.2,55.29,54.14,55.3,56.62,57.75,58.87,59.02,62.5,62.04,64.3,64.83,58.81,60.38,59.9,59.16,58.46,61.24,60.32,60.82,59.05,57.83,59.79,58.56,54.52,54.53,50.25,52.85,54.51,52.35,51.33,53.74,53.79,54.46,53.2,55.53,54.68,56.99,55.93,56.74,55.96,56.74,57.29,58.27,56.77,56.66,56.63,54.96,54.12,55.32,52.84,52.74,53.17,53.05,54.45,55.52,56.72,55.88,55.64,56.78,58.44,57.74,55.0,54.45,54.19,53.77,53.29,53.71,54.41,53.5,53.2,52.16,52.92,53.65,53.92,53.32,52.11,49.47,49.13,46.41,46.4,47.72,49.35,49.77,49.47,55.33,46.81,47.11,46.18,46.06,44.35,45.39,44.69,50.96,43.55,45.95,53.31,46.03,46.02,44.19,45.25,45.61,45.1,45.78,46.48,44.56,44.92,45.91,46.47,45.63,45.17,46.25,44.94,44.75,45.2,45.58,45.71,46.53,48.47,48.79,49.21,48.28,49.15,49.14,47.97,48.02,48.72,48.4,47.89,49.56,51.5,51.82,50.8,51.31,50.25,52.02,49.86,48.99,47.61,48.63,49.89,50.77,50.72,51.04,51.39,49.88],"au":[50.36,49.76,50.33,49.85,50.18,50.01,49.34,48.98,48.42,48.26,48.78,48.67,49.24,49.24,48.9,49.2,49.04,49.36,49.68,50.05,50.03,50.59,50.48,50.46,50.47,50.79,51.15,50.54,50.65,51.4,51.36,51.34,51.34,50.87,50.83,50.95,50.8,50.85,51.25,51.57,52.21,52.38,53.26,52.91,53.5,53.49,53.65,55.61,54.22,52.78,52.31,53.07,52.96,54.15,53.56,52.43,52.72,52.88,52.47,52.2,52.81,52.95,53.04,53.37,53.12,52.52,52.58,52.27,52.27,52.66,52.96,52.71,52.66,53.13,53.23,52.89,53.03,52.69,52.13,51.85,51.24,51.36,51.84,51.74,51.91,52.36,51.97,52.2,51.61,51.72,52.14,52.4,52.4,51.99,52.04,52.41,52.18,51.85,52.03,52.07,51.81,51.77,51.71,51.48,51.6,52.2,52.2,52.06,52.27,52.84,52.98,51.06,51.34,50.83,51.11,51.35,50.79,50.54,50.52,50.52,49.32,48.9,48.96,48.79,47.53,48.52,48.79,48.81,48.62,49.44,49.44,49.31,48.76,48.64,48.31,48.76,49.09,49.35,49.29,50.67,50.97,50.99,50.27,49.72,48.87,49.25,48.97,48.63,48.88,48.88,48.66,48.8,49.55,49.38,49.11,49.18,49.06,49.3,49.59,49.14,49.72,49.18,49.17,48.16,48.51,48.65,48.74,48.9,48.48,48.35,48.08,47.81,47.28,47.02,47.26,47.87,47.72,47.45,47.02,46.31,46.12,46.23,45.71,45.72,46.04,45.47,46.38,46.37,46.44,46.57,46.68,46.71,47.0,46.91,47.13,47.03,47.02,47.21,47.07,47.36,46.07,46.87,46.81,47.04,46.99,47.04,47.48,47.08,46.79,46.95,46.64,47.31,47.21,47.26,47.6,47.68,47.55,47.22,47.43,47.29,47.23,47.07,47.2,47.99,47.64,47.66,48.25,48.36,48.51,48.68,48.35,48.67,48.71,49.12,49.23,49.28,49.4,49.54,49.32,49.9,49.98,50.0,50.23,50.13,50.19,50.32,49.84,50.13,49.92,49.84,50.21,49.77,49.51,49.3,48.79,47.89,47.97,48.18,47.9,47.89,47.75,48.07,48.06,47.59,48.02,48.29,48.88,49.0,49.06,49.03,49.25,49.64,49.76,49.47,49.47,49.41,49.17,49.37,49.09,49.01,48.94,48.9,49.43,47.44,47.96,48.09,48.53,48.85,48.99,49.14,49.03,48.88,49.44,49.37,48.88,48.98,49.49,49.23,49.33,49.2,48.98,49.39,48.77,48.58,48.8,48.76,48.81,49.03,49.06,47.82,48.11,48.31,48.58,48.47,47.74,48.09,47.9,47.93,48.79,48.76,49.09,49.06,49.03,48.82,48.77,48.95,49.63,49.73,49.0,48.68,48.89,49.25,49.24,49.56,50.04,49.77,49.63,49.68,49.62,49.29,49.93,50.57,50.56,50.89,51.83,52.25,52.64,53.01,52.55,51.53,51.3,51.21,50.93,50.83,50.47,50.38,50.55,50.32,50.71,50.7,50.9,50.63,50.82,50.76,50.57,50.69,51.05,51.79,51.26,51.59,51.43,50.97,51.03,51.12,51.58,51.13,51.18,51.17,51.35,51.39,52.27,52.2,52.1,52.48,52.64,52.23,51.93,51.56,51.19,51.21,51.47,50.56,50.77,51.19,51.31,51.52,51.52,52.87,53.04,52.38,52.88,53.75,53.72,53.89,53.73,54.81,54.78,54.19,54.81,56.39,55.89,56.57,58.52,59.13,58.0,57.99,58.48,58.47,57.0,56.05,57.04,56.03,56.03,56.03,56.32,55.76,56.36,57.44,57.09,57.09,57.09,56.71,55.95,55.98,55.95,55.92,55.92,55.92,55.92,56.86,56.83,56.94,57.29,57.29,57.29,57.71,57.98,58.57,58.06,58.06,58.06,58.06,58.48,58.56,58.1,57.93,57.87,57.87,57.87,56.48,57.22,57.41,57.66,57.66,57.93,56.6,57.05,57.13,56.97,57.45,56.5,55.64,57.1,55.95,55.83,56.32,55.47,55.63,55.99,55.58,55.64,55.29,55.77,55.52,55.55,55.57,55.08,55.51,55.94,55.43,55.47,55.57,55.56,56.03,57.51,55.99,55.43,56.76,56.15,56.0,55.99,56.17,55.56,55.49,55.38,55.6,56.12,55.54,55.83,56.41,55.61,55.9,55.94,56.03,55.74,55.49,55.68,54.71,54.09,53.76,53.9,53.09,54.35,54.31,54.5,54.43,54.87,55.61,55.35,55.65,55.5,55.72,56.26,55.99,56.21,56.37,55.72,55.93,56.94,56.53,56.07,55.66,55.97,56.08,56.27,56.57,56.42,56.45,56.02,55.61,55.5,54.88,54.66,55.41,55.31,55.12,54.45,54.44,54.51,54.59,54.73,53.66,53.87,53.78,53.92,54.53,55.2,54.81,54.2,54.71,54.66,54.73,54.73,55.21,55.7,55.77,56.19,56.17,55.32,55.24,54.45,54.24,53.93,53.64,53.58,53.7,54.25,53.77,53.82,53.37,53.71,53.24,52.89,54.01,53.6,53.78,53.98,54.79,55.21,54.99,55.35,54.88,54.88,54.55,55.02,54.38,54.23,53.97,54.11,53.77,54.45,54.18,54.42,54.71,54.82,54.12,54.29,54.63,54.78,54.37,54.64,54.74,53.75,54.28,54.03,54.85,54.26,54.41,54.22,54.64,54.51,54.51,55.64,55.69,56.15,56.07,56.27,56.0,56.14,56.04,56.25,57.0,57.08,56.53,56.57,57.29,56.81,57.15,57.35,57.44,56.98,56.82,56.91,57.02,56.59,55.13,55.63,56.06,56.0,56.03,56.02,56.11,55.9,55.55,55.09,55.46,55.39,55.53,55.48,55.42,54.95,55.17,55.08,55.08,55.55,55.59,56.08,55.65,55.29,55.16,55.6,56.33,57.45,58.8,58.13,58.09,59.9,59.17,57.82,58.19,59.72,59.07,58.1,58.49,58.04,58.56,58.28,58.34,59.29,59.47,59.15,58.71,58.99,58.75,59.26,58.65,58.42,58.93,58.56,57.9,58.03,58.13,57.95,58.04,58.16,58.74,59.27,59.37,58.76,59.18,59.73,59.72,59.33,59.43,59.54,58.78,58.89,58.33,58.7,58.83,59.06,58.48,58.07,58.35,58.29,58.96,58.92,59.01,58.56,58.94,58.99,58.45,58.31,57.85,57.56,57.53,57.7,57.35,56.98,56.45,56.61,56.61,56.43,56.1,56.08,56.55,56.62,56.66,56.88,56.53,56.38,56.47,56.25,56.33,56.3,56.15,55.88,56.7,56.61,56.69,56.88,56.83,56.9,57.1,57.12,57.15,57.11,57.56,56.9,56.91,56.83,56.9,56.81,56.41,55.76,55.88,56.23,56.03,55.95,55.83,55.86,55.74,55.97,56.41,56.74,57.03,56.88,57.12,57.23,57.44,57.46,57.76,58.05,57.63,57.47,57.6,57.29,57.19,57.62,57.94,58.04,58.01,58.19,58.03,58.2,58.13,57.4,57.15,56.47,56.36,56.07,55.78,55.63,55.65,55.97,56.41,56.36,59.02,58.42,58.49,59.37,59.96,60.16,59.58,59.9,60.32,60.42,60.94,60.18,60.48,59.98,59.54,59.49,59.32,58.59,58.95,58.28,58.33,58.08,58.08,58.98,58.91,58.55,58.68,58.76,59.08,59.71,60.13,60.07,61.27,60.2,60.16,60.42,59.81,59.02,59.03,59.76,59.67,59.46,59.84,59.57,60.19,60.21,60.21,60.6,60.99,60.62,60.52,60.52,60.47,60.39,60.05,60.04,59.59,59.59,59.73,59.51,59.84,60.33,60.28,59.75,59.35,59.94,59.68,59.91,59.88,59.56,59.82,60.21,60.4,60.46,60.68,60.7,60.54,60.66,60.72,60.69,60.64,60.25,60.44,59.79,59.82,59.84,60.25,60.28,60.37,60.13,59.95,60.27,60.3,60.04,60.21,61.02,61.67,62.93,62.81,63.63,63.72,63.97,63.97,63.5,63.75,63.96,63.62,63.8,63.84,71.04,64.34,64.46,64.85,65.16,65.7,67.03,67.51,67.73,67.85,67.96,69.34,69.72,69.39,69.83,72.38,70.9,71.66,72.17,71.82,71.86,71.13,69.31,69.66,69.69,70.27,70.27,69.43,68.94,68.99,69.27,69.04,69.23,69.07,70.83,69.69,69.83,70.23,70.37,70.77,72.13,71.47,71.64,70.09,69.42,69.37,69.24,69.43,69.54,69.12,68.95,69.04,69.71,68.93,68.56,69.01,69.12,68.94,69.64,69.61,69.22,69.69,69.89,70.82,69.9,69.43,69.55,70.1,69.62,69.71,70.08,70.16,70.13,70.19,70.47,70.53,71.0,71.01,71.99,72.58,72.36,71.2,70.94,71.25,71.53,70.22,70.3,70.98,71.04,71.79,72.56,73.15,71.26,71.04,70.63,70.89,71.4,71.81,72.41,72.14,71.77,72.19,72.68,73.19,72.48,72.3,72.1,72.49,72.34,72.16,73.07,73.09,72.62,72.65,72.33,72.93,72.88,72.62,73.1,73.39,73.58,74.38,74.64,74.32,74.47,74.62,75.25,75.79,76.26,76.35,77.28,76.72,75.82,77.08,77.03,77.01,77.51,77.88,77.3,76.71,76.93,77.53,78.2,78.11,78.95,79.81,80.45,81.07,81.28,81.96,81.41,81.02,81.15,81.74,82.65,82.23,81.4,80.86,80.8,81.46,79.73,80.25,80.44,78.44,78.89,78.48,78.17,78.91,80.18,79.9,81.47,83.79,81.77,80.35,80.98,80.7,81.11,80.57,80.74,80.91,80.87,80.18,80.65,81.48,82.47,82.7,81.75,81.4,80.95,81.11,80.97,80.66,81.86,81.74,82.7,83.11,83.66,84.1,83.43,83.98,84.58,84.24,84.28,84.31,84.82,84.74,84.93,84.65,84.55,85.32,85.82,86.5,87.82,87.35,88.62,88.76,88.67,90.38,90.54,89.51,89.95,89.9,88.97,89.32,90.73,90.92,89.87,90.33,90.26,89.23,88.67,88.54,88.31,89.14,87.66,86.37,86.37,85.92,85.98,85.87,87.13,88.89,88.33,88.88,89.37,89.87,90.0,89.74,89.8,90.09,91.09,91.63,92.86,93.19,93.06,89.91,90.28,88.71,88.52,88.7,90.47,91.45,90.57,91.35,93.41,94.03,96.34,96.72,93.86,93.96,93.15,92.77,93.51,92.6,91.47,92.17,93.98,96.0,95.89,95.16,95.11,93.14,94.11,92.24,92.01,92.17,94.14,94.58,93.56,93.76,94.11,94.14,93.38,94.23,93.81,93.67,94.29,94.56,94.83,95.52,94.51,93.94,93.78,93.69,93.66,95.39,94.79,94.41,94.4,94.5,93.97,94.27,92.05,92.19,91.59,90.3,89.94,91.04,91.27,91.23,91.08,90.53,91.09,91.06,91.91,92.73,92.57,92.41,92.34,92.56,92.99,93.05,93.78,92.03,91.36,91.94,92.28,92.71,92.95,92.82,93.27,93.58,93.16,93.05,93.9,92.72,92.71,92.21,92.37,91.87,92.21,91.99,91.73,91.78,92.31,92.6,93.06,93.72,93.86,93.86,95.15,96.18,97.95,97.67,97.64,99.2,99.85,100.28,99.67,100.0,99.56,100.63,99.61,99.58,100.0,101.82,103.06,102.97,102.79,103.27,104.49,104.18,106.64,106.2,105.82,108.71,109.08,111.63,111.85,111.08,113.1,115.21,116.0,116.83,119.23,117.36,117.99,113.01,114.23,112.57,111.65,107.89,111.11,110.43,111.57,111.66,111.68,111.03,111.9,111.6,113.42,115.11,115.96,117.27,115.21,113.22,112.07,114.25,113.25,113.38,115.29,115.59,115.4,115.96,117.53,115.93,115.82,115.71,116.57,116.24,116.09,115.89,117.86,118.4,118.92,117.11,118.55,116.23,118.77,122.04,122.12,122.81,121.93,123.44,126.4,126.21,127.82,127.46,127.53,129.07,129.71,133.56,132.69,134.83,137.94,141.46,148.33,135.39,129.98,134.02,137.31,132.73,132.41,135.87,136.29,136.41,137.01,134.83,135.86,133.74,133.62,136.02,137.49,140.25,141.27,141.22,141.27,141.09,147.65,146.13,143.57,142.58,141.2,141.7,143.04,143.54,144.32,142.54,140.09,139.93,139.02,131.38,129.58,119.3,122.91,126.3,123.32,123.88,126.88,127.72,130.97,128.87,130.62,130.06,131.74,130.45,130.74,129.68,130.39,130.93,131.23,130.65,130.81,130.12,129.01,128.86,128.93,126.74,125.63,127.15,124.62,125.28,128.38,129.38,128.96,127.39,128.71,129.12,129.18,125.74,125.44,125.58,124.54,125.03,125.59,126.24,124.98,123.33,121.4,125.15,124.37,125.05,123.49,123.51,120.48,120.48,115.77,114.06,117.1,120.12,120.32,119.97,137.19,116.63,118.17,116.41,115.05,112.78,114.18,113.76,129.3,112.5,115.45,134.26,116.86,116.32,114.11,115.46,114.36,113.44,113.59,113.06,112.38,113.11,114.48,116.1,115.26,114.6,115.6,113.73,113.74,114.24,113.44,112.95,113.21,115.79,118.93,120.33,120.78,121.97,122.96,122.25,121.26,121.92,122.02,120.98,123.24,125.82,128.07,127.85,127.34,126.49,126.93,123.29,121.5,119.73,122.59,123.72,122.17,121.9,121.44,121.51,120.59]};</script>
+<script>
+/* ============================================================
+   Sensor Technology · Monitor de mercados
+   Câmbio: AwesomeAPI (cotação a cada ~30 s) · Metais: gold-api.com (spot USD/ozt, convertido para EUR/g)
+   Histórico: BCE via Frankfurter (câmbio), xaus.com (ouro), registros diários da Sensor (Pd, Pt)
+   ?lang=en|pt|ja|de · ?embed=1 · teclas 1–6 escolhem o instrumento
+   ============================================================ */
+(() => {
+  const H = Viz.h, q = new URLSearchParams(location.search), EMBED = q.get('embed') === '1';
+  const LANGS = ['en', 'pt', 'ja', 'de'];
+  // idioma: ?lang= (explícito) → escolhido antes nestas páginas → ?alang= (idioma do app que abriu) → navegador
+  let lang = q.get('lang') || '';
+  if (!LANGS.includes(lang)) { try { lang = localStorage.getItem('ops-lang') || ''; } catch (e) {} }
+  if (!LANGS.includes(lang)) lang = q.get('alang') || '';
+  if (!LANGS.includes(lang)) lang = (navigator.language || 'en').slice(0, 2).toLowerCase();
+  if (!LANGS.includes(lang)) lang = 'en';
+  const LOC = { en: 'en-US', pt: 'pt-BR', ja: 'ja-JP', de: 'de-DE' };
+  const T = {
+    en: { title: 'MARKET MONITOR', sub: 'Currencies and precious metals', fx: 'CURRENCIES', met: 'PRECIOUS METALS', unitM: 'EUR per gram', chart: 'CHART', cross: 'PARTNER CURRENCIES · PTAX', conv: 'METALS · UNIT CONVERSION',
+      pd: 'PALLADIUM', pt: 'PLATINUM', au: 'GOLD', bid: 'Bid', ask: 'Ask', hi: 'High', lo: 'Low', day: 'day', ses: 'session', live: 'LIVE', stale: 'DELAYED', off: 'OFFLINE', wait: 'CONNECTING',
+      pair: 'Pair', last: 'Last', chg: 'Chg', time: 'Time', metal: 'Metal', close: 'Close', back: 'Showcase', rLive: 'LIVE',
+      noHist: 'No daily reference for this period: showing the live session.', histSt: 'Daily reference: Sensor Technology records until {d}. Live spot from there on.', histEcb: 'Daily reference rates from the ECB. Live quote at the end.', histAu: 'Daily closes. Live spot at the end.', sesOnly: 'Quotes collected by this screen since it was opened.',
+      src: 'Indicative mid-market quotes. Not for trading or settlement.', srcFx: 'FX: AwesomeAPI', srcM: 'Metals: gold-api.com', srcH: 'History: ECB via Frankfurter, xaus.com',
+      sesNote: 'Metals: change against the previous day once this screen has seen it; until then, against the start of the session.', ptax: 'PTAX = official Banco Central do Brasil rate', eurg: 'EUR/g' },
+    pt: { title: 'MONITOR DE MERCADOS', sub: 'Moedas e metais preciosos', fx: 'MOEDAS', met: 'METAIS PRECIOSOS', unitM: 'EUR por grama', chart: 'GRÁFICO', cross: 'MOEDAS DOS PARCEIROS · PTAX', conv: 'METAIS · CONVERSÃO DE UNIDADES',
+      pd: 'PALÁDIO', pt: 'PLATINA', au: 'OURO', bid: 'Compra', ask: 'Venda', hi: 'Máx', lo: 'Mín', day: 'dia', ses: 'sessão', live: 'AO VIVO', stale: 'ATRASADO', off: 'SEM CONEXÃO', wait: 'CONECTANDO',
+      pair: 'Par', last: 'Último', chg: 'Var', time: 'Hora', metal: 'Metal', close: 'Fechar', back: 'Showcase', rLive: 'AO VIVO',
+      noHist: 'Sem referência diária neste período: mostrando a sessão ao vivo.', histSt: 'Referência diária: registros da Sensor Technology até {d}. Daí em diante, spot ao vivo.', histEcb: 'Taxas diárias de referência do BCE. Cotação ao vivo no fim.', histAu: 'Fechamentos diários. Spot ao vivo no fim.', sesOnly: 'Cotações coletadas por esta tela desde que foi aberta.',
+      src: 'Cotações indicativas de mercado. Não servem para negociação nem liquidação.', srcFx: 'Câmbio: AwesomeAPI', srcM: 'Metais: gold-api.com', srcH: 'Histórico: BCE via Frankfurter, xaus.com',
+      sesNote: 'Metais: variação contra o dia anterior depois que esta tela o registrou; até lá, contra o início da sessão.', ptax: 'PTAX = taxa oficial do Banco Central do Brasil', eurg: 'EUR/g' },
+    ja: { title: 'マーケットモニター', sub: '為替と貴金属', fx: '為替', met: '貴金属', unitM: 'ユーロ/グラム', chart: 'チャート', cross: 'パートナー通貨 · PTAX', conv: '貴金属 · 単位換算',
+      pd: 'パラジウム', pt: 'プラチナ', au: '金', bid: '買値', ask: '売値', hi: '高値', lo: '安値', day: '前日比', ses: 'セッション', live: 'ライブ', stale: '遅延', off: 'オフライン', wait: '接続中',
+      pair: '通貨ペア', last: '現在値', chg: '変化', time: '時刻', metal: '金属', close: '閉じる', back: 'ショーケース', rLive: 'ライブ',
+      noHist: 'この期間の日次データがないため、ライブセッションを表示しています。', histSt: '日次データ：センサー・テクノロジー社の記録（{d}まで）。以降はライブのスポット価格。', histEcb: '欧州中央銀行の日次参考レート。末尾はライブ値。', histAu: '日次終値。末尾はライブのスポット価格。', sesOnly: 'この画面を開いてから取得した値です。',
+      src: '参考用の仲値です。取引や決済には使用できません。', srcFx: '為替：AwesomeAPI', srcM: '貴金属：gold-api.com', srcH: '履歴：ECB（Frankfurter）、xaus.com',
+      sesNote: '貴金属：この画面が前日の値を記録した後は前日比、それまではセッション開始時との比較。', ptax: 'PTAX＝ブラジル中央銀行の公式レート', eurg: 'EUR/g' },
+    de: { title: 'MARKTMONITOR', sub: 'Währungen und Edelmetalle', fx: 'WÄHRUNGEN', met: 'EDELMETALLE', unitM: 'EUR je Gramm', chart: 'CHART', cross: 'PARTNERWÄHRUNGEN · PTAX', conv: 'METALLE · EINHEITEN',
+      pd: 'PALLADIUM', pt: 'PLATIN', au: 'GOLD', bid: 'Geld', ask: 'Brief', hi: 'Hoch', lo: 'Tief', day: 'Tag', ses: 'Sitzung', live: 'LIVE', stale: 'VERZÖGERT', off: 'OFFLINE', wait: 'VERBINDE',
+      pair: 'Paar', last: 'Letzter', chg: 'Änd.', time: 'Zeit', metal: 'Metall', close: 'Schließen', back: 'Showcase', rLive: 'LIVE',
+      noHist: 'Keine Tagesreferenz für diesen Zeitraum: Anzeige der Live-Sitzung.', histSt: 'Tagesreferenz: Aufzeichnungen der Sensor Technology bis {d}. Danach Live-Spot.', histEcb: 'Tägliche Referenzkurse der EZB. Am Ende der Live-Kurs.', histAu: 'Tagesschlusskurse. Am Ende der Live-Spot.', sesOnly: 'Kurse, die dieser Bildschirm seit dem Öffnen erfasst hat.',
+      src: 'Indikative Mittelkurse. Nicht für Handel oder Abrechnung.', srcFx: 'Devisen: AwesomeAPI', srcM: 'Metalle: gold-api.com', srcH: 'Historie: EZB via Frankfurter, xaus.com',
+      sesNote: 'Metalle: Änderung gegenüber dem Vortag, sobald dieser Bildschirm ihn erfasst hat; bis dahin gegenüber dem Sitzungsbeginn.', ptax: 'PTAX = offizieller Kurs der brasilianischen Zentralbank', eurg: 'EUR/g' },
+  };
+  let L = T[lang];
+  const OZ = 31.1034768;
+  const MAIN = [
+    { id: 'USDBRL', nm: 'USD/BRL', kind: 'fx', dec: 4 }, { id: 'EURBRL', nm: 'EUR/BRL', kind: 'fx', dec: 4 }, { id: 'EURUSD', nm: 'EUR/USD', kind: 'fx', dec: 4 },
+    { id: 'XPD', nm: 'pd', kind: 'metal', dec: 2, sym: 'Pd' }, { id: 'XPT', nm: 'pt', kind: 'metal', dec: 2, sym: 'Pt' }, { id: 'XAU', nm: 'au', kind: 'metal', dec: 2, sym: 'Au' },
+  ];
+  const CROSS = [
+    { id: 'USDJPY', nm: 'USD/JPY', dec: 2 }, { id: 'EURJPY', nm: 'EUR/JPY', dec: 2 }, { id: 'EURCHF', nm: 'EUR/CHF', dec: 4 }, { id: 'CHFBRL', nm: 'CHF/BRL', dec: 4 }, { id: 'JPYBRL', nm: '100 JPY/BRL', dec: 4, mult: 100 },
+    { id: 'USDBRLPTAX', nm: 'PTAX USD/BRL', dec: 4 }, { id: 'EURBRLPTAX', nm: 'PTAX EUR/BRL', dec: 4 },
+  ];
+  const API = {
+    fx: 'https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,EUR-USD,USD-JPY,EUR-JPY,EUR-CHF,CHF-BRL,JPY-BRL',
+    ptax: 'https://economia.awesomeapi.com.br/json/last/USD-BRLPTAX,EUR-BRLPTAX',
+    metal: (s) => 'https://api.gold-api.com/price/' + s,
+    ecbLatest: 'https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,BRL',
+    ecbHist: (from) => `https://api.frankfurter.dev/v1/${from}..?base=EUR&symbols=USD,BRL`,
+    goldSpot: 'https://xaus.com/api/v1/spot', goldHist: 'https://xaus.com/api/v1/history',
+  };
+  const POLL = 30000;
+  const nf = (d) => new Intl.NumberFormat(LOC[lang], { minimumFractionDigits: d, maximumFractionDigits: d });
+  const F = (v, d) => (v == null || !isFinite(v) ? '–' : nf(d).format(v));
+  const fill = (s, v) => String(s).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? v[k] : m));
+  const dayKey = (t) => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  const S = {}, SER = {}; MAIN.forEach((m) => { SER[m.id] = []; });
+  let store = { day: dayKey(Date.now()), ser: {}, prev: {} };
+  try { const raw = JSON.parse(localStorage.getItem('st-monitor-1') || 'null'); if (raw && raw.day) store = raw; } catch (e) {}
+  (function rollover() {
+    const today = dayKey(Date.now());
+    if (store.day !== today) { store.prev = store.prev || {}; Object.keys(store.ser || {}).forEach((id) => { const a = store.ser[id]; if (a && a.length) store.prev[id] = { d: store.day, v: a[a.length - 1][1] }; }); store.ser = {}; store.day = today; }
+    MAIN.forEach((m) => { if (store.ser && store.ser[m.id]) SER[m.id] = store.ser[m.id].slice(); });
+  })();
+  let lastSave = 0;
+  function persist() { const now = Date.now(); if (now - lastSave < 55000) return; lastSave = now; store.ser = {}; MAIN.forEach((m) => { const a = SER[m.id]; store.ser[m.id] = a.length > 1500 ? a.filter((p, i) => i % 2 === 0 || i === a.length - 1) : a; }); try { localStorage.setItem('st-monitor-1', JSON.stringify(store)); } catch (e) {} }
+  async function getJSON(url, ms) { const c = new AbortController(), t = setTimeout(() => c.abort(), ms || 9000); try { const r = await fetch(url, { cache: 'no-store', signal: c.signal }); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.json(); } finally { clearTimeout(t); } }
+
+  /* ---------------- estrutura ---------------- */
+  const root = document.getElementById('mon');
+  const bar = H('header', 'bar', root);
+  const logo = H('img', '', bar); logo.src = 'logo.png'; logo.alt = 'Sensor Technology';
+  const ttl = H('span', 'ttl', bar), sub = H('span', 'sub', bar); H('span', 'sp', bar);
+  const clocks = H('div', 'clocks', bar);
+  const CITY = [['SAO', 'America/Sao_Paulo'], ['NYC', 'America/New_York'], ['LON', 'Europe/London'], ['ZRH', 'Europe/Zurich'], ['TYO', 'Asia/Tokyo']];
+  const clockEl = CITY.map(([c]) => { const s = H('span', '', clocks, c); return H('b', '', s, '--:--'); });
+  const live = H('span', 'live stale', bar); H('i', '', live); const liveT = H('span', '', live);
+  const langs = H('div', 'langs', bar); const LBL = { en: 'EN', pt: 'PT', ja: '日本語', de: 'DE' };
+  LANGS.forEach((l) => { const b = H('button', '', langs, LBL[l]); b.type = 'button'; b.dataset.l = l; b.addEventListener('click', () => setLang(l)); });
+  const xb = H(EMBED ? 'button' : 'a', 'x', bar);
+  const XI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>', BI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M10 6l-6 6 6 6"/></svg>';
+  if (EMBED) { xb.type = 'button'; xb.addEventListener('click', () => { try { parent.postMessage({ type: 'ops-close' }, location.origin); } catch (e) {} }); } else xb.href = './';
+  const tape = H('div', 'tape', root), tapeRun = H('div', 'tape-run', tape);
+  const grid = H('main', 'grid', root), colL = H('div', 'col l', grid), colR = H('div', 'col r', grid);
+  const pane = (parent, key) => { const p = H('section', 'pane', parent); const h2 = H('h2', '', p); H('kbd', '', h2, key); const t = H('span', '', h2); const sm = H('small', '', h2); return { p, t, sm }; };
+  const pFx = pane(colL, 'FX'), pMt = pane(colL, 'PM'), pCh = pane(colR, 'GP'); const row2 = H('div', 'row2', colR); const pCr = pane(row2, 'XR'), pCv = pane(row2, 'CV');
+  const bigFx = H('div', 'big', pFx.p), bigMt = H('div', 'big', pMt.p);
+  const rows = {};
+  MAIN.forEach((m, i) => {
+    const b = H('button', 'q', m.kind === 'fx' ? bigFx : bigMt); b.type = 'button'; b.addEventListener('click', () => select(m.id));
+    const nm = H('span', 'nm', b); H('kbd', '', nm, String(i + 1)); const nmT = H('span', '', nm);
+    const px = H('span', 'px', b, '–'); const ch = H('span', 'ch', b); const chB = H('b', 'fl', ch, '–'); const chS = H('small', '', ch);
+    const meta = H('span', 'meta', b);
+    rows[m.id] = { b, nmT, px, chB, chS, meta };
+  });
+  // gráfico
+  const chart = H('div', 'chart', pCh.p), chHead = H('div', 'chart-head', chart);
+  const chNm = H('span', 'nm', chHead), chPx = H('span', 'px', chHead), chUnit = H('span', 'unit', chHead); H('span', 'sp', chHead);
+  const ranges = H('div', 'ranges', chHead); const RANGES = [['live', 0], ['1M', 31], ['3M', 92], ['1Y', 366], ['5Y', 1827]];
+  RANGES.forEach(([r]) => { const b = H('button', '', ranges, r); b.type = 'button'; b.dataset.r = r; b.addEventListener('click', () => { range = r; drawChart(); }); });
+  const chViz = H('div', '', chart), chNote = H('div', 'chart-note', chart);
+  // tabelas
+  const mkTable = (parent, n) => { const wrap = H('div', 'scroll', parent); const tb = H('table', 'tb', wrap); const hr = H('tr', '', H('thead', '', tb)); const ths = []; for (let i = 0; i < n; i++) ths.push(H('th', '', hr)); return { ths, body: H('tbody', '', tb) }; };
+  const tCr = mkTable(pCr.p, 4), tCv = mkTable(pCv.p, 5);
+  const crRows = {}; CROSS.forEach((c) => { const tr = H('tr', '', tCr.body); crRows[c.id] = [H('td', '', tr, c.nm), H('td', '', tr, '–'), H('td', '', tr, '–'), H('td', '', tr, '–')]; });
+  const cvRows = {}; MAIN.filter((m) => m.kind === 'metal').forEach((m) => { const tr = H('tr', '', tCv.body); cvRows[m.id] = [H('td', '', tr), H('td', '', tr, '–'), H('td', '', tr, '–'), H('td', '', tr, '–'), H('td', '', tr, '–')]; });
+  const foot = H('footer', 'foot', root); const fSrc = H('span', '', foot), fFx = H('span', '', foot), fM = H('span', '', foot), fH = H('span', '', foot), fP = H('span', '', foot);
+
+  let sel = 'USDBRL', range = '1Y';
+  try { const s0 = localStorage.getItem('st-monitor-sel'); if (s0 && SER[s0]) sel = s0; } catch (e) {}
+  const instr = (id) => MAIN.find((m) => m.id === id);
+  const label = (m) => (m.kind === 'metal' ? L[m.nm] : m.nm);
+
+  function texts() {
+    L = T[lang]; Viz.setLocale(LOC[lang]); document.documentElement.lang = lang === 'pt' ? 'pt-BR' : lang; document.title = 'Sensor Technology · ' + L.title;
+    ttl.textContent = L.title; sub.textContent = L.sub; pFx.t.textContent = L.fx; pMt.t.textContent = L.met; pMt.sm.textContent = L.unitM; pCh.t.textContent = L.chart; pCr.t.textContent = L.cross; pCv.t.textContent = L.conv; pMt.p.title = L.sesNote;
+    xb.innerHTML = EMBED ? XI : BI; H('span', '', xb, EMBED ? L.close : L.back);
+    Array.from(langs.children).forEach((b) => b.classList.toggle('on', b.dataset.l === lang));
+    [L.pair, L.last, L.chg + ' %', L.time].forEach((t, i) => { tCr.ths[i].textContent = t; });
+    [L.metal, 'EUR/g', 'BRL/g', 'USD/ozt', 'EUR/kg'].forEach((t, i) => { tCv.ths[i].textContent = t; });
+    Array.from(ranges.children).forEach((b) => { if (b.dataset.r === 'live') b.textContent = L.rLive; });
+    fSrc.textContent = L.src; fFx.textContent = L.srcFx; fM.textContent = L.srcM; fH.textContent = L.srcH; fP.textContent = L.ptax;
+    MAIN.forEach((m) => { rows[m.id].nmT.textContent = label(m); if (cvRows[m.id]) cvRows[m.id][0].textContent = label(m); });
+    renderAll(true); drawChart(); status();
+  }
+  function setLang(l) { if (l === lang) return; lang = l; try { localStorage.setItem('ops-lang', l); } catch (e) {} texts(); }
+
+  /* ---------------- apresentação dos valores ---------------- */
+  const sign = (p) => (p > 0.0005 ? 'up' : p < -0.0005 ? 'dn' : 'fl');
+  const arrow = (p) => (p > 0.0005 ? '▲' : p < -0.0005 ? '▼' : '■');
+  const pctTxt = (p) => (p == null || !isFinite(p) ? '–' : arrow(p) + ' ' + (p > 0 ? '+' : p < 0 ? '−' : '') + F(Math.abs(p), 2) + '%');
+  const hm = (t) => (t ? new Intl.DateTimeFormat(LOC[lang], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(new Date(t)) : '–');
+  function renderRow(m, quiet) {
+    const s = S[m.id], r = rows[m.id]; if (!s) return;
+    const txt = F(s.v, m.dec);
+    if (r.px.textContent !== txt) { const dir = s.last != null && s.v !== s.last ? (s.v > s.last ? 'fu' : 'fd') : ''; r.px.textContent = txt; if (dir && !quiet) { r.px.classList.remove('fu', 'fd'); void r.px.offsetWidth; r.px.classList.add(dir); setTimeout(() => r.px.classList.remove('fu', 'fd'), 90); } }
+    r.chB.textContent = pctTxt(s.pct); r.chB.className = s.pct == null ? 'fl' : sign(s.pct); r.chS.textContent = s.pct == null ? '' : (s.pk === 'ses' ? L.ses : L.day);
+    r.meta.textContent = '';
+    const add = (k, v) => { if (k) r.meta.appendChild(document.createTextNode(k + ' ')); H('b', '', r.meta, v); };
+    if (m.kind === 'fx') { if (s.bid != null) add(L.bid, F(s.bid, m.dec)); if (s.ask != null) add(L.ask, F(s.ask, m.dec)); if (s.hi != null) add(L.hi, F(s.hi, m.dec)); if (s.lo != null) add(L.lo, F(s.lo, m.dec)); if (s.note) add('', s.note); }
+    else { add('', m.sym + ' · ' + L.eurg); add('USD/ozt', F(s.usd, 2)); if (s.hi != null) add(L.hi, F(s.hi, 2)); if (s.lo != null) add(L.lo, F(s.lo, 2)); }
+  }
+  function renderTape() {
+    const items = MAIN.concat(CROSS).filter((m) => S[m.id]);
+    const sig = items.map((m) => m.id).join(',') + lang;
+    if (tapeRun.dataset.sig !== sig) { tapeRun.dataset.sig = sig; tapeRun.textContent = ''; tapeRun._c = [];
+      for (let k = 0; k < 2; k++) items.forEach((m) => { const it = H('span', 'tape-i', tapeRun); H('span', '', it, m.kind === 'metal' ? L[m.nm] + ' ' + L.eurg : m.nm); const b = H('b', '', it); const c = H('span', '', it); tapeRun._c.push([m, b, c]); });
+      tapeRun.style.animationDuration = Math.max(40, items.length * 7) + 's'; }
+    (tapeRun._c || []).forEach(([m, b, c]) => { const s = S[m.id]; b.textContent = F(s.v * (m.mult || 1), m.dec); c.textContent = pctTxt(s.pct); c.className = s.pct == null ? 'fl' : sign(s.pct); });
+  }
+  function renderTables() {
+    CROSS.forEach((c) => { const s = S[c.id], r = crRows[c.id]; if (!s) return; r[1].textContent = F(s.v * (c.mult || 1), c.dec); r[2].textContent = pctTxt(s.pct); r[2].className = s.pct == null ? 'fl' : sign(s.pct); r[3].textContent = hm(s.ts); });
+    const eu = S.EURUSD && S.EURUSD.v, eb = S.EURBRL && S.EURBRL.v;
+    MAIN.filter((m) => m.kind === 'metal').forEach((m) => { const s = S[m.id], r = cvRows[m.id]; if (!s) return;
+      r[1].textContent = F(s.v, 2); r[2].textContent = eb ? F(s.v * eb, 2) : '–'; r[3].textContent = F(s.usd, 2); r[4].textContent = F(s.v * 1000, 0); });
+  }
+  function renderAll(quiet) { MAIN.forEach((m) => renderRow(m, quiet)); renderTape(); renderTables(); Object.keys(rows).forEach((id) => rows[id].b.classList.toggle('sel', id === sel)); headChart(); }
+  function headChart() { const m = instr(sel), s = S[sel]; chNm.textContent = label(m); chPx.textContent = s ? F(s.v, m.dec) : '–'; chUnit.textContent = m.kind === 'metal' ? L.unitM : ''; Array.from(ranges.children).forEach((b) => b.classList.toggle('on', b.dataset.r === range)); }
+
+  /* ---------------- relógios e estado ---------------- */
+  let lastOk = 0, tried = false;
+  function status() { const age = Date.now() - lastOk; const st = !lastOk ? (tried ? 'off' : 'stale') : age < 100000 ? '' : age < 300000 ? 'stale' : 'off';
+    live.className = 'live' + (st ? ' ' + st : ''); liveT.textContent = (!lastOk ? (tried ? L.off : L.wait) : st === '' ? L.live : st === 'stale' ? L.stale : L.off) + (lastOk ? ' ' + hm(lastOk) : ''); }
+  function tickClock() { const now = new Date(); CITY.forEach(([c, tz], i) => { try { clockEl[i].textContent = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: tz }).format(now); } catch (e) {} }); status(); }
+
+  /* ---------------- coleta ---------------- */
+  function put(id, o) { const prev = S[id]; S[id] = Object.assign({ last: prev ? prev.v : null }, o); }
+  function addPoint(id, v) { const a = SER[id]; const now = Date.now(); if (a.length && now - a[a.length - 1][0] < 20000) a[a.length - 1] = [now, v]; else a.push([now, v]); }
+  async function pullFx() {
+    try {
+      const j = await getJSON(API.fx);
+      Object.keys(j).forEach((k) => { const x = j[k], bid = +x.bid, ask = +x.ask; if (!isFinite(bid)) return;
+        put(k, { v: bid, bid, ask: isFinite(ask) ? ask : null, hi: +x.high || null, lo: +x.low || null, pct: isFinite(+x.pctChange) ? +x.pctChange : null, pk: 'day', ts: (+x.timestamp || 0) * 1000 }); });
+      return true;
+    } catch (e) {
+      try { const j = await getJSON(API.ecbLatest); const u = j.rates.USD, b = j.rates.BRL, ts = Date.parse(j.date + 'T15:00:00Z');
+        put('EURUSD', { v: u, pct: null, ts, note: 'ECB ' + j.date }); put('EURBRL', { v: b, pct: null, ts, note: 'ECB ' + j.date }); put('USDBRL', { v: b / u, pct: null, ts, note: 'ECB ' + j.date }); return true; } catch (e2) { return false; }
+    }
+  }
+  let lastPtax = 0;
+  async function pullPtax() { if (Date.now() - lastPtax < 600000) return; try { const j = await getJSON(API.ptax); lastPtax = Date.now(); Object.keys(j).forEach((k) => { const x = j[k], bid = +x.bid; if (isFinite(bid)) put(k, { v: bid, pct: isFinite(+x.pctChange) ? +x.pctChange : null, pk: 'day', ts: (+x.timestamp || 0) * 1000 }); }); } catch (e) {} }
+  let goldPrev = null; // fechamento anterior do ouro em EUR/g (do histórico)
+  function metalPct(id, v) {
+    const p = store.prev && store.prev[id];
+    if (p && p.v > 0 && (Date.now() - Date.parse(p.d + 'T12:00:00')) < 5.5 * 864e5) return { pct: (v / p.v - 1) * 100, pk: 'day' };
+    if (id === 'XAU' && goldPrev) return { pct: (v / goldPrev - 1) * 100, pk: 'day' };
+    const a = SER[id]; if (a.length) return { pct: (v / a[0][1] - 1) * 100, pk: 'ses' };
+    return { pct: 0, pk: 'ses' };
+  }
+  async function pullMetals() {
+    const eu = S.EURUSD && S.EURUSD.v; let ok = false;
+    await Promise.all(MAIN.filter((m) => m.kind === 'metal').map(async (m) => {
+      let usd = null, ts = Date.now();
+      try { const j = await getJSON(API.metal(m.id)); usd = +j.price; if (j.updatedAt) ts = Date.parse(j.updatedAt) || ts; } catch (e) {
+        if (m.id === 'XAU') { try { const j = await getJSON(API.goldSpot); usd = +j.spot_usd_oz; } catch (e2) {} } }
+      if (!isFinite(usd) || !usd || !eu) return;
+      const v = usd / eu / OZ, a = SER[m.id], vals = a.map((p) => p[1]).concat([v]);
+      const pc = metalPct(m.id, v);
+      put(m.id, { v, usd, pct: pc.pct, pk: pc.pk, ts, hi: Math.max.apply(null, vals), lo: Math.min.apply(null, vals) }); ok = true;
+    }));
+    return ok;
+  }
+  let busy = false;
+  async function tick() {
+    if (busy || document.hidden) return; busy = true;
+    try {
+      const okFx = await pullFx(); await pullPtax(); const okM = await pullMetals(); tried = true;
+      if (okFx || okM) { lastOk = Date.now(); MAIN.forEach((m) => { if (S[m.id]) addPoint(m.id, S[m.id].v); }); persist(); }
+      renderAll(false); if (range === 'live' || !chartDrawnAt || Date.now() - chartDrawnAt > 120000) drawChart(); else headChart(); status();
+    } finally { busy = false; }
+  }
+
+  /* ---------------- histórico e gráfico ---------------- */
+  const HIST = {}; let fxHist = null, fxHistP = null, goldHistP = null;
+  const day0 = Date.parse(METALS_HIST.base + 'T12:00:00Z');
+  HIST.XPD = METALS_HIST.d.map((d, i) => [day0 + d * 864e5, METALS_HIST.pd[i]]); HIST.XPT = METALS_HIST.d.map((d, i) => [day0 + d * 864e5, METALS_HIST.pt[i]]);
+  const stRecUntil = HIST.XPD[HIST.XPD.length - 1][0];
+  function loadFxHist() {
+    if (!fxHistP) { const from = new Date(Date.now() - 1830 * 864e5).toISOString().slice(0, 10);
+      fxHistP = getJSON(API.ecbHist(from), 15000).then((j) => { fxHist = {}; const E = [], B = [], U = [];
+        Object.keys(j.rates).sort().forEach((d) => { const r = j.rates[d], t = Date.parse(d + 'T12:00:00Z'); if (!r.USD || !r.BRL) return; fxHist[d] = r.USD; E.push([t, r.USD]); B.push([t, r.BRL]); U.push([t, r.BRL / r.USD]); });
+        HIST.EURUSD = E; HIST.EURBRL = B; HIST.USDBRL = U; return true; }).catch(() => { fxHistP = null; return false; }); }
+    return fxHistP;
+  }
+  function loadGoldHist() {
+    if (!goldHistP) goldHistP = Promise.all([getJSON(API.goldHist, 15000), loadFxHist()]).then(([j]) => {
+      if (!fxHist) throw new Error('fx'); const out = []; let lastFx = null;
+      j.points.forEach((p) => { const fx = fxHist[p.d] || lastFx; if (!fx) return; lastFx = fx; out.push([Date.parse(p.d + 'T12:00:00Z'), p.c / fx / OZ]); });
+      HIST.XAU = out; const today = new Date().toISOString().slice(0, 10); const before = out.filter((p) => new Date(p[0]).toISOString().slice(0, 10) < today); if (before.length) goldPrev = before[before.length - 1][1]; return true;
+    }).catch(() => { goldHistP = null; HIST.XAU = METALS_HIST.d.map((d, i) => [day0 + d * 864e5, METALS_HIST.au[i]]); return false; });
+    return goldHistP;
+  }
+  let chartObj = null, chartOpt = null, chartDrawnAt = 0, drawSeq = 0;
+  async function drawChart() {
+    const seq = ++drawSeq; const m = instr(sel); headChart();
+    let pts = [], note = '', gap = 0;
+    const days = (RANGES.find((r) => r[0] === range) || [0, 0])[1];
+    if (range !== 'live') {
+      if (m.kind === 'fx') await loadFxHist(); else if (m.id === 'XAU') await loadGoldHist();
+      if (seq !== drawSeq) return;
+      const from = Date.now() - days * 864e5; const h = (HIST[m.id] || []).filter((p) => p[0] >= from);
+      if (h.length >= 2) { pts = h.slice(); const s = S[m.id]; if (s) pts.push([Date.now(), s.v]);
+        if (m.kind === 'fx') note = L.histEcb; else if (m.id === 'XAU' && goldHistP) note = L.histAu; else { note = fill(L.histSt, { d: new Intl.DateTimeFormat(LOC[lang], { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(stRecUntil)) }); gap = 12 * 864e5; }
+      } else note = L.noHist;
+    }
+    if (!pts.length) { pts = SER[m.id].slice(); if (range === 'live') note = L.sesOnly; }
+    const span = pts.length ? pts[pts.length - 1][0] - pts[0][0] : 0;
+    const dfD = new Intl.DateTimeFormat(LOC[lang], { day: 'numeric', month: 'short', year: 'numeric' }), dfT = new Intl.DateTimeFormat(LOC[lang], { hour: '2-digit', minute: '2-digit', hour12: false }), dfM = new Intl.DateTimeFormat(LOC[lang], { month: 'short' }), dfY = new Intl.DateTimeFormat(LOC[lang], { month: 'short', year: '2-digit' });
+    const intraday = span < 2.5 * 864e5; const ticks = [];
+    if (pts.length > 1) {
+      if (intraday) { const stepH = span > 8 * 36e5 ? 2 : span > 3 * 36e5 ? 1 : 0.5; const st = new Date(pts[0][0]); st.setMinutes(0, 0, 0); for (let t = st.getTime(); t <= pts[pts.length - 1][0]; t += stepH * 36e5) if (t >= pts[0][0]) ticks.push(t); }
+      else { const d = new Date(pts[0][0]); d.setDate(1); d.setHours(12, 0, 0, 0); const stepM = span > 900 * 864e5 ? 12 : span > 200 * 864e5 ? 2 : 1; if (stepM === 12) d.setMonth(0);
+        for (let k = 0; k < 80; k++) { const t = d.getTime(); if (t > pts[pts.length - 1][0]) break; if (t >= pts[0][0]) ticks.push(t); d.setMonth(d.getMonth() + stepM); } }
+    }
+    chartOpt = Object.assign(chartOpt || {}, { series: [{ name: label(m), color: '#FFA028', pts }], gapAfter: gap, xTicks: ticks, yPad: 0.14,
+      fmtX: (t) => (intraday ? dfT.format(new Date(t)) : dfD.format(new Date(t))), fmtTick: (t) => (intraday ? dfT.format(new Date(t)) : span > 900 * 864e5 ? String(new Date(t).getFullYear()) : span > 200 * 864e5 ? dfY.format(new Date(t)) : dfM.format(new Date(t))),
+      fmtV: (v) => F(v, m.dec), caption: label(m) });
+    chNote.textContent = note;
+    if (!chartObj) chartObj = Viz.lines(chViz, chartOpt); else chartObj.replay();
+    chartDrawnAt = Date.now();
+  }
+  function select(id) { if (!SER[id]) return; sel = id; try { localStorage.setItem('st-monitor-sel', id); } catch (e) {} Object.keys(rows).forEach((k) => rows[k].b.classList.toggle('sel', k === sel)); drawChart(); }
+  document.addEventListener('keydown', (e) => { if (e.altKey || e.ctrlKey || e.metaKey) return; const n = parseInt(e.key, 10); if (n >= 1 && n <= MAIN.length) select(MAIN[n - 1].id); else if (e.key === 'Escape' && EMBED) { try { parent.postMessage({ type: 'ops-close' }, location.origin); } catch (err) {} } });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
+
+  texts(); tickClock(); setInterval(tickClock, 1000);
+  tick(); setInterval(tick, POLL);
+  loadGoldHist().then(() => { if (S.XAU) { const pc = metalPct('XAU', S.XAU.v); S.XAU.pct = pc.pct; S.XAU.pk = pc.pk; renderAll(true); } });
+  window.ST_MONITOR = { S, SER, tick, select, setRange: (r) => { range = r; return drawChart(); } };
+})();
+
+</script>
+</body>
+</html>

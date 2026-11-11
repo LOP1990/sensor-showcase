@@ -157,3 +157,42 @@ Linha do tempo narrada marco a marco (10/11, 16h40)
   fica desligado. Para mudar um texto: edite o trecho no JSON e gere de novo
   (STEPS=history1,history2 python3 tts-en/make_tour_audio.py en ja de pt).
 
+
+Planejamento e controle, área de parceiros e monitor de mercados (10/11, noite)
+  Três páginas novas, na mesma pasta do app, abertas pelo trilho (Planejamento · Câmbio e metais). No quiosque
+  elas abrem POR CIMA do app, em um quadro (o app continua carregado; fecha pelo botão Fechar ou Esc); no
+  celular abrem como página, com o botão Showcase para voltar. Para esconder uma entrada do trilho sem
+  recompilar: config.json → "hidden": ["team", "x:planning", "x:monitor"] (mantenha os itens que já estavam).
+
+  planning.html — apresentação "Planejamento e controle" (15 slides, EN · PT · 日本語 · DE)
+    Navegação: setas da tela ou do teclado, deslizar com o dedo, traços do rodapé; planning.html#8 abre no
+    slide 8; ?lang=ja força o idioma (o idioma escolhido na página fica lembrado no aparelho).
+    Os gráficos usam indicadores calculados dos relatórios do Power BI (posição de novembro/2026): prazo de
+    produção por semana, demanda mensal desde 2011 em índice, curva ABC das famílias, plano vinculado × saldo
+    livre, rendimento por carretel em índice (média de 12 meses = 100), pontualidade por ano, plano de
+    carreira, PSI 2025, avaliação de fornecedores, customizações e rastreio dos embarques.
+    NÃO entram na página: nomes de clientes, fornecedores ou pessoas, preços, custos, margens, salários,
+    volumes por país, percentuais absolutos de rendimento por classe, parâmetros de processo.
+
+  partners.html — área de parceiros (EN · PT · 日本語 · DE)
+    O conteúdo (mapa dos controles, cadeia de rastreabilidade, regras de demanda e estoque, rendimento,
+    desempenho, fornecedores, pessoas, expedição) vai CIFRADO dentro da página: AES-256-GCM, chave derivada
+    do código de acesso por PBKDF2-SHA256 (250 mil iterações). Sem o código, o que está publicado é ilegível.
+    O código NÃO está no repositório nem em nenhum arquivo do site. Formato: ST-XXXX-XXXX-XXXX.
+    Link direto para enviar a um parceiro: .../partners.html#k=CODIGO (o código some da barra de endereço ao
+    abrir). O navegador não guarda o código: ao fechar ou tocar em Bloquear, a área volta a pedir.
+    Para trocar o código (ex.: depois de uma visita), é preciso gerar a página de novo com outro código.
+
+  monitor.html — monitor de mercados (estilo terminal; EN · PT · 日本語 · DE)
+    Ao vivo, a cada 30 s: USD/BRL, EUR/BRL, EUR/USD (AwesomeAPI) e paládio, platina e ouro em EUR/g
+    (gold-api.com em USD/onça troy ÷ EUR/USD ÷ 31,1035). Também: moedas dos parceiros (JPY, CHF), PTAX do
+    Banco Central e conversão dos metais (EUR/g, BRL/g, USD/ozt, EUR/kg). Teclas 1 a 6 escolhem o gráfico.
+    Histórico do gráfico: câmbio = taxas diárias do BCE (Frankfurter); ouro = fechamentos diários (xaus.com);
+    paládio e platina = registros diários da Sensor (tabela de cotações do Protheus) até 11/09/2026, com o
+    spot ao vivo ligado ao fim. Variação dos metais: contra o dia anterior quando esta tela já o registrou
+    (fica guardado no aparelho); até lá, contra o início da sessão. Cotações indicativas, não servem para
+    negociação nem liquidação. Se uma fonte cair, o indicador mostra ATRASADO/SEM CONEXÃO e o câmbio usa a
+    taxa de referência do BCE.
+
+  Atualização dos números: os indicadores são um retrato dos arquivos .pbix (novembro/2026). Para atualizar,
+  é preciso exportar os relatórios de novo e regerar as páginas (não é automático).

@@ -168,7 +168,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 #rail:not(.on) button { pointer-events: none; } /* trilho escondido não pode roubar toques (ex.: do Voltar do 3D) */
 #rail button {
   display: flex; align-items: center; gap: 14px;
-  min-height: clamp(52px, calc(6.2 * var(--vh)), 68px);
+  flex: 0 1 clamp(52px, calc(6.2 * var(--vh)), 68px); min-height: 34px; /* encolhe por igual quando a altura aperta (barra da apresentação aberta, janelas baixas) */
   padding: 6px 14px 6px 0;
   font-size: clamp(15px, calc(1.25 * var(--vw)), 20px); font-weight: 500; text-align: left;
   color: var(--text-2); border-left: 2px solid transparent; border-radius: 0 10px 10px 0;
@@ -178,7 +178,16 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 #rail button.on { color: var(--text); border-left-color: var(--plat); padding-left: 14px; background: linear-gradient(90deg, rgba(191, 211, 230, .10), transparent 80%); }
 #rail button.on .i { opacity: 1; }
 #rail button:active { background: rgba(191, 211, 230, .12); }
-#rail .sep { height: 1px; background: var(--line); margin: 10px 0; }
+#rail .sep { flex: none; height: 1px; background: var(--line); margin: 10px 0; }
+body.h-s #rail { gap: 2px; }
+body.h-s #rail .sep { margin: 5px 0; }
+body.h-xs #rail button { min-height: 28px; font-size: 14px; gap: 10px; }
+body.h-xs #rail button .i { width: 18px; height: 18px; }
+/* páginas de operações abertas por cima do app */
+.xlayer { position: fixed; inset: 0; z-index: 70; background: var(--bg); opacity: 0; transition: opacity .35s var(--ease); pointer-events: auto; }
+.xlayer.on { opacity: 1; }
+.xlayer[hidden] { display: none; }
+.xlayer iframe { width: 100%; height: 100%; border: 0; display: block; background: var(--bg); }
 #rail button.wchip { color: var(--glow); }
 #rail button.wchip .i { opacity: .9; }
 
@@ -1291,7 +1300,7 @@ body.h-xs .env-kpis .tile .v .n { font-size: clamp(16px, calc(1.5 * var(--vw)), 
   <div id="admin" class="admin" hidden>
     <h4 data-i18n="adminTitle"></h4>
     <div class="row"><span data-i18n="adminIdle"></span><b id="admin-idle"></b></div>
-    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-1632</b></div>
+    <div class="row"><span data-i18n="adminVersion"></span><b>2026.11.10-2053</b></div>
     <div class="row"><span data-i18n="adminFs"></span><button type="button" class="btn" id="admin-fs" data-i18n="adminFsBtn"></button></div>
     <div class="row"><span data-i18n="adminClose"></span><button type="button" class="btn" id="admin-close" data-i18n="close"></button></div>
   </div>
@@ -1309,6 +1318,7 @@ body.h-xs .env-kpis .tile .v .n { font-size: clamp(16px, calc(1.5 * var(--vw)), 
     <div class="vbar" id="vbar"><button type="button" class="vpp" id="v-pp" aria-label="Play/Pause"><svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button><span class="vt" id="v-cur">0:00</span><input type="range" id="v-seek" min="0" max="1000" value="0" step="1" aria-label="Posição do vídeo"><span class="vt dur" id="v-dur">0:00</span></div>
     <div class="video-hint" id="video-hint"></div>
   </div>
+  <div id="xlayer" class="xlayer" hidden><iframe id="xframe" title="Sensor Technology" allow="fullscreen"></iframe></div>
   <audio id="welcome-audio" preload="auto"></audio>
   <audio id="tour-audio" preload="auto"></audio>
   <button type="button" id="tour-tab" class="tour-tab" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg><span data-i18n="tourStart"></span><svg class="pl" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
@@ -5964,7 +5974,7 @@ const I18N = {
     heroCww: 'CWW · elemento Pt100 wire-wound', heroEw: 'EW · micro-aquecedor', heroTap: 'Toque no elemento para explorar em 3D',
     qrTitle: 'Leve no celular', qrText: 'Aponte a câmera para abrir esta apresentação no seu telefone.', qrHello: 'Bem-vindo! Navegue pelas seções acima.', desktopHint: 'Dica: desative “Site para computador” no menu do navegador para ver a versão para celular.',
     navHome: 'Início', navHistory: 'História', navWorld: 'Presença global', navMarkets: 'Mercados e aplicações',
-    navClients: 'Clientes', navCerts: 'Certificações', navProducts: 'Produtos', navTeam: 'Nosso time', navEnv: 'Ambiental',
+    navClients: 'Clientes', navCerts: 'Certificações', navProducts: 'Produtos', navTeam: 'Nosso time', navEnv: 'Ambiental', navPlanning: 'Planejamento', navMonitor: 'Câmbio e metais',
     navWelcome: 'Boas-vindas', navAbout: 'Quem somos',
     aboutTitle: 'Quem somos', whoWeAre: 'Quem somos', whatWeDo: 'O que fazemos', mission: 'Missão', vision: 'Visão', values: 'Valores',
     producedCap: 'sensores produzidos desde 1989 — e subindo', statSince: 'sensores desde 1989',
@@ -6015,7 +6025,7 @@ const I18N = {
     heroCww: 'CWW · Pt100 wire-wound element', heroEw: 'EW · micro-heater', heroTap: 'Tap the element to explore it in 3D',
     qrTitle: 'Take it with you', qrText: 'Point your camera to open this presentation on your phone.', qrHello: 'Welcome! Browse the sections above.', desktopHint: 'Tip: turn off “Desktop site” in the browser menu to get the phone version.',
     navHome: 'Home', navHistory: 'History', navWorld: 'Global presence', navMarkets: 'Markets and applications',
-    navClients: 'Clients', navCerts: 'Certifications', navProducts: 'Products', navTeam: 'Our team', navEnv: 'Environment',
+    navClients: 'Clients', navCerts: 'Certifications', navProducts: 'Products', navTeam: 'Our team', navEnv: 'Environment', navPlanning: 'Planning', navMonitor: 'FX & metals',
     navWelcome: 'Welcome', navAbout: 'About us',
     aboutTitle: 'About us', whoWeAre: 'Who we are', whatWeDo: 'What we do', mission: 'Mission', vision: 'Vision', values: 'Values',
     producedCap: 'sensors made since 1989 — and counting', statSince: 'sensors since 1989',
@@ -6090,6 +6100,8 @@ const ICONS = {
   clients: P('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M17.5 13.5a6.5 6.5 0 0 1 4 6.5"/>'),
   certs: P('<circle cx="12" cy="9" r="5.5"/><path d="M8.5 13.5 7 21l5-2.5 5 2.5-1.5-7.5"/>'),
   products: P('<path d="M12 3 4 7v10l8 4 8-4V7z"/><path d="M4 7l8 4 8-4M12 11v10"/>'),
+  planning: P('<path d="M3 20h18"/><path d="M6 20v-8M11 20V5M16 20v-11M21 20v-5"/>'),
+  monitor: P('<path d="M3 12h4l2.5-6 4 12 2.5-6H21"/>'),
   hvac: P('<circle cx="12" cy="12" r="2.2"/><path d="M12 2.5v6M12 15.5v6M2.5 12h6M15.5 12h6M5.3 5.3l4.2 4.2M14.5 14.5l4.2 4.2M18.7 5.3l-4.2 4.2M9.5 14.5l-4.2 4.2"/>'),
   auto: P('<path d="M3 14l2-6h14l2 6v5H3z"/><circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/><path d="M5 11h14"/>'),
   industry: P('<path d="M3 20V9l5 3V9l5 3V6l6 3v11z"/><path d="M8 20v-4h3v4M14 20v-4h3v4"/>'),
@@ -6139,6 +6151,8 @@ const SCREENS = ['attract', 'home', 'history', 'about', 'team', 'world', 'market
 const RAIL = [
   ['attract', 'navWelcome'], ['home', 'navHome'], ['history', 'navHistory'], ['about', 'navAbout'], ['team', 'navTeam'], ['world', 'navWorld'], ['markets', 'navMarkets'],
   ['clients', 'navClients'], ['certs', 'navCerts'], ['env', 'navEnv'], ['products', 'navProducts'],
+  // páginas de operações (abrem por cima do app, em quadro próprio): "x:" + nome em XLayer.pages
+  ['x:planning', 'navPlanning'], ['x:monitor', 'navMonitor'],
 ];
 let current = 'attract';
 // Telas ocultas (data.js kiosk.hidden; config.json "hidden" sobrepõe sem recompilar)
@@ -6207,6 +6221,31 @@ const Layout = {
     if (typeof Clients !== 'undefined') Clients.fit();
   },
 };
+/* Páginas de operações (planejamento, câmbio e metais, área de parceiros) abertas por cima do app, em um quadro.
+   O app continua carregado por baixo; a página fecha pelo próprio botão Fechar (mensagem 'ops-close') ou por Esc. */
+const XLayer = {
+  open: false,
+  pages: { planning: 'planning.html', monitor: 'monitor.html' },
+  show(name) {
+    const url = this.pages[name]; if (!url) return;
+    if (IS_MOBILE) { location.href = `${url}?alang=${LANG}`; return; }
+    if (typeof Tour !== 'undefined' && Tour.on && Tour.playing) Tour.pause();
+    if (Videos.playing) Videos.stop(false);
+    Welcome.stopVoice();
+    const l = $('#xlayer'), f = $('#xframe');
+    f.src = `${url}?embed=1&alang=${LANG}`;
+    l.hidden = false; requestAnimationFrame(() => l.classList.add('on'));
+    this.open = true; document.body.classList.add('x-on');
+  },
+  hide() {
+    if (!this.open) return;
+    const l = $('#xlayer'); l.classList.remove('on'); this.open = false; document.body.classList.remove('x-on'); lastTouch = performance.now();
+    setTimeout(() => { if (!this.open) { l.hidden = true; $('#xframe').src = 'about:blank'; } }, 380);
+  },
+};
+window.addEventListener('message', (e) => { if (e.origin === location.origin && e.data && e.data.type === 'ops-close') XLayer.hide(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && XLayer.open) XLayer.hide(); });
+
 function goWelcome() {
   go('attract');
   if (Welcome.active) setTimeout(() => Welcome.speak(false), 350);
@@ -6215,9 +6254,19 @@ function buildRail() {
   const rail = $('#rail');
   rail.innerHTML = '';
   const items = RAIL.filter(([s]) => !HIDDEN.has(s) && (s !== 'attract' || (Welcome.active && !IS_MOBILE)));
+  let extSep = false;
   items.forEach(([s, k]) => {
     const b = document.createElement('button');
     b.type = 'button';
+    if (s.startsWith('x:')) {
+      const name = s.slice(2);
+      if (!extSep) { extSep = true; const sep = document.createElement('div'); sep.className = 'sep'; rail.appendChild(sep); }
+      b.dataset.x = name;
+      b.innerHTML = `<span class="i">${ICONS[name]}</span><span data-i18n="${k}"></span>`;
+      b.addEventListener('click', () => { Sfx.play('tick', 0.7); XLayer.show(name); });
+      rail.appendChild(b);
+      return;
+    }
     b.dataset.screen = s;
     b.innerHTML = `<span class="i">${ICONS[s === 'attract' ? 'welcome' : s]}</span><span data-i18n="${k}"></span>`;
     b.addEventListener('click', () => { if (s !== current) Sfx.play('tick', 0.7); s === 'attract' ? goWelcome() : go(s); });
@@ -6266,7 +6315,7 @@ function kioskGuards() {
   setInterval(() => {
     const idle = (performance.now() - lastTouch) / 1000;
     const lim = +D.kiosk.idleSeconds || 0; // 0 = desligado (padrão desde 10/11: o retorno automático cortava vídeos e apresentações)
-    if (lim > 0 && !IS_MOBILE && idle > lim && current !== 'attract' && !Tour.on && !Videos.playing) { go('attract'); userChoseLang = false; const dl = RemoteConfig.cfg && RemoteConfig.cfg.defaultLang; if (dl && dl !== LANG) setLang(dl); }
+    if (lim > 0 && !IS_MOBILE && idle > lim && current !== 'attract' && !Tour.on && !Videos.playing && !XLayer.open) { go('attract'); userChoseLang = false; const dl = RemoteConfig.cfg && RemoteConfig.cfg.defaultLang; if (dl && dl !== LANG) setLang(dl); }
   }, 1000);
   // Mantém a tela acesa
   let lock = null;
@@ -6297,7 +6346,7 @@ function kioskGuards() {
    Quando a versão publicada muda, o app recarrega sozinho assim
    que estiver ocioso na tela de atração (nunca no meio de um uso).
    ------------------------------------------------------------ */
-const BUILD = '2026.11.10-1632';
+const BUILD = '2026.11.10-2053';
 const Updater = {
   pending: null, failures: 0,
   start() {
@@ -8375,7 +8424,7 @@ const Tour = {
    Laço principal
    ------------------------------------------------------------ */
 function loop(now) {
-  if (!Videos.playing) { if (current === 'viewer' || Viewer.heroActive()) Viewer.render(now); else Globe.render(now); }
+  if (!Videos.playing && !XLayer.open) { if (current === 'viewer' || Viewer.heroActive()) Viewer.render(now); else Globe.render(now); }
   requestAnimationFrame(loop);
 }
 
@@ -8418,7 +8467,7 @@ try { if (window.fully && typeof fully.bind === 'function') fully.bind('onMotion
 RemoteConfig.start();
 Updater.start();
 Energy.start();
-window.SensorApp = { go, setLang, Viewer, Globe, Welcome, Videos, RemoteConfig, Energy, Tour, Motion, data: D, build: BUILD, checkUpdate: () => Updater.check() };
+window.SensorApp = { go, setLang, Viewer, Globe, Welcome, Videos, RemoteConfig, Energy, Tour, Motion, XLayer, Layout, data: D, build: BUILD, checkUpdate: () => Updater.check() };
 })();
 
 </script>
