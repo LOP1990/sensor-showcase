@@ -231,8 +231,10 @@ Planejamento e controle, visão de parceiros e monitor de mercados (10/11, noite
   Rotina diária dos metais (GitHub Actions)
     .github/workflows/metais.yml roda de segunda a sexta às 18:35 (Brasília) e executa scripts/metais.py, que
     grava em metais.json o registro do dia: paládio, platina e ouro em EUR/g (spot do gold-api.com convertido
-    pelo EUR/USD do momento). Não usa chave nem segredo. Um registro por dia; rodar de novo no mesmo dia
-    substitui o registro. Valor absurdo (fora de faixa ou a mais de 25 % do registro anterior) é recusado e a
+    pelo EUR/USD). O EUR/USD é a cotação do momento (AwesomeAPI); quando essa fonte recusa o acesso vindo do
+    GitHub (limite de requisições, comum), entra a taxa de referência do BCE do dia. Cada registro guarda o
+    EUR/USD usado e a origem ("fx": "momento" ou "bce"); a diferença entre as duas costuma ficar abaixo de 0,5 %.
+    Não usa chave nem segredo. Um registro por dia; rodar de novo no mesmo dia substitui o registro. Valor absurdo (fora de faixa ou a mais de 25 % do registro anterior) é recusado e a
     execução aparece como falha na aba Actions, sem alterar o arquivo.
     Rodar à mão: aba Actions → metais → Run workflow.
     Para fechar o buraco de 12/09/2026 até o início da rotina com os números da própria Sensor, basta
