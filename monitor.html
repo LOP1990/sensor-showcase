@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="icons/icon-192.png">
 <title>Sensor Technology · Market monitor</title>
-<!-- versão 2026.11.10-2053 -->
+<!-- versão 2026.11.10-2110 -->
 <style>
 @font-face { font-family: 'Martian Mono'; font-style: normal; font-display: swap; font-weight: 100 800; font-stretch: 75% 112.5%; src: url(fonts/MartianMono-var.woff2) format('woff2'); }
 @font-face { font-family: 'Noto Sans JP'; font-weight: 700; font-display: swap; src: url(fonts/NotoSansJP-bold.woff2) format('woff2'); unicode-range: U+3000-30FF, U+4E00-9FFF, U+FF00-FFEF; }
@@ -106,7 +106,9 @@ body { background: var(--k); color: var(--amber); font-family: var(--mono); font
 .live.stale { color: var(--amber); } .live.off { color: var(--down); } .live.stale i, .live.off i { animation: none; box-shadow: none; }
 @keyframes pulse { 50% { opacity: .35; } }
 .bar .langs { display: flex; gap: .15rem; }
-.bar .langs button { padding: .25rem .5rem; color: var(--dim); border: 1px solid transparent; min-height: 2rem; font-size: .85rem; }
+.bar .langs button { padding: .25rem .5rem; color: var(--dim); border: 1px solid transparent; min-height: 2rem; font-size: .85rem; white-space: nowrap; }
+.bar .langs { flex: none; }
+.bar .live, .bar .x, .bar .ttl, .bar img { flex: none; }
 .bar .langs button.on { color: var(--k); background: var(--white); }
 .bar .x { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .8rem; border: 1px solid var(--rule); color: var(--white); min-height: 2rem; text-decoration: none; font-size: .9rem; white-space: nowrap; }
 .bar .x svg { width: .95rem; height: .95rem; }
@@ -668,12 +670,12 @@ const Viz = (() => {
     { id: 'USDBRLPTAX', nm: 'PTAX USD/BRL', dec: 4 }, { id: 'EURBRLPTAX', nm: 'PTAX EUR/BRL', dec: 4 },
   ];
   const API = {
-    fx: 'https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,EUR-USD,USD-JPY,EUR-JPY,EUR-CHF,CHF-BRL,JPY-BRL',
+    fx: 'https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,EUR-USD,USD-JPY,EUR-JPY,EUR-CHF,CHF-BRL,JPY-BRL,XAU-EUR',
     ptax: 'https://economia.awesomeapi.com.br/json/last/USD-BRLPTAX,EUR-BRLPTAX',
     metal: (s) => 'https://api.gold-api.com/price/' + s,
     ecbLatest: 'https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,BRL',
     ecbHist: (from) => `https://api.frankfurter.dev/v1/${from}..?base=EUR&symbols=USD,BRL`,
-    goldSpot: 'https://xaus.com/api/v1/spot', goldHist: 'https://xaus.com/api/v1/history',
+    goldHist: 'https://xaus.com/api/v1/history',
   };
   const POLL = 30000;
   const nf = (d) => new Intl.NumberFormat(LOC[lang], { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -763,7 +765,7 @@ const Viz = (() => {
     r.chB.textContent = pctTxt(s.pct); r.chB.className = s.pct == null ? 'fl' : sign(s.pct); r.chS.textContent = s.pct == null ? '' : (s.pk === 'ses' ? L.ses : L.day);
     r.meta.textContent = '';
     const add = (k, v) => { if (k) r.meta.appendChild(document.createTextNode(k + ' ')); H('b', '', r.meta, v); };
-    if (m.kind === 'fx') { if (s.bid != null) add(L.bid, F(s.bid, m.dec)); if (s.ask != null) add(L.ask, F(s.ask, m.dec)); if (s.hi != null) add(L.hi, F(s.hi, m.dec)); if (s.lo != null) add(L.lo, F(s.lo, m.dec)); if (s.note) add('', s.note); }
+    if (m.kind === 'fx') { if (s.bid != null) add(L.bid, F(s.bid, m.dec)); if (s.ask != null) add(L.ask, F(s.ask, m.dec)); if (s.hi != null) add(L.hi, F(s.hi, m.dec)); if (s.lo != null) add(L.lo, F(s.lo, m.dec)); if (s.note) add('', s.note); else if (s.ts) add('', hm(s.ts)); }
     else { add('', m.sym + ' · ' + L.eurg); add('USD/ozt', F(s.usd, 2)); if (s.hi != null) add(L.hi, F(s.hi, 2)); if (s.lo != null) add(L.lo, F(s.lo, 2)); }
   }
   function renderTape() {
@@ -796,6 +798,7 @@ const Viz = (() => {
     try {
       const j = await getJSON(API.fx);
       Object.keys(j).forEach((k) => { const x = j[k], bid = +x.bid, ask = +x.ask; if (!isFinite(bid)) return;
+        if (k === 'XAUEUR') { goldRef = { eurOz: bid, pct: isFinite(+x.pctChange) ? +x.pctChange : null, t: Date.now() }; return; } // ouro em EUR/ozt: dá a variação do dia na mesma convenção do câmbio
         put(k, { v: bid, bid, ask: isFinite(ask) ? ask : null, hi: +x.high || null, lo: +x.low || null, pct: isFinite(+x.pctChange) ? +x.pctChange : null, pk: 'day', ts: (+x.timestamp || 0) * 1000 }); });
       return true;
     } catch (e) {
@@ -805,11 +808,11 @@ const Viz = (() => {
   }
   let lastPtax = 0;
   async function pullPtax() { if (Date.now() - lastPtax < 600000) return; try { const j = await getJSON(API.ptax); lastPtax = Date.now(); Object.keys(j).forEach((k) => { const x = j[k], bid = +x.bid; if (isFinite(bid)) put(k, { v: bid, pct: isFinite(+x.pctChange) ? +x.pctChange : null, pk: 'day', ts: (+x.timestamp || 0) * 1000 }); }); } catch (e) {} }
-  let goldPrev = null; // fechamento anterior do ouro em EUR/g (do histórico)
+  let goldRef = null; // ouro em EUR/ozt pela mesma fonte do câmbio (variação do dia e reserva de preço)
   function metalPct(id, v) {
+    if (id === 'XAU' && goldRef && goldRef.pct != null && Date.now() - goldRef.t < 300000) return { pct: goldRef.pct, pk: 'day' };
     const p = store.prev && store.prev[id];
     if (p && p.v > 0 && (Date.now() - Date.parse(p.d + 'T12:00:00')) < 5.5 * 864e5) return { pct: (v / p.v - 1) * 100, pk: 'day' };
-    if (id === 'XAU' && goldPrev) return { pct: (v / goldPrev - 1) * 100, pk: 'day' };
     const a = SER[id]; if (a.length) return { pct: (v / a[0][1] - 1) * 100, pk: 'ses' };
     return { pct: 0, pk: 'ses' };
   }
@@ -818,7 +821,7 @@ const Viz = (() => {
     await Promise.all(MAIN.filter((m) => m.kind === 'metal').map(async (m) => {
       let usd = null, ts = Date.now();
       try { const j = await getJSON(API.metal(m.id)); usd = +j.price; if (j.updatedAt) ts = Date.parse(j.updatedAt) || ts; } catch (e) {
-        if (m.id === 'XAU') { try { const j = await getJSON(API.goldSpot); usd = +j.spot_usd_oz; } catch (e2) {} } }
+        if (m.id === 'XAU' && goldRef && eu && Date.now() - goldRef.t < 300000) usd = goldRef.eurOz * eu; }
       if (!isFinite(usd) || !usd || !eu) return;
       const v = usd / eu / OZ, a = SER[m.id], vals = a.map((p) => p[1]).concat([v]);
       const pc = metalPct(m.id, v);
@@ -852,7 +855,7 @@ const Viz = (() => {
     if (!goldHistP) goldHistP = Promise.all([getJSON(API.goldHist, 15000), loadFxHist()]).then(([j]) => {
       if (!fxHist) throw new Error('fx'); const out = []; let lastFx = null;
       j.points.forEach((p) => { const fx = fxHist[p.d] || lastFx; if (!fx) return; lastFx = fx; out.push([Date.parse(p.d + 'T12:00:00Z'), p.c / fx / OZ]); });
-      HIST.XAU = out; const today = new Date().toISOString().slice(0, 10); const before = out.filter((p) => new Date(p[0]).toISOString().slice(0, 10) < today); if (before.length) goldPrev = before[before.length - 1][1]; return true;
+      HIST.XAU = out; return true;
     }).catch(() => { goldHistP = null; HIST.XAU = METALS_HIST.d.map((d, i) => [day0 + d * 864e5, METALS_HIST.au[i]]); return false; });
     return goldHistP;
   }
@@ -891,7 +894,7 @@ const Viz = (() => {
 
   texts(); tickClock(); setInterval(tickClock, 1000);
   tick(); setInterval(tick, POLL);
-  loadGoldHist().then(() => { if (S.XAU) { const pc = metalPct('XAU', S.XAU.v); S.XAU.pct = pc.pct; S.XAU.pk = pc.pk; renderAll(true); } });
+  loadGoldHist();
   window.ST_MONITOR = { S, SER, tick, select, setRange: (r) => { range = r; return drawChart(); } };
 })();
 
