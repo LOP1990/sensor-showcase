@@ -158,41 +158,86 @@ Linha do tempo narrada marco a marco (10/11, 16h40)
   (STEPS=history1,history2 python3 tts-en/make_tour_audio.py en ja de pt).
 
 
-Planejamento e controle, área de parceiros e monitor de mercados (10/11, noite)
-  Três páginas novas, na mesma pasta do app, abertas pelo trilho (Planejamento · Câmbio e metais). No quiosque
-  elas abrem POR CIMA do app, em um quadro (o app continua carregado; fecha pelo botão Fechar ou Esc); no
-  celular abrem como página, com o botão Showcase para voltar. Para esconder uma entrada do trilho sem
-  recompilar: config.json → "hidden": ["team", "x:planning", "x:monitor"] (mantenha os itens que já estavam).
+Planejamento e controle, visão de parceiros e monitor de mercados (10/11, noite; ampliado às 22h)
+  Três páginas na mesma pasta do app, abertas pelo trilho (Planejamento · Câmbio e metais). No quiosque elas
+  abrem POR CIMA do app, em um quadro (o app continua carregado; fecha pelo botão Fechar ou Esc); no celular
+  abrem como página, com o botão Showcase para voltar. Para esconder uma entrada do trilho sem recompilar:
+  config.json → "hidden": ["team", "x:planning", "x:monitor"] (mantenha os itens que já estavam).
 
-  planning.html — apresentação "Planejamento e controle" (15 slides, EN · PT · 日本語 · DE)
-    Navegação: setas da tela ou do teclado, deslizar com o dedo, traços do rodapé; planning.html#8 abre no
-    slide 8; ?lang=ja força o idioma (o idioma escolhido na página fica lembrado no aparelho).
-    Os gráficos usam indicadores calculados dos relatórios do Power BI (posição de novembro/2026): prazo de
-    produção por semana, demanda mensal desde 2011 em índice, curva ABC das famílias, plano vinculado × saldo
-    livre, rendimento por carretel em índice (média de 12 meses = 100), pontualidade por ano, plano de
-    carreira, PSI 2025, avaliação de fornecedores, customizações e rastreio dos embarques.
-    NÃO entram na página: nomes de clientes, fornecedores ou pessoas, preços, custos, margens, salários,
-    volumes por país, percentuais absolutos de rendimento por classe, parâmetros de processo.
+  planning.html — apresentação "Planejamento e controle" (EN · PT · 日本語 · DE)
+    23 slides abertos e mais 5 reservados a parceiros (28 com a visão de parceiros ligada).
+    Navegação: setas da tela ou do teclado, deslizar com o dedo, traços do rodapé. planning.html#8 abre no
+    slide 8 e planning.html#tug abre pelo nome do slide; ?lang=ja força o idioma.
+    Roteiro (os nomes entre parênteses servem no endereço, depois do #):
+      Abertura (cover) · Mercado: a diferença de prazo, 8 semanas para fabricar × 3 a 5 pedidas (gap), a
+      distribuição medida (why), 15 anos de demanda (market) · Planejamento: curva ABC (abc), mix de classes
+      (mix), saldo livre (ahead), onde olhamos antes de confirmar uma data (confirm) · Materiais: qualificação
+      do fio de platina, 21 a 26 semanas, ou 28 a 36 com segunda amostra (qualify), os três materiais e a sua
+      variação (materials), fornecedores (supply) · Processo: ajustar, pintar, recozer, medir (process),
+      carretéis (spool), classes (classes), [rendimento por classe (yield)], [por lote de fio (ptlots)], cabo
+      de guerra resistência × alfa (tug) · Produção: pontualidade (control), apontamento (prod), [custo
+      gerencial por lote (cost)], [composição do custo (costmix)] · Pessoas (career, retain) · Clientes
+      (custom) · Entrega (deliver) · [exercício do planejador (exercise)] · Fechamento (closing) · Parceiros
+      (partners). Entre colchetes: só com a visão de parceiros.
+    Cabo de guerra: três botões (Resistência puxa · Equilibrar · Alfa puxa) movem a marca; fora da zona-alvo,
+    uma das duas grandezas aparece "fora da faixa". Ao entrar no slide ele faz a demonstração sozinho uma vez.
+    É uma analogia, e o slide diz isso.
+    Exercício do planejador: pedido HIPOTÉTICO (2.000 peças de 1/10 da KN 1515 G em 4 semanas; estoque e
+    lotes ilustrativos). O visitante escolhe a semana, depois "a notícia boa ou a ruim primeiro". O único
+    número real é o rendimento de 1/10 cadastrado para o planejamento da família.
+    Prazos de fabricação (cerca de 8 semanas), prazos pedidos (3 a 5 semanas) e etapas da qualificação do fio
+    são os informados pela direção; a nota do slide traz a média medida (semana média de conclusão em 12 meses).
+    O que NÃO entra em nenhuma página: nomes de clientes, fornecedores ou pessoas, preços, margens, salários,
+    volumes por país, parâmetros de processo (temperaturas, tolerância da cerâmica, valor do alfa) e custo em
+    moeda.
+
+  Visão de parceiros (dentro da apresentação)
+    Botão "Visão de parceiros" no topo da apresentação → digitar o código (ST-XXXX-XXXX-XXXX). Entram 5 slides:
+    rendimento ABSOLUTO por classe (usado no planejamento × medido na bancada em 12 meses, KN 1515 G e
+    KN 0815), a mesma família por lote de fio de platina, custo gerencial de cada lote EM ÍNDICE (mediana da
+    família = 100) para KN 1515 G e KN 0815 (curva A), K 2515 (curva B) e K 1517 2×Pt100 (curva C), composição
+    do custo (fio de platina, terminais, ouro, cerâmica, mão de obra) e o exercício do planejador.
+    Os slides reservados vão CIFRADOS dentro da página (AES-256-GCM, chave por PBKDF2-SHA256, 250 mil
+    iterações), como a área de parceiros; sem o código, o que está publicado é ilegível.
+    Depois de digitado, o código fica só na SESSÃO do navegador (sessionStorage): vale para a apresentação e
+    para a área de parceiros, sobrevive a fechar e reabrir o quadro dentro do app, e some ao fechar o
+    navegador/app, ao tocar em "Visão de parceiros ligada" → Bloquear, ou depois de 8 horas.
+    NUM QUIOSQUE ABERTO AO PÚBLICO: bloquear ao terminar (o botão do topo fica dourado enquanto está ligada).
+    Link direto: .../planning.html#k=CODIGO (pode combinar: #k=CODIGO&cost). O código sai da barra de endereço.
+    Custo: só índice e composição em %. Nenhum valor em reais e nenhuma relação de custo entre famílias.
 
   partners.html — área de parceiros (EN · PT · 日本語 · DE)
-    O conteúdo (mapa dos controles, cadeia de rastreabilidade, regras de demanda e estoque, rendimento,
-    desempenho, fornecedores, pessoas, expedição) vai CIFRADO dentro da página: AES-256-GCM, chave derivada
-    do código de acesso por PBKDF2-SHA256 (250 mil iterações). Sem o código, o que está publicado é ilegível.
-    O código NÃO está no repositório nem em nenhum arquivo do site. Formato: ST-XXXX-XXXX-XXXX.
-    Link direto para enviar a um parceiro: .../partners.html#k=CODIGO (o código some da barra de endereço ao
-    abrir). O navegador não guarda o código: ao fechar ou tocar em Bloquear, a área volta a pedir.
-    Para trocar o código (ex.: depois de uma visita), é preciso gerar a página de novo com outro código.
+    Nove seções: mapa dos controles, cadeia de rastreabilidade, regras de demanda e estoque, platina e
+    rendimento (agora com o rendimento por classe de quatro famílias, por lote de fio e a participação do 1/10
+    nas vendas por ano), desempenho da produção, CUSTO GERENCIAL (como é calculado, variação por lote,
+    composição, custo × rendimento), fornecedores, pessoas, expedição. Conteúdo cifrado, mesmo código.
+    Link direto para enviar a um parceiro: .../partners.html#k=CODIGO.
+    O código NÃO está no repositório nem em nenhum arquivo do site. Para trocá-lo (ex.: depois de uma visita),
+    é preciso gerar as páginas de novo com outro código.
 
   monitor.html — monitor de mercados (estilo terminal; EN · PT · 日本語 · DE)
     Ao vivo, a cada 30 s: USD/BRL, EUR/BRL, EUR/USD (AwesomeAPI) e paládio, platina e ouro em EUR/g
     (gold-api.com em USD/onça troy ÷ EUR/USD ÷ 31,1035). Também: moedas dos parceiros (JPY, CHF), PTAX do
     Banco Central e conversão dos metais (EUR/g, BRL/g, USD/ozt, EUR/kg). Teclas 1 a 6 escolhem o gráfico.
     Histórico do gráfico: câmbio = taxas diárias do BCE (Frankfurter); ouro = fechamentos diários (xaus.com);
-    paládio e platina = registros diários da Sensor (tabela de cotações do Protheus) até 11/09/2026, com o
-    spot ao vivo ligado ao fim. Variação dos metais: contra o dia anterior quando esta tela já o registrou
-    (fica guardado no aparelho); até lá, contra o início da sessão. Cotações indicativas, não servem para
-    negociação nem liquidação. Se uma fonte cair, o indicador mostra ATRASADO/SEM CONEXÃO e o câmbio usa a
-    taxa de referência do BCE.
+    paládio e platina = registros diários da Sensor (tabela de cotações do Protheus) até 11/09/2026 e, daí em
+    diante, o arquivo metais.json (abaixo), com o spot ao vivo ligado ao fim. Entre 12/09/2026 e o primeiro
+    registro do metais.json não há dados: o gráfico liga os dois trechos com um traço fino.
+    Variação do dia dos metais: contra o registro do dia útil anterior (metais.json ou, se houver, o valor que
+    esta tela guardou no aparelho); sem nenhum dos dois, contra o início da sessão.
+    Cotações indicativas, não servem para negociação nem liquidação. Se uma fonte cair, o indicador mostra
+    ATRASADO/SEM CONEXÃO e o câmbio usa a taxa de referência do BCE.
+
+  Rotina diária dos metais (GitHub Actions)
+    .github/workflows/metais.yml roda de segunda a sexta às 18:35 (Brasília) e executa scripts/metais.py, que
+    grava em metais.json o registro do dia: paládio, platina e ouro em EUR/g (spot do gold-api.com convertido
+    pelo EUR/USD do momento). Não usa chave nem segredo. Um registro por dia; rodar de novo no mesmo dia
+    substitui o registro. Valor absurdo (fora de faixa ou a mais de 25 % do registro anterior) é recusado e a
+    execução aparece como falha na aba Actions, sem alterar o arquivo.
+    Rodar à mão: aba Actions → metais → Run workflow.
+    Para fechar o buraco de 12/09/2026 até o início da rotina com os números da própria Sensor, basta
+    exportar de novo a tabela de cotações (SZU) ou atualizar o relatório Analítico e regerar o monitor.
 
   Atualização dos números: os indicadores são um retrato dos arquivos .pbix (novembro/2026). Para atualizar,
-  é preciso exportar os relatórios de novo e regerar as páginas (não é automático).
+  é preciso exportar os relatórios de novo e regerar as páginas (não é automático). Só o metais.json se
+  atualiza sozinho.

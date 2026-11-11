@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="icons/icon-192.png">
 <title>Sensor Technology · Market monitor</title>
-<!-- versão 2026.11.10-2122 -->
+<!-- versão 2026.11.10-2253 -->
 <style>
 @font-face { font-family: 'Martian Mono'; font-style: normal; font-display: swap; font-weight: 100 800; font-stretch: 75% 112.5%; src: url(fonts/MartianMono-var.woff2) format('woff2'); }
 @font-face { font-family: 'Noto Sans JP'; font-weight: 700; font-display: swap; src: url(fonts/NotoSansJP-bold.woff2) format('woff2'); unicode-range: U+3000-30FF, U+4E00-9FFF, U+FF00-FFEF; }
@@ -63,6 +63,18 @@ ul, ol { list-style: none; }
 .meter-track { height: .5rem; border-radius: 99px; background: rgba(57, 135, 229, .22); overflow: hidden; }
 .meter-track i { display: block; height: 100%; border-radius: 99px; background: var(--s1); transform-origin: left center; }
 .meter-val { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; min-width: 2.4rem; text-align: right; }
+
+/* barras empilhadas em linhas (várias composições lado a lado, uma legenda só) */
+.stackrows { display: grid; gap: .5rem; }
+.stackrows .segbar-legend { margin: 0 0 .45rem; }
+.stack-row { display: grid; grid-template-columns: minmax(6.5rem, 11rem) minmax(0, 1fr); gap: .9rem; align-items: center; }
+.stack-lbl { display: grid; line-height: 1.2; min-width: 0; }
+.stack-lbl b { font-size: .92rem; font-weight: 600; color: var(--text); }
+.stack-lbl span { font-size: .78rem; color: var(--text-3); }
+@media (max-width: 760px), (orientation: portrait) and (max-width: 1100px) {
+  .stack-row { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
+  .stack-lbl { display: flex; gap: .5rem; align-items: baseline; }
+}
 
 /* ---------- peças comuns ---------- */
 .stat { display: grid; gap: .1rem; }
@@ -163,7 +175,7 @@ body { background: var(--k); color: var(--amber); font-family: var(--mono); font
 .ranges button.on { background: var(--amber); color: var(--k); font-weight: 700; }
 .chart .viz { min-height: 0; height: 100%; padding: 0 .4rem; }
 .chart .viz svg text { font-family: var(--mono); font-stretch: 80%; }
-.chart-note { padding: .25rem 1rem .5rem; color: var(--dim); font-size: .8rem; min-height: 1.6rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chart-note { padding: .25rem 1rem .5rem; color: var(--dim); font-size: .8rem; line-height: 1.35; min-height: 1.6rem; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 
 /* tabelas */
 .tb { width: 100%; border-collapse: collapse; align-self: start; }
@@ -552,26 +564,177 @@ const Viz = (() => {
      o: { rows:[{label, idx[]}], lo, hi, lblMedian, tipRow(label, v), caption } */
   function rowsDots(host, o) {
     return mount(host, ({ svg, w, h: H, r, animate }) => {
-      const fs = Math.max(11, r * 0.7), n = o.rows.length;
-      const lblW = Math.min(w * 0.34, r * 9.5);
+      const fs = Math.max(11, r * 0.7), n = o.rows.length, step = o.step || 20;
+      const narrow = w < 520, lblW = Math.min(w * (narrow ? 0.4 : 0.36), r * (o.lblW || 9.5));
       const m = { l: lblW, r: r * 0.8, t: r * 1.4, b: r * 1.6 };
       const pw = w - m.l - m.r, ph = H - m.t - m.b, band = ph / n, lo = o.lo || 40, hi = o.hi || 140;
       const x = (v) => m.l + ((Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * pw;
       const g = el('g', { 'font-size': fs }, svg);
-      for (let v = lo; v <= hi; v += 20) { el('line', { x1: x(v), x2: x(v), y1: m.t, y2: m.t + ph, stroke: v === 100 ? C.axis : C.grid, 'stroke-width': v === 100 ? 1.5 : 1 }, g);
-        el('text', { x: x(v), y: m.t + ph + fs * 1.5, 'text-anchor': 'middle', fill: v === 100 ? C.text : C.text3, 'font-weight': v === 100 ? 600 : 400, style: 'font-variant-numeric: tabular-nums' }, g, String(v)); }
+      const skip = pw / ((hi - lo) / step) < fs * 2.4 ? 2 : 1;
+      for (let v = lo; v <= hi; v += step) { el('line', { x1: x(v), x2: x(v), y1: m.t, y2: m.t + ph, stroke: v === 100 ? C.axis : C.grid, 'stroke-width': v === 100 ? 1.5 : 1 }, g);
+        if (skip === 1 || Math.round((v - 100) / step) % skip === 0) el('text', { x: x(v), y: m.t + ph + fs * 1.5, 'text-anchor': 'middle', fill: v === 100 ? C.text : C.text3, 'font-weight': v === 100 ? 600 : 400, style: 'font-variant-numeric: tabular-nums' }, g, String(v)); }
       el('text', { x: x(100), y: m.t - fs * 0.6, 'text-anchor': 'middle', fill: C.text2 }, g, o.lblMedian);
+      const rad = o.swarm ? Math.max(3.5, Math.min(5, r * 0.26)) : 5, dia = rad * 2 + 1.5;
       o.rows.forEach((row, i) => {
         const cy = m.t + band * i + band / 2;
-        el('text', { x: m.l - r * 0.6, y: cy + fs * 0.35, 'text-anchor': 'end', fill: C.text2 }, g, row.label);
+        if (row.sub) { el('text', { x: m.l - r * 0.7, y: cy - fs * 0.15, 'text-anchor': 'end', fill: C.text, 'font-weight': 600, 'font-size': fs * 1.08 }, g, row.label);
+          el('text', { x: m.l - r * 0.7, y: cy + fs * 1.2, 'text-anchor': 'end', fill: C.text3 }, g, narrow && row.subN != null ? row.subN : row.sub); }
+        else el('text', { x: m.l - r * 0.6, y: cy + fs * 0.35, 'text-anchor': 'end', fill: C.text2 }, g, row.label);
         el('line', { x1: x(Math.min.apply(null, row.idx)), x2: x(Math.max.apply(null, row.idx)), y1: cy, y2: cy, stroke: C.mute, 'stroke-width': 2, 'stroke-linecap': 'round' }, g);
-        row.idx.forEach((v, k) => { const c = el('circle', { cx: x(v), cy, r: 5, fill: C.s1, stroke: C.surface, 'stroke-width': 2 }, g);
-          if (animate && c.animate) c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 120 + i * 70 + k * 18, fill: 'both' });
-          const hit = el('circle', { cx: x(v), cy, r: 12, fill: 'transparent', tabindex: -1 }, g); bindTip(hit, row.label, [[o.lblIdx || '', fmt(v, 0), C.s1]]); });
+        if (row.band) { const bh = Math.min(band * 0.62, r * 2.2);
+          const b = el('rect', { x: x(row.band[0]), y: cy - bh / 2, width: Math.max(2, x(row.band[1]) - x(row.band[0])), height: bh, rx: 4, fill: 'rgba(57,135,229,.16)', tabindex: 0 }, g);
+          if (o.lblBand) bindTip(b, row.label, [[o.lblBand, fmt(row.band[0], 0) + '–' + fmt(row.band[1], 0), C.s1]]); }
+        const placed = [];
+        row.idx.slice().sort((a, b) => a - b).forEach((v, k) => {
+          const px = x(v); let dy = 0;
+          if (o.swarm) { const maxK = Math.max(1, Math.floor((band * 0.46) / dia));
+            for (let t = 0; t <= maxK * 2; t++) { const cand = (t % 2 ? 1 : -1) * Math.ceil(t / 2) * dia; if (!placed.some((q) => Math.hypot(q[0] - px, q[1] - cand) < dia)) { dy = cand; break; } } placed.push([px, dy]); }
+          const c = el('circle', { cx: px, cy: cy + dy, r: rad, fill: C.s1, stroke: C.surface, 'stroke-width': o.swarm ? 1.5 : 2 }, g);
+          if (animate && c.animate) c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 120 + i * 70 + k * (o.swarm ? 9 : 18), fill: 'both' });
+          const hit = el('circle', { cx: px, cy: cy + dy, r: o.swarm ? rad + 3 : 12, fill: 'transparent', tabindex: -1 }, g); bindTip(hit, row.label, [[o.lblIdx || '', fmt(v, 0), C.s1]]); });
       });
       svg.setAttribute('aria-label', o.caption || '');
       table(host, o.caption, ['', 'min', 'max', 'n'], o.rows.map((x_) => [x_.label, Math.min.apply(null, x_.idx), Math.max.apply(null, x_.idx), x_.idx.length]));
     });
+  }
+
+  /* ---------- séries anuais (poucas linhas, rótulo direto no fim, eixo único) ----------
+     o = { years:[...], series:[{name, values, color}], unit, dec, yMax, caption, partial (rótulo do último ano, opcional) } */
+  function years(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7), n = o.years.length;
+      const lblW = Math.max.apply(null, o.series.map((s_) => s_.name.length)) * fs * 0.56 + r * 3.2;
+      const m = { l: r * 2.6, r: Math.min(w * 0.36, lblW), t: r * 1.0, b: r * 1.9 };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b;
+      const max = o.yMax || Math.max.apply(null, [].concat.apply([], o.series.map((s_) => s_.values))) * 1.15;
+      const tk = ticks(max, 4), top = Math.max(max, tk[tk.length - 1]);
+      const X = (i) => m.l + (n === 1 ? pw / 2 : (i / (n - 1)) * pw), Y = (v) => m.t + ph - (v / top) * ph;
+      const g = el('g', { 'font-size': fs }, svg);
+      tk.forEach((v) => { el('line', { x1: m.l, x2: m.l + pw, y1: Y(v), y2: Y(v), stroke: v === 0 ? C.axis : C.grid, 'stroke-width': 1 }, g);
+        el('text', { x: m.l - r * 0.4, y: Y(v) + fs * 0.35, 'text-anchor': 'end', fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, fmt(v, 0) + (o.unit || '')); });
+      const every = Math.max(1, Math.ceil((fs * 3.1) / (pw / Math.max(1, n - 1))));
+      o.years.forEach((y, i) => { if ((n - 1 - i) % every === 0) el('text', { x: X(i), y: m.t + ph + fs * 1.5, 'text-anchor': 'middle', fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, String(y)); });
+      const ends = o.series.map((s_) => Y(s_.values[n - 1]));
+      // rótulos do fim sem colisão (afasta o mínimo necessário)
+      const order = ends.map((y, i) => i).sort((a, b) => ends[a] - ends[b]); const ly = ends.slice(); const gap = fs * 2.5;
+      for (let k = 1; k < order.length; k++) if (ly[order[k]] - ly[order[k - 1]] < gap) ly[order[k]] = ly[order[k - 1]] + gap;
+      o.series.forEach((s_, si) => {
+        const d = 'M' + s_.values.map((v, i) => X(i).toFixed(1) + ',' + Y(v).toFixed(1)).join('L');
+        const path = el('path', { d, fill: 'none', stroke: s_.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, g);
+        if (animate && path.getTotalLength) { const len = path.getTotalLength(); path.style.strokeDasharray = len; path.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], { duration: 1300, delay: 150 + si * 250, easing: 'cubic-bezier(.3,.6,.2,1)', fill: 'both' }); }
+        [0, n - 1].forEach((i) => el('circle', { cx: X(i), cy: Y(s_.values[i]), r: 5, fill: s_.color, stroke: C.surface, 'stroke-width': 2 }, g));
+        const t0 = el('text', { x: X(0) + fs * 0.5, y: Y(s_.values[0]) - fs * 0.75, fill: C.text, 'font-weight': 600, style: 'font-variant-numeric: tabular-nums' }, g, fmt(s_.values[0], o.dec || 0) + (o.unit || ''));
+        const lx = m.l + pw + r * 0.6;
+        const t1 = el('text', { x: lx, y: ly[si] - fs * 0.1, fill: C.text, 'font-weight': 600, 'font-size': fs * 1.25, style: 'font-variant-numeric: tabular-nums' }, g, fmt(s_.values[n - 1], o.dec || 0) + (o.unit || ''));
+        const t2 = el('text', { x: lx, y: ly[si] + fs * 1.1, fill: C.text2 }, g, s_.name);
+        if (animate) { fadeIn(t0, 400, 300); fadeIn(t1, 500, 1200 + si * 250); fadeIn(t2, 500, 1200 + si * 250); }
+      });
+      const cross = el('line', { y1: m.t, y2: m.t + ph, stroke: C.axis, 'stroke-width': 1, visibility: 'hidden' }, g);
+      const hit = el('rect', { x: m.l - 6, y: m.t, width: pw + 12, height: ph, fill: 'transparent', tabindex: 0, 'aria-label': o.caption || '' }, g);
+      const move = (e) => { const b = svg.getBoundingClientRect(); const px = ((e.clientX - b.left) / b.width) * w; const i = Math.max(0, Math.min(n - 1, Math.round(((px - m.l) / pw) * (n - 1))));
+        cross.setAttribute('x1', X(i)); cross.setAttribute('x2', X(i)); cross.setAttribute('visibility', 'visible');
+        showTip(e.clientX, e.clientY, String(o.years[i]) + (o.partial && i === n - 1 ? ' ' + o.partial : ''), o.series.map((s_) => [s_.name, fmt(s_.values[i], o.dec || 0) + (o.unit || ''), s_.color])); };
+      hit.addEventListener('pointermove', move); hit.addEventListener('pointerdown', move);
+      hit.addEventListener('pointerleave', () => { cross.setAttribute('visibility', 'hidden'); hideTip(); });
+      svg.setAttribute('aria-label', o.caption || '');
+      table(host, o.caption, [''].concat(o.series.map((s_) => s_.name)), o.years.map((y, i) => [String(y)].concat(o.series.map((s_) => fmt(s_.values[i], o.dec || 0) + (o.unit || '')))));
+    });
+  }
+
+  /* ---------- dispersão (cada ponto = um lote), poucas séries com legenda ----------
+     o = { series:[{name, color, pts:[[x,y],...]}], xTitle, yTitle, xUnit, lblX, lblY, yRef (linha de referência), caption } */
+  function scatter(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7);
+      const all = [].concat.apply([], o.series.map((s_) => s_.pts));
+      const xs = all.map((p) => p[0]), ys = all.map((p) => p[1]);
+      const nice = (lo, hi, st) => [Math.floor(lo / st) * st, Math.ceil(hi / st) * st];
+      const [x0, x1] = nice(Math.min.apply(null, xs), Math.max.apply(null, xs), o.xStep || 10), [y0, y1] = nice(Math.min.apply(null, ys), Math.max.apply(null, ys), o.yStep || 20);
+      const m = { l: r * 2.8, r: r * 0.8, t: r * 2.0, b: r * 2.9 };
+      const pw = w - m.l - m.r, ph = H - m.t - m.b;
+      const X = (v) => m.l + ((v - x0) / (x1 - x0)) * pw, Y = (v) => m.t + ph - ((v - y0) / (y1 - y0)) * ph;
+      const g = el('g', { 'font-size': fs }, svg);
+      for (let v = y0; v <= y1; v += (o.yStep || 20)) { const ref = v === o.yRef;
+        el('line', { x1: m.l, x2: m.l + pw, y1: Y(v), y2: Y(v), stroke: ref ? C.axis : C.grid, 'stroke-width': ref ? 1.5 : 1 }, g);
+        el('text', { x: m.l - r * 0.4, y: Y(v) + fs * 0.35, 'text-anchor': 'end', fill: ref ? C.text : C.text3, 'font-weight': ref ? 600 : 400, style: 'font-variant-numeric: tabular-nums' }, g, String(v)); }
+      for (let v = x0; v <= x1; v += (o.xStep || 10)) { el('line', { x1: X(v), x2: X(v), y1: m.t, y2: m.t + ph, stroke: C.grid, 'stroke-width': 1 }, g);
+        el('text', { x: X(v), y: m.t + ph + fs * 1.5, 'text-anchor': 'middle', fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, fmt(v, 0) + (o.xUnit || '')); }
+      if (o.xTitle) el('text', { x: m.l + pw / 2, y: H - fs * 0.35, 'text-anchor': 'middle', fill: C.text3 }, g, o.xTitle);
+      // legenda (uma linha, acima da área)
+      let lx = m.l;
+      o.series.forEach((s_) => { el('circle', { cx: lx + 5, cy: m.t - r * 1.05, r: 5, fill: s_.color }, g); const t = el('text', { x: lx + 15, y: m.t - r * 1.05 + fs * 0.35, fill: C.text2 }, g, s_.name);
+        lx += 15 + (t.getComputedTextLength ? t.getComputedTextLength() : s_.name.length * fs * 0.56) + r * 1.2; });
+      o.series.forEach((s_, si) => s_.pts.forEach((p, k) => {
+        const c = el('circle', { cx: X(p[0]), cy: Y(p[1]), r: 4.5, fill: s_.color, stroke: C.surface, 'stroke-width': 1.5, tabindex: -1 }, g);
+        if (animate && c.animate) c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 150 + si * 200 + k * 10, fill: 'both' });
+        const hit = el('circle', { cx: X(p[0]), cy: Y(p[1]), r: 10, fill: 'transparent' }, g);
+        bindTip(hit, s_.name, [[o.lblX || '', fmt(p[0], 0) + (o.xUnit || ''), s_.color], [o.lblY || '', fmt(p[1], 0)]]);
+      }));
+      svg.setAttribute('aria-label', o.caption || '');
+      table(host, o.caption, ['', o.lblX || 'x', o.lblY || 'y'], [].concat.apply([], o.series.map((s_) => s_.pts.map((p) => [s_.name, fmt(p[0], 0) + (o.xUnit || ''), fmt(p[1], 0)]))));
+    });
+  }
+
+  /* ---------- dispersão em painéis (um painel por grupo, mesmos eixos; identidade pelo título, não pela cor) ----------
+     o = { panels:[{name, sub, pts:[[x,y],...]}], xTitle, lblX, lblY, yRef, xStep, yStep, caption } */
+  function scatterGrid(host, o) {
+    return mount(host, ({ svg, w, h: H, r, animate }) => {
+      const fs = Math.max(11, r * 0.7), n = o.panels.length, col = o.color || '#BFD3E6';
+      const cols = w < 560 ? Math.min(2, n) : n, rws = Math.ceil(n / cols);
+      const all = [].concat.apply([], o.panels.map((p) => p.pts));
+      const xs = all.map((p) => p[0]), ys = all.map((p) => p[1]), xStep = o.xStep || 20, yStep = o.yStep || 20;
+      const x0 = Math.floor(Math.min.apply(null, xs) / xStep) * xStep, x1 = Math.ceil(Math.max.apply(null, xs) / xStep) * xStep;
+      const y0 = Math.floor(Math.min.apply(null, ys) / yStep) * yStep, y1 = Math.ceil(Math.max.apply(null, ys) / yStep) * yStep;
+      const m = { l: r * 2.6, r: r * 0.7, t: r * 1.9, b: r * (o.xTitle ? 3.0 : 1.9) }, gap = r * 1.5, vgap = r * 3.4;
+      const pw = (w - m.l - m.r - gap * (cols - 1)) / cols, ph = (H - m.t - m.b - vgap * (rws - 1)) / rws;
+      const g = el('g', { 'font-size': fs }, svg);
+      o.panels.forEach((p, i) => {
+        const cx = i % cols, cy = Math.floor(i / cols), px = m.l + cx * (pw + gap), py = m.t + cy * (ph + vgap);
+        const X = (v) => px + ((v - x0) / (x1 - x0)) * pw, Y = (v) => py + ph - ((v - y0) / (y1 - y0)) * ph;
+        if (cx === 0) for (let v = y0; v <= y1; v += yStep) el('text', { x: m.l - r * 0.4, y: Y(v) + fs * 0.35, 'text-anchor': 'end', fill: v === o.yRef ? C.text : C.text3, 'font-weight': v === o.yRef ? 600 : 400, style: 'font-variant-numeric: tabular-nums' }, g, String(v));
+        const tt = el('text', { x: px, y: py - r * 0.75, fill: C.text, 'font-weight': 600 }, g, p.name);
+        const tw = tt.getComputedTextLength ? tt.getComputedTextLength() : p.name.length * fs * 0.6;
+        if (p.sub && tw + r * 0.5 + p.sub.length * fs * 0.52 < pw) el('text', { x: px + tw + r * 0.5, y: py - r * 0.75, fill: C.text3 }, g, p.sub);
+        for (let v = y0; v <= y1; v += yStep) el('line', { x1: px, x2: px + pw, y1: Y(v), y2: Y(v), stroke: v === o.yRef ? C.axis : C.grid, 'stroke-width': v === o.yRef ? 1.5 : 1 }, g);
+        for (let v = x0; v <= x1; v += xStep) { el('line', { x1: X(v), x2: X(v), y1: py, y2: py + ph, stroke: C.grid, 'stroke-width': 1 }, g);
+          el('text', { x: X(v), y: py + ph + fs * 1.5, 'text-anchor': 'middle', fill: C.text3, style: 'font-variant-numeric: tabular-nums' }, g, fmt(v, 0)); }
+        p.pts.forEach((pt, k) => {
+          const c = el('circle', { cx: X(pt[0]), cy: Y(pt[1]), r: 4.5, fill: col, stroke: C.surface, 'stroke-width': 1.5 }, g);
+          if (animate && c.animate) c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 150 + i * 180 + k * 10, fill: 'both' });
+          const hit = el('circle', { cx: X(pt[0]), cy: Y(pt[1]), r: 10, fill: 'transparent', tabindex: -1 }, g);
+          bindTip(hit, p.name, [[o.lblX || '', fmt(pt[0], 0), col], [o.lblY || '', fmt(pt[1], 0)]]);
+        });
+      });
+      if (o.xTitle) el('text', { x: m.l + (w - m.l - m.r) / 2, y: H - fs * 0.35, 'text-anchor': 'middle', fill: C.text3 }, g, o.xTitle);
+      svg.setAttribute('aria-label', o.caption || '');
+      table(host, o.caption, ['', o.lblX || 'x', o.lblY || 'y'], [].concat.apply([], o.panels.map((p) => p.pts.map((pt) => [p.name, fmt(pt[0], 0), fmt(pt[1], 0)]))));
+    });
+  }
+
+  /* ---------- barras empilhadas em linhas (várias composições lado a lado), uma legenda só — HTML ----------
+     o = { rows:[{label, sub, values:[...]}], keys:[{label, color, dark}], unit, dec, caption } */
+  function stackRows(host, o) {
+    host.textContent = ''; host.classList.add('stackrows');
+    const lg = h('div', 'segbar-legend', host);
+    o.keys.forEach((k_) => { const it = h('span', '', lg); const sw = h('i', '', it); sw.style.background = k_.color; h('span', '', it, k_.label); });
+    const bars = [];
+    o.rows.forEach((row) => {
+      const rr = h('div', 'stack-row', host);
+      const lb = h('div', 'stack-lbl', rr); h('b', '', lb, row.label); if (row.sub) h('span', '', lb, row.sub);
+      const total = row.values.reduce((a, b) => a + Math.max(0, b), 0);
+      const bar = h('div', 'segbar-bar', rr); bar.setAttribute('role', 'img');
+      bar.setAttribute('aria-label', row.label + (row.sub ? ', ' + row.sub : '') + ': ' + o.keys.map((k_, i) => k_.label + ' ' + fmt(row.values[i], o.dec || 0) + (o.unit || '')).join(', '));
+      row.values.forEach((v, i) => {
+        if (v <= 0) return; const k_ = o.keys[i];
+        const sg = h('div', 'segbar-seg', bar); sg.style.flexGrow = v / total; sg.style.flexBasis = '0'; sg.style.background = k_.color; sg.tabIndex = 0;
+        const lab = h('span', '', sg, fmt(v, o.dec || 0) + (o.unit || '')); lab.style.color = k_.dark ? '#0B1017' : '#fff';
+        bindTip(sg, row.label + (row.sub ? ' · ' + row.sub : ''), [[k_.label, fmt(v, o.dec == null ? 0 : Math.max(1, o.dec)) + (o.unit || ''), k_.color]]);
+        requestAnimationFrame(() => { if (lab.scrollWidth + 16 > sg.clientWidth) lab.hidden = true; });
+      });
+      bars.push(bar);
+    });
+    table(host, o.caption, [''].concat(o.keys.map((k_) => k_.label)), o.rows.map((row) => [row.label + (row.sub ? ' · ' + row.sub : '')].concat(row.values.map((v) => fmt(v, o.dec == null ? 0 : Math.max(1, o.dec)) + (o.unit || '')))));
+    return { replay() { if (reduced()) return; bars.forEach((bar, i) => { if (bar.animate) bar.animate([{ clipPath: 'inset(0 100% 0 0 round 6px)' }, { clipPath: 'inset(0 0 0 0 round 6px)' }], { duration: 800, delay: i * 110, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both' }); }); } };
   }
 
   /* ---------- linhas no tempo com mira (monitor e curvas acumuladas) ----------
@@ -615,7 +778,7 @@ const Viz = (() => {
     });
   }
 
-  return { C, setLocale, fmt, columns, pareto, longSeries, strip, segbar, meters, rowsDots, lines, showTip, hideTip, bindTip, table, h, el };
+  return { C, setLocale, fmt, columns, pareto, longSeries, strip, segbar, meters, rowsDots, lines, years, scatter, scatterGrid, stackRows, showTip, hideTip, bindTip, table, h, el };
 })();
 
 </script>
@@ -624,7 +787,8 @@ const Viz = (() => {
 /* ============================================================
    Sensor Technology · Monitor de mercados
    Câmbio: AwesomeAPI (cotação a cada ~30 s) · Metais: gold-api.com (spot USD/ozt, convertido para EUR/g)
-   Histórico: BCE via Frankfurter (câmbio), xaus.com (ouro), registros diários da Sensor (Pd, Pt)
+   Histórico: BCE via Frankfurter (câmbio), xaus.com (ouro), registros diários da Sensor (Pd, Pt) e, depois deles,
+   o arquivo metais.json do repositório (um registro por dia útil, gravado pela rotina .github/workflows/metais.yml)
    ?lang=en|pt|ja|de · ?embed=1 · teclas 1–6 escolhem o instrumento
    ============================================================ */
 (() => {
@@ -641,25 +805,25 @@ const Viz = (() => {
     en: { title: 'MARKET MONITOR', sub: 'Currencies and precious metals', fx: 'CURRENCIES', met: 'PRECIOUS METALS', unitM: 'EUR per gram', chart: 'CHART', cross: 'PARTNER CURRENCIES · PTAX', conv: 'METALS · UNIT CONVERSION',
       pd: 'PALLADIUM', pt: 'PLATINUM', au: 'GOLD', bid: 'Bid', ask: 'Ask', hi: 'High', lo: 'Low', day: 'day', ses: 'session', live: 'LIVE', stale: 'DELAYED', off: 'OFFLINE', wait: 'CONNECTING',
       pair: 'Pair', last: 'Last', chg: 'Chg', time: 'Time', metal: 'Metal', close: 'Close', back: 'Showcase', rLive: 'LIVE',
-      noHist: 'No daily reference for this period: showing the live session.', histSt: 'Daily reference: Sensor Technology records until {d}. Live spot from there on.', histEcb: 'Daily reference rates from the ECB. Live quote at the end.', histAu: 'Daily closes. Live spot at the end.', sesOnly: 'Quotes collected by this screen since it was opened.',
+      noHist: 'No daily reference for this period: showing the live session.', histSt: 'Daily reference: Sensor Technology records until {d}. Live spot from there on.', histSt2: 'Sensor Technology records until {d}; one spot record per business day from {d2}. Live spot at the end.', histEcb: 'Daily reference rates from the ECB. Live quote at the end.', histAu: 'Daily closes. Live spot at the end.', sesOnly: 'Quotes collected by this screen since it was opened.',
       src: 'Indicative mid-market quotes. Not for trading or settlement.', srcFx: 'FX: AwesomeAPI', srcM: 'Metals: gold-api.com', srcH: 'History: ECB via Frankfurter, xaus.com',
       sesNote: 'Metals: change against the previous day once this screen has seen it; until then, against the start of the session.', ptax: 'PTAX = official Banco Central do Brasil rate', eurg: 'EUR/g' },
     pt: { title: 'MONITOR DE MERCADOS', sub: 'Moedas e metais preciosos', fx: 'MOEDAS', met: 'METAIS PRECIOSOS', unitM: 'EUR por grama', chart: 'GRÁFICO', cross: 'MOEDAS DOS PARCEIROS · PTAX', conv: 'METAIS · CONVERSÃO DE UNIDADES',
       pd: 'PALÁDIO', pt: 'PLATINA', au: 'OURO', bid: 'Compra', ask: 'Venda', hi: 'Máx', lo: 'Mín', day: 'dia', ses: 'sessão', live: 'AO VIVO', stale: 'ATRASADO', off: 'SEM CONEXÃO', wait: 'CONECTANDO',
       pair: 'Par', last: 'Último', chg: 'Var', time: 'Hora', metal: 'Metal', close: 'Fechar', back: 'Showcase', rLive: 'AO VIVO',
-      noHist: 'Sem referência diária neste período: mostrando a sessão ao vivo.', histSt: 'Referência diária: registros da Sensor Technology até {d}. Daí em diante, spot ao vivo.', histEcb: 'Taxas diárias de referência do BCE. Cotação ao vivo no fim.', histAu: 'Fechamentos diários. Spot ao vivo no fim.', sesOnly: 'Cotações coletadas por esta tela desde que foi aberta.',
+      noHist: 'Sem referência diária neste período: mostrando a sessão ao vivo.', histSt: 'Referência diária: registros da Sensor Technology até {d}. Daí em diante, spot ao vivo.', histSt2: 'Registros da Sensor Technology até {d}; desde {d2}, um registro do spot por dia útil. Spot ao vivo no fim.', histEcb: 'Taxas diárias de referência do BCE. Cotação ao vivo no fim.', histAu: 'Fechamentos diários. Spot ao vivo no fim.', sesOnly: 'Cotações coletadas por esta tela desde que foi aberta.',
       src: 'Cotações indicativas de mercado. Não servem para negociação nem liquidação.', srcFx: 'Câmbio: AwesomeAPI', srcM: 'Metais: gold-api.com', srcH: 'Histórico: BCE via Frankfurter, xaus.com',
       sesNote: 'Metais: variação contra o dia anterior depois que esta tela o registrou; até lá, contra o início da sessão.', ptax: 'PTAX = taxa oficial do Banco Central do Brasil', eurg: 'EUR/g' },
     ja: { title: 'マーケットモニター', sub: '為替と貴金属', fx: '為替', met: '貴金属', unitM: 'ユーロ/グラム', chart: 'チャート', cross: 'パートナー通貨 · PTAX', conv: '貴金属 · 単位換算',
       pd: 'パラジウム', pt: 'プラチナ', au: '金', bid: '買値', ask: '売値', hi: '高値', lo: '安値', day: '前日比', ses: 'セッション', live: 'ライブ', stale: '遅延', off: 'オフライン', wait: '接続中',
       pair: '通貨ペア', last: '現在値', chg: '変化', time: '時刻', metal: '金属', close: '閉じる', back: 'ショーケース', rLive: 'ライブ',
-      noHist: 'この期間の日次データがないため、ライブセッションを表示しています。', histSt: '日次データ：センサー・テクノロジー社の記録（{d}まで）。以降はライブのスポット価格。', histEcb: '欧州中央銀行の日次参考レート。末尾はライブ値。', histAu: '日次終値。末尾はライブのスポット価格。', sesOnly: 'この画面を開いてから取得した値です。',
+      noHist: 'この期間の日次データがないため、ライブセッションを表示しています。', histSt: '日次データ：センサー・テクノロジー社の記録（{d}まで）。以降はライブのスポット価格。', histSt2: 'センサー・テクノロジー社の記録（{d}まで）、{d2}以降は営業日ごとのスポット価格の記録。末尾はライブ値。', histEcb: '欧州中央銀行の日次参考レート。末尾はライブ値。', histAu: '日次終値。末尾はライブのスポット価格。', sesOnly: 'この画面を開いてから取得した値です。',
       src: '参考用の仲値です。取引や決済には使用できません。', srcFx: '為替：AwesomeAPI', srcM: '貴金属：gold-api.com', srcH: '履歴：ECB（Frankfurter）、xaus.com',
       sesNote: '貴金属：この画面が前日の値を記録した後は前日比、それまではセッション開始時との比較。', ptax: 'PTAX＝ブラジル中央銀行の公式レート', eurg: 'EUR/g' },
     de: { title: 'MARKTMONITOR', sub: 'Währungen und Edelmetalle', fx: 'WÄHRUNGEN', met: 'EDELMETALLE', unitM: 'EUR je Gramm', chart: 'CHART', cross: 'PARTNERWÄHRUNGEN · PTAX', conv: 'METALLE · EINHEITEN',
       pd: 'PALLADIUM', pt: 'PLATIN', au: 'GOLD', bid: 'Geld', ask: 'Brief', hi: 'Hoch', lo: 'Tief', day: 'Tag', ses: 'Sitzung', live: 'LIVE', stale: 'VERZÖGERT', off: 'OFFLINE', wait: 'VERBINDE',
       pair: 'Paar', last: 'Letzter', chg: 'Änd.', time: 'Zeit', metal: 'Metall', close: 'Schließen', back: 'Showcase', rLive: 'LIVE',
-      noHist: 'Keine Tagesreferenz für diesen Zeitraum: Anzeige der Live-Sitzung.', histSt: 'Tagesreferenz: Aufzeichnungen der Sensor Technology bis {d}. Danach Live-Spot.', histEcb: 'Tägliche Referenzkurse der EZB. Am Ende der Live-Kurs.', histAu: 'Tagesschlusskurse. Am Ende der Live-Spot.', sesOnly: 'Kurse, die dieser Bildschirm seit dem Öffnen erfasst hat.',
+      noHist: 'Keine Tagesreferenz für diesen Zeitraum: Anzeige der Live-Sitzung.', histSt: 'Tagesreferenz: Aufzeichnungen der Sensor Technology bis {d}. Danach Live-Spot.', histSt2: 'Aufzeichnungen der Sensor Technology bis {d}; ab {d2} ein Spot-Eintrag je Werktag. Am Ende der Live-Spot.', histEcb: 'Tägliche Referenzkurse der EZB. Am Ende der Live-Kurs.', histAu: 'Tagesschlusskurse. Am Ende der Live-Spot.', sesOnly: 'Kurse, die dieser Bildschirm seit dem Öffnen erfasst hat.',
       src: 'Indikative Mittelkurse. Nicht für Handel oder Abrechnung.', srcFx: 'Devisen: AwesomeAPI', srcM: 'Metalle: gold-api.com', srcH: 'Historie: EZB via Frankfurter, xaus.com',
       sesNote: 'Metalle: Änderung gegenüber dem Vortag, sobald dieser Bildschirm ihn erfasst hat; bis dahin gegenüber dem Sitzungsbeginn.', ptax: 'PTAX = offizieller Kurs der brasilianischen Zentralbank', eurg: 'EUR/g' },
   };
@@ -680,6 +844,7 @@ const Viz = (() => {
     ecbLatest: 'https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,BRL',
     ecbHist: (from) => `https://api.frankfurter.dev/v1/${from}..?base=EUR&symbols=USD,BRL`,
     goldHist: 'https://xaus.com/api/v1/history',
+    daily: 'metais.json',
   };
   const POLL = 30000;
   const nf = (d) => new Intl.NumberFormat(LOC[lang], { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -817,6 +982,7 @@ const Viz = (() => {
     if (id === 'XAU' && goldRef && goldRef.pct != null && Date.now() - goldRef.t < 300000) return { pct: goldRef.pct, pk: 'day' };
     const p = store.prev && store.prev[id];
     if (p && p.v > 0 && (Date.now() - Date.parse(p.d + 'T12:00:00')) < 5.5 * 864e5) return { pct: (v / p.v - 1) * 100, pk: 'day' };
+    const dref = dailyPrev(id); if (dref) return { pct: (v / dref - 1) * 100, pk: 'day' };
     const a = SER[id]; if (a.length) return { pct: (v / a[0][1] - 1) * 100, pk: 'ses' };
     return { pct: 0, pk: 'ses' };
   }
@@ -848,6 +1014,21 @@ const Viz = (() => {
   const day0 = Date.parse(METALS_HIST.base + 'T12:00:00Z');
   HIST.XPD = METALS_HIST.d.map((d, i) => [day0 + d * 864e5, METALS_HIST.pd[i]]); HIST.XPT = METALS_HIST.d.map((d, i) => [day0 + d * 864e5, METALS_HIST.pt[i]]);
   const stRecUntil = HIST.XPD[HIST.XPD.length - 1][0];
+  // registros diários do repositório (metais.json): entram depois do último registro da Sensor
+  const KEY = { XPD: 'pd', XPT: 'pt', XAU: 'au' }; let DAILY = [], dailyP = null, dailyAt = 0, dailyFrom = 0;
+  function loadDaily() {
+    if (dailyP && Date.now() - dailyAt < 3600e3) return dailyP;
+    dailyAt = Date.now();
+    dailyP = getJSON(API.daily, 8000).then((j) => {
+      const rows = (j && j.dias || []).filter((x) => /^\d{4}-\d{2}-\d{2}$/.test(x.d || '')).map((x) => Object.assign({ t: Date.parse(x.d + 'T12:00:00Z') }, x)).filter((x) => x.t > stRecUntil).sort((a, b) => a.t - b.t);
+      const base = { XPD: METALS_HIST.pd, XPT: METALS_HIST.pt };
+      ['XPD', 'XPT'].forEach((id) => { HIST[id] = METALS_HIST.d.map((d, i) => [day0 + d * 864e5, base[id][i]]).concat(rows.filter((x) => isFinite(+x[KEY[id]]) && +x[KEY[id]] > 0).map((x) => [x.t, +x[KEY[id]]])); });
+      DAILY = rows; dailyFrom = rows.length ? rows[0].t : 0; return true;
+    }).catch(() => { dailyP = null; return false; });
+    return dailyP;
+  }
+  // último registro diário de um dia anterior a hoje (para a variação do dia), com no máximo 5,5 dias
+  function dailyPrev(id) { const today = new Date().toISOString().slice(0, 10); for (let i = DAILY.length - 1; i >= 0; i--) { const x = DAILY[i]; if (x.d < today) return Date.now() - x.t < 5.5 * 864e5 && +x[KEY[id]] > 0 ? +x[KEY[id]] : null; } return null; }
   function loadFxHist() {
     if (!fxHistP) { const from = new Date(Date.now() - 1830 * 864e5).toISOString().slice(0, 10);
       fxHistP = getJSON(API.ecbHist(from), 15000).then((j) => { fxHist = {}; const E = [], B = [], U = [];
@@ -869,11 +1050,11 @@ const Viz = (() => {
     let pts = [], note = '', gap = 0;
     const days = (RANGES.find((r) => r[0] === range) || [0, 0])[1];
     if (range !== 'live') {
-      if (m.kind === 'fx') await loadFxHist(); else if (m.id === 'XAU') await loadGoldHist();
+      if (m.kind === 'fx') await loadFxHist(); else if (m.id === 'XAU') await loadGoldHist(); else await loadDaily();
       if (seq !== drawSeq) return;
       const from = Date.now() - days * 864e5; const h = (HIST[m.id] || []).filter((p) => p[0] >= from);
       if (h.length >= 2) { pts = h.slice(); const s = S[m.id]; if (s) pts.push([Date.now(), s.v]);
-        if (m.kind === 'fx') note = L.histEcb; else if (m.id === 'XAU' && goldHistP) note = L.histAu; else { note = fill(L.histSt, { d: new Intl.DateTimeFormat(LOC[lang], { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(stRecUntil)) }); gap = 12 * 864e5; }
+        if (m.kind === 'fx') note = L.histEcb; else if (m.id === 'XAU' && goldHistP) note = L.histAu; else { const dfN = new Intl.DateTimeFormat(LOC[lang], dailyFrom && lang !== 'en' ? { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' } : { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }); note = dailyFrom ? fill(L.histSt2, { d: dfN.format(new Date(stRecUntil)), d2: dfN.format(new Date(dailyFrom)) }) : fill(L.histSt, { d: dfN.format(new Date(stRecUntil)) }); gap = 12 * 864e5; }
       } else note = L.noHist;
     }
     if (!pts.length) { pts = SER[m.id].slice(); if (range === 'live') note = L.sesOnly; }
@@ -897,9 +1078,10 @@ const Viz = (() => {
   document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
 
   texts(); tickClock(); setInterval(tickClock, 1000);
-  tick(); setInterval(tick, POLL);
+  // os registros diários chegam antes da primeira leitura (no máximo 1,2 s de espera), para a variação do dia já sair certa
+  Promise.race([loadDaily(), new Promise((r) => setTimeout(r, 1200))]).then(() => { tick(); setInterval(tick, POLL); });
   loadGoldHist();
-  window.ST_MONITOR = { S, SER, tick, select, setRange: (r) => { range = r; return drawChart(); } };
+  window.ST_MONITOR = { S, SER, tick, select, setRange: (r) => { range = r; return drawChart(); }, get daily() { return DAILY.slice(); } };
 })();
 
 </script>
