@@ -1,6 +1,9 @@
 {
   "unidade": "EUR/g",
   "fonte": "gold-api.com (spot, USD por onça troy) convertido pelo EUR/USD do momento do registro",
+  "atualizado": "2026-11-11T01:55:01Z",
+  "cambio": "BCE (Frankfurter)",
   "dias": [
+    {"d": "2026-11-10", "pd": 30.33, "pt": 44.78, "au": 116.01, "eurusd": 1.1214}
   ]
 }
