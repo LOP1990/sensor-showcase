@@ -1,9 +1,10 @@
 {
   "unidade": "EUR/g",
   "fonte": "gold-api.com (spot, USD por onça troy) convertido pelo EUR/USD de cada registro: fx \"momento\" = cotação do momento (AwesomeAPI); fx \"bce\" = taxa de referência do BCE do dia (Frankfurter)",
-  "atualizado": "2026-11-12T02:30:07Z",
+  "atualizado": "2026-11-13T02:06:21Z",
   "dias": [
     {"d": "2026-11-10", "pd": 30.33, "pt": 44.73, "au": 115.98, "eurusd": 1.1214, "fx": "bce"},
-    {"d": "2026-11-11", "pd": 30.6, "pt": 44.67, "au": 115.25, "eurusd": 1.1127, "fx": "bce"}
+    {"d": "2026-11-11", "pd": 30.6, "pt": 44.67, "au": 115.25, "eurusd": 1.1127, "fx": "bce"},
+    {"d": "2026-11-12", "pd": 29.29, "pt": 44.68, "au": 113.42, "eurusd": 1.1081, "fx": "bce"}
   ]
 }
